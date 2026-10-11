@@ -1,6 +1,8 @@
 <script lang="ts">
 	import { formatClock } from '../../core/time.ts';
-	import type { Session } from '../../session/session.svelte.ts';
+	import type { FullscreenControl } from '../../device/fullscreen.ts';
+	import type { Session, Warning } from '../../session/session.svelte.ts';
+	import Banner from '../parts/Banner.svelte';
 	import Button from '../parts/Button.svelte';
 	import ConfirmDialog from '../parts/ConfirmDialog.svelte';
 	import Icon from '../parts/Icon.svelte';
@@ -8,15 +10,51 @@
 	import Ring from '../parts/Ring.svelte';
 	import StatePill from '../parts/StatePill.svelte';
 
-	let { session, title }: { session: Session; title: string } = $props();
+	let {
+		session,
+		title,
+		fullscreen
+	}: { session: Session; title: string; fullscreen: FullscreenControl } = $props();
 
 	const display = $derived(session.display);
 	const paused = $derived(display.state === 'paused');
+
+	const WARNING_TEXT: Record<Warning, { message: string; detail: string }> = {
+		audio: {
+			message: 'ベルの音を出せません。',
+			detail: '端末の消音を解除するか、音量を上げてから画面を一度タップしてください。'
+		},
+		wakeLock: {
+			message: '画面のスリープを防げませんでした。',
+			detail: '端末の自動ロックを長めにしておくと安心です。'
+		}
+	};
+
+	function onkeydown(e: KeyboardEvent) {
+		session.handleKey(e);
+		// F：全画面。確認中と修飾キー付き、押しっぱなしは無視する
+		if (
+			e.key.toLowerCase() === 'f' &&
+			!e.ctrlKey && !e.altKey && !e.metaKey && !e.repeat &&
+			!session.confirming && fullscreen.supported
+		) {
+			e.preventDefault();
+			void fullscreen.toggle();
+		}
+	}
 </script>
 
-<svelte:window onkeydown={(e) => session.handleKey(e)} />
+<svelte:window {onkeydown} onpointermove={() => session.poke()} onpointerdown={() => session.poke()} />
 
-<div class="screen timer {display.state}">
+<div class="screen timer {display.state}" class:hidden-controls={session.controlsHidden}>
+	{#each session.warnings as w (w)}
+		<Banner
+			message={WARNING_TEXT[w].message}
+			detail={WARNING_TEXT[w].detail}
+			onclose={() => session.dismissWarning(w)}
+		/>
+	{/each}
+
 	<div class="top">
 		<p class="talk-title">{title}</p>
 		{#if display.next}
@@ -54,10 +92,18 @@
 		>
 			<Icon name="stop" filled />終了
 		</Button>
+		{#if fullscreen.supported}
+			<span class="fullscreen">
+				<Button size="lg" variant="ghost" iconOnly aria-label="全画面" onclick={() => fullscreen.toggle()}>
+					<Icon name="full" />
+				</Button>
+			</span>
+		{/if}
 	</div>
 
 	<div class="kbd-hints">
 		<span><Kbd>Space</Kbd>一時停止・再開</span>
+		{#if fullscreen.supported}<span><Kbd>F</Kbd>全画面</span>{/if}
 		<span><Kbd>Esc</Kbd>終了</span>
 	</div>
 
@@ -165,6 +211,25 @@
 		align-items: center;
 		gap: var(--space-3);
 		flex-wrap: nowrap;
+	}
+
+	/* 全画面ボタンは広い画面でだけ出す（値は .screen が渡す） */
+	.fullscreen {
+		display: var(--fullscreen-display);
+	}
+
+	/* 操作ボタンを隠した状態。位置は変えず、フェードして消す。カーソルも隠す */
+	.controls,
+	.kbd-hints {
+		transition: opacity var(--duration-slow) var(--easing-exit);
+	}
+	.hidden-controls {
+		cursor: none;
+	}
+	.hidden-controls .controls,
+	.hidden-controls .kbd-hints {
+		visibility: hidden;
+		opacity: 0;
 	}
 
 	.kbd-hints {

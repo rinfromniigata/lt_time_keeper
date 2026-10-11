@@ -104,6 +104,7 @@ svg {
   --controls-flex: 1 1 0;
   --controls-padding: var(--space-4);
   --kbd-hints-display: none;
+  --fullscreen-display: none;
   --settings-col-display: contents;
   --sound-test-flex: 1 1 100%;
   --sheet-align: end;
@@ -129,6 +130,7 @@ svg {
     --controls-flex: none;
     --controls-padding: var(--space-7);
     --kbd-hints-display: flex;
+    --fullscreen-display: inline-flex;
     --settings-col-display: flex;
     --sound-test-flex: none;
     --sheet-align: center;

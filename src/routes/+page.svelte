@@ -2,6 +2,7 @@
 	import { onMount } from 'svelte';
 	import { SettingsStore } from '#lib/settings/store.svelte.ts';
 	import { Session } from '#lib/session/session.svelte.ts';
+	import { BrowserFullscreen } from '#lib/device/fullscreen.ts';
 	import { BrowserWakeLock } from '#lib/device/wake_lock.ts';
 	import { AudioRinger } from '#lib/output/audio_ringer.ts';
 	import { CompositeRinger } from '#lib/output/composite_ringer.ts';
@@ -22,6 +23,9 @@
 
 	// 計測セッションは、開始で作り、終了で捨てる。設定は開始時点の複製を渡す
 	let session = $state<Session | null>(null);
+
+	// 全画面はブラウザの機能で、計測の開始・終了とは関係なく1つを使い回す
+	const fullscreen = new BrowserFullscreen();
 
 	function start() {
 		// 開始を続けて押しても、2回目は何もしない
@@ -57,6 +61,6 @@
 	{#if screen === 'settings'}
 		<SettingsScreen {settings} previewRinger={audioRinger} onstart={start} />
 	{:else if session}
-		<TimerScreen {session} title={settings.title} />
+		<TimerScreen {session} title={settings.title} {fullscreen} />
 	{/if}
 </main>
