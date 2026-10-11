@@ -31,8 +31,9 @@
 - [x] T2-2 【エージェント】`core/timer.ts`（開始・一時停止・再開、スナップショット）を実装する
   - 依存: T2-1
   - 実施メモ: imple §3.2 どおり。カウンターを持たず、開始時刻・一時停止の開始時刻・停止の合計から毎回計算する。二重の start／pause／resume と、未開始での pause は何もしない。開始前の snapshot は経過0。`progress` は超過で 1、それ以外は残り÷持ち時間。単体テスト `timer.test.ts` 10件（累計22件）、`check`、`check:tokens` 通過
-- [ ] T2-3 【エージェント】`core/bells.ts` の型定義（Bell・BellBase・Strikes）だけを先に置き、`settings/`（設定の型・初期値・持ち時間0の検証、保存インターフェースと「何もしない」実装、設定ストア）を実装する
+- [x] T2-3 【エージェント】`core/bells.ts` の型定義（Bell・BellBase・Strikes）だけを先に置き、`settings/`（設定の型・初期値・持ち時間0の検証、保存インターフェースと「何もしない」実装、設定ストア）を実装する
   - 依存: T2-1
+  - 実施メモ: `bells.ts` は型のみ。`settings/` は `settings.ts`（`Settings`・`DEFAULT_SETTINGS`・`validate`・`canStart`）、`repository.ts`（`SettingsRepository`・`NoopRepository`）、`store.svelte.ts`（`SettingsStore`）。`validate` の `silentBellIds` は常に空配列で、鳴らないベルの検出は T3-2 で足す。ストアは setter（持ち時間は 0..99:59 に、音量は 0..1 に収める）ごとに `save` を呼び、`snapshot()` でセッション用の複製を返す。ベルの追加・変更・削除は T3-2。ストアのテストは `$state` を使うため、`store.test.ts`（`.svelte.test.ts` は vitest の対象外）に置いた。単体テスト累計31件、`check`、`check:tokens` 通過
 - [ ] T2-4 【エージェント】部品を作る（ボタン各種、数値入力・持ち時間入力、プリセット、文字入力、状態ラベル、リング、確認ダイアログ）。S90 の状態をすべて持たせる
   - 依存: T1-3, T1-5
   - 画面: S90
