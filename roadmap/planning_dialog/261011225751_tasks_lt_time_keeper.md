@@ -1,7 +1,7 @@
 # lt_time_keeper 実装項目（tasks）
 
-- 設計: `261011205957_imple_lt_time_keeper.md`
-- 検証: `261011210245_walk_lt_time_keeper.md`（同じ Phase 番号の W 項目）
+- 設計: `261011225751_imple_lt_time_keeper.md`
+- 検証: `261011225751_walk_lt_time_keeper.md`（同じ Phase 番号の W 項目）
 - 進め方: Tn をすべて終えたら Wn を行い、Wn がすべて通過してから Phase n+1 に進む
 
 ---
@@ -15,7 +15,7 @@
   - 実施メモ: `sv` 1.1.1 で `--template minimal --types ts --add vitest=usages:unit playwright=demo:no sveltekit-adapter=adapter:static --install bun` を実行。adapter-static 4.0.0、kit 3.x、vite 8、vitest 4。ひな形のデモ（vitest-examples・e2e サンプル）は削除し、`.gitignore` に `roadmap/archived/` を戻した。`+layout.ts` に prerender・ssr、test スクリプトと Playwright の webServer を bun に変更。ユニットテストがまだ無いため `passWithNoTests` を有効化。`bun run check`・`bun run build` 通過
 - [x] T1-3 【エージェント】トークンとブランド資料を配置する（specs の tokens を `src/lib/theme/tokens.css` へ、brand.md とマスターSVGを `docs/brand/` へコピーし、`base.css` を作る）
   - 依存: T1-2
-  - 実施メモ: tokens は `lt_time_keeper_tokens_v1.css` を無変更で `src/lib/theme/tokens.css` へ（`cmp` で一致確認）。brand.md とマスターSVGは版番号付きのまま `docs/brand/` へ。`base.css` は reset・フォーカスリング・reduced-motion のみ（720px のブレークポイントは T2-7 で必要になった時点で足す）。`+layout.svelte` で両 CSS を読み込み
+  - 実施メモ: tokens は `lt_time_keeper_tokens_v2.css` を無変更で `src/lib/theme/tokens.css` へ（`cmp` で一致確認）。brand.md とマスターSVGは版番号付きのまま `docs/brand/` へ。`base.css` は reset・フォーカスリング・reduced-motion のみ（720px のブレークポイントは T2-7 で必要になった時点で足す）。`+layout.svelte` で両 CSS を読み込み
 - [x] T1-4 【エージェント】`scripts/check_tokens.ts` を作り、`bun run check:tokens` で実行できるようにする
   - 依存: T1-3
   - 実施メモ: 検査は(1) tokens.css が specs 最新版の tokens と一致、(2) src 内 .svelte・.css(tokens.css を除く)に色(#xxx・rgb(・hsl()と寸法(px・rem・ms)の直書きがない、の2点。コメントは除外。許可は base.css の `720px` のみ(スクリプト内 ALLOWED)。意図的な違反(直書き・tokens 改変)で失敗することを確認。型検査用に `@types/bun` を devDependencies に追加し、tsconfig の include に scripts を追加
@@ -91,6 +91,11 @@
   - 依存: T1-5, T2-5
   - 画面: S01, S01e
   - 実施メモ: `ui/parts/ThemeMenu.svelte` を追加し、S01 のヘッダーに配置。月のボタンで開き、最初のフォーカスは選択中の項目、↑↓・Home・End で移動、Esc でボタンへ戻って閉じる、外側の操作・Tab でも閉じる。選択は `theme.set`（`data-theme` の付け外し、保存なし）。check 0エラー・check:tokens・build 通過。画面での動作確認は W4-4 で行う
+- [x] T4-5 【エージェント】終了の確認（S03f）の最初のフォーカスを「終了する」にし、確認中の Space は何もしないようにする（キー割り当ては変えない）
+  - 依存: T4-3
+  - 画面: S03f
+  - 変更: `roadmap/development/261011225501_change_confirm_initial_focus.md`
+  - 実施メモ: `ConfirmDialog` に `initialFocus`（既定は従来どおりキャンセル側）を追加し、計測画面は `confirm` を渡す。Space は keydown・keyup とも `preventDefault` してボタンを押させない（案A）。キー割り当て（Enter・Esc）と Tab の循環は変更なし
 
 ## Phase 5: PWA とアイコン
 - [ ] T5-1 【エージェント】Service Worker を実装する（インストールした版のドキュメントで登録の挙動を確認、全資源の事前キャッシュ、版を含むキャッシュ名、古いキャッシュの削除、SKIP_WAITING）

@@ -66,7 +66,7 @@ test('Space で一時停止・再開でき、一時停止中は「再開」が�
 	await expect(digits(page)).toHaveText('4:45');
 });
 
-test('Esc で確認が出て「続ける」にフォーカスがあり、確認中も進む。Esc で閉じ、Enter で S01 に戻り値が残る', async ({
+test('Esc で確認が出て「終了する」にフォーカスがあり、確認中も進む。Esc で閉じ、Enter で S01 に戻り値が残る', async ({
 	page
 }) => {
 	await open(page);
@@ -79,7 +79,7 @@ test('Esc で確認が出て「続ける」にフォーカスがあり、確認�
 	await page.keyboard.press('Escape');
 	const dialog = page.getByRole('alertdialog');
 	await expect(dialog).toBeVisible();
-	await expect(page.getByRole('button', { name: '続ける' })).toBeFocused();
+	await expect(page.getByRole('button', { name: '終了する' })).toBeFocused();
 	await advance(page, 5_000);
 	await expect(digits(page)).toHaveText('9:45');
 
@@ -233,4 +233,33 @@ test('長い表示名は省略され、次のベルは隠れない。見出し�
 		expect(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth)).toBe(false);
 		await expect(page.locator('.next-bell .prefix')).toBeVisible({ visible: width === 1280 });
 	}
+});
+
+test('確認中の Space は、どちらのボタンにフォーカスがあっても何もしない。Tab は2つのボタンの間で回る', async ({
+	page
+}) => {
+	await open(page);
+	await page.getByRole('button', { name: '開始' }).click();
+	await page.keyboard.press('Escape');
+	const dialog = page.getByRole('alertdialog');
+	const confirm = page.getByRole('button', { name: '終了する' });
+	const cancel = page.getByRole('button', { name: '続ける' });
+	await expect(confirm).toBeFocused();
+
+	await page.keyboard.press('Space');
+	await expect(dialog).toBeVisible();
+	await expect(digits(page)).toBeVisible();
+
+	await page.keyboard.press('Tab');
+	await expect(cancel).toBeFocused();
+	await page.keyboard.press('Space');
+	await expect(dialog).toBeVisible(); // 「続ける」も押されない
+	await page.keyboard.press('Shift+Tab');
+	await expect(confirm).toBeFocused();
+	await page.keyboard.press('Tab');
+	await page.keyboard.press('Tab');
+	await expect(confirm).toBeFocused();
+
+	await page.keyboard.press('Enter');
+	await expect(page.getByRole('button', { name: '開始' })).toBeVisible();
 });

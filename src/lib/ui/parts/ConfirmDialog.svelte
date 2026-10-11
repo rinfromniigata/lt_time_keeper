@@ -2,8 +2,8 @@
 	import { onMount, type Snippet } from 'svelte';
 	import Button from './Button.svelte';
 
-	// 確認ダイアログ。最初のフォーカスは「キャンセル側（続ける）」に置く。
-	// Enter・Esc などのキー操作は呼び出し側（セッション）が担う。
+	// 確認ダイアログ。最初のフォーカスは initialFocus で選ぶ（既定はキャンセル側）。
+	// Enter・Esc などのキー操作は呼び出し側（セッション）が担う。Space は押し間違いで決定しないよう、ボタンを押させない。
 	// 配置は最も近い position: relative の祖先（.app）を覆う
 	interface Props {
 		title: string;
@@ -11,23 +11,40 @@
 		cancelLabel: string;
 		onconfirm: () => void;
 		oncancel: () => void;
+		initialFocus?: 'cancel' | 'confirm'; // 最初にフォーカスするボタン
 		children?: Snippet; // 本文
 		hints?: Snippet; // キー操作の案内
 	}
 
-	let { title, confirmLabel, cancelLabel, onconfirm, oncancel, children, hints }: Props = $props();
+	let {
+		title,
+		confirmLabel,
+		cancelLabel,
+		onconfirm,
+		oncancel,
+		initialFocus = 'cancel',
+		children,
+		hints
+	}: Props = $props();
 
 	const titleId = $props.id();
 	let dialog: HTMLDivElement;
 
 	onMount(() => {
 		const previous = document.activeElement instanceof HTMLElement ? document.activeElement : null;
-		dialog.querySelector('button')?.focus(); // 先頭のボタン＝キャンセル側
+		const buttons = dialog.querySelectorAll<HTMLElement>('button'); // 先頭＝キャンセル側、末尾＝確定側
+		(initialFocus === 'confirm' ? buttons[buttons.length - 1] : buttons[0])?.focus();
 		return () => previous?.focus();
 	});
 
+	// Space はボタンの標準操作（keyup で押したことになる）も含めて止める
+	function blockSpace(e: KeyboardEvent) {
+		if (e.key === ' ') e.preventDefault();
+	}
+
 	// フォーカスがダイアログの外へ出ないよう、Tab を2つのボタンの間で回す
 	function onkeydown(e: KeyboardEvent) {
+		blockSpace(e);
 		if (e.key !== 'Tab') return;
 		const buttons = dialog.querySelectorAll<HTMLElement>('button');
 		const first = buttons[0];
@@ -46,7 +63,7 @@
 <div class="layer">
 	<!-- Tab を回すためだけにキーを受ける。ダイアログ自体にはフォーカスしない -->
 	<!-- svelte-ignore a11y_interactive_supports_focus -->
-	<div bind:this={dialog} class="dialog" role="alertdialog" aria-modal="true" aria-labelledby={titleId} {onkeydown}>
+	<div bind:this={dialog} class="dialog" role="alertdialog" aria-modal="true" aria-labelledby={titleId} {onkeydown} onkeyup={blockSpace}>
 		<h3 id={titleId}>{title}</h3>
 		{#if children}<p class="body">{@render children()}</p>{/if}
 		{#if hints}<p class="body hints">{@render hints()}</p>{/if}

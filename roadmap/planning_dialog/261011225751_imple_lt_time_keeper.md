@@ -1,7 +1,7 @@
 # lt_time_keeper 実装設計（imple）
 
-- 対象スペック: `roadmap/specs/lt_time_keeper_SPEC_v1.md`（プランアセット v1）
-- 対応する tasks・walk: `261011210212_tasks_lt_time_keeper.md`・`261011210245_walk_lt_time_keeper.md`
+- 対象スペック: `roadmap/specs/lt_time_keeper_SPEC_v2.md`（プランアセット v2）
+- 対応する tasks・walk: `261011225751_tasks_lt_time_keeper.md`・`261011225751_walk_lt_time_keeper.md`
 
 ---
 
@@ -58,7 +58,7 @@ src/
    ├─ pwa/
    │  └─ update.svelte.ts   新しい Service Worker の検知と切り替え
    ├─ theme/
-   │  ├─ tokens.css         specs の tokens_v1.css の写し（値の唯一の置き場）
+   │  ├─ tokens.css         specs の tokens_v2.css の写し（値の唯一の置き場）
    │  ├─ base.css           リセット・共通の土台（値はトークン参照のみ）
    │  └─ theme.svelte.ts    テーマの選択（system / light / dark）と data-theme の反映
    └─ ui/
@@ -280,7 +280,7 @@ export class UpdateNotifier {
 
 ### 3.9 theme・ui
 
-- `tokens.css` は specs の `lt_time_keeper_tokens_v1.css` を変更なしでコピーする。`--mock-` の値と、モックで vw を cqi に読み替えた部分は持ち込まない
+- `tokens.css` は specs の `lt_time_keeper_tokens_v2.css` を変更なしでコピーする。`--mock-` の値と、モックで vw を cqi に読み替えた部分は持ち込まない
 - 部品は値をトークンからだけ参照する。モックにある計算式（例: `calc(var(--ring-size) * var(--ring-digit-ratio))`）は、トークンどうしの計算として書いてよい
 - 広い画面（720px以上）の配置は、`.app` をコンテナにしたコンテナクエリで切り替える（720px はトークンにない値のため、ブレークポイントの定数として `base.css` の1か所にだけ書き、`check_tokens.ts` の例外に登録する）
 - テーマは `<html data-theme>` を付け外しする。「OSに合わせる」では属性を外す

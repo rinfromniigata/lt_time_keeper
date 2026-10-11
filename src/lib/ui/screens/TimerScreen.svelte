@@ -114,6 +114,7 @@
 			cancelLabel="続ける"
 			onconfirm={() => session.confirmFinish()}
 			oncancel={() => session.cancelFinish()}
+			initialFocus="confirm"
 		>
 			経過 {formatClock(session.snapshot.elapsedMs)} ／ {formatClock(session.durationMs)}。終了すると設定画面に戻ります。計測はこのあいだも続いています。
 			{#snippet hints()}
