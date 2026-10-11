@@ -1,12 +1,36 @@
 <!doctype html>
-<html lang="en">
+<html lang="ja">
 	<head>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<meta name="text-scale" content="scale" />
+		<title>LTタイムキーパー</title>
 		%sveltekit.head%
 	</head>
 	<body data-sveltekit-preload-data="hover">
+		<!-- UIアイコンのスプライト。<use href="#i-…"> で参照する（線の太さ・色は .icon のCSSで指定） -->
+		<svg width="0" height="0" style="position: absolute" aria-hidden="true" focusable="false">
+			<symbol id="i-pause" viewBox="0 0 24 24"><rect x="6" y="5" width="4" height="14" rx="1" /><rect x="14" y="5" width="4" height="14" rx="1" /></symbol>
+			<symbol id="i-play" viewBox="0 0 24 24"><path d="M7 5l12 7-12 7z" /></symbol>
+			<symbol id="i-stop" viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="2" /></symbol>
+			<symbol id="i-full" viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5" /></symbol>
+			<symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" /></symbol>
+			<symbol id="i-minus" viewBox="0 0 24 24"><path d="M5 12h14" /></symbol>
+			<symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18" /></symbol>
+			<symbol id="i-bell" viewBox="0 0 24 24"><path d="M6 16V11a6 6 0 0 1 12 0v5l2 2H4z" /><path d="M10 20a2 2 0 0 0 4 0" /></symbol>
+			<symbol id="i-alert" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" /><path d="M12 7v6M12 16.5v.5" /></symbol>
+			<symbol id="i-back" viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7" /></symbol>
+			<symbol id="i-moon" viewBox="0 0 24 24"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z" /></symbol>
+			<!-- ブランドのマーク（docs/brand のマスターSVGと同じ図形。固定色のため、スプライトはここに置く） -->
+			<symbol id="ic-brand" viewBox="0 0 1024 1024"><rect width="1024" height="1024" fill="#121316" /><circle cx="512" cy="512" r="280" fill="none" stroke="#2a2d33" stroke-width="120" /><path d="M512 232 A280 280 0 1 1 245.7 598.5" fill="none" stroke="#3ccf7a" stroke-width="120" stroke-linecap="round" /></symbol>
+		</svg>
+
+		<!-- S00 起動中。アプリが表示できる状態になったら +page.svelte が取り除く -->
+		<div id="splash" class="splash" role="status">
+			<svg class="mark" aria-hidden="true"><use href="#ic-brand" /></svg>
+			<div class="row"><span class="spinner" aria-hidden="true"></span><span>読み込み中…</span></div>
+		</div>
+
 		<div style="display: contents">%sveltekit.body%</div>
 	</body>
 </html>

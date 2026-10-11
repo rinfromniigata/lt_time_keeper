@@ -19,9 +19,10 @@
 - [x] T1-4 【エージェント】`scripts/check_tokens.ts` を作り、`bun run check:tokens` で実行できるようにする
   - 依存: T1-3
   - 実施メモ: 検査は(1) tokens.css が specs 最新版の tokens と一致、(2) src 内 .svelte・.css(tokens.css を除く)に色(#xxx・rgb(・hsl()と寸法(px・rem・ms)の直書きがない、の2点。コメントは除外。許可は base.css の `720px` のみ(スクリプト内 ALLOWED)。意図的な違反(直書き・tokens 改変)で失敗することを確認。型検査用に `@types/bun` を devDependencies に追加し、tsconfig の include に scripts を追加
-- [ ] T1-5 【エージェント】起動画面と画面の土台を作る（`app.html` に S00 の静的マークアップ、UIアイコンのスプライト、`+page.svelte` の画面切り替えの枠、`theme.svelte.ts`）
+- [x] T1-5 【エージェント】起動画面と画面の土台を作る（`app.html` に S00 の静的マークアップ、UIアイコンのスプライト、`+page.svelte` の画面切り替えの枠、`theme.svelte.ts`）
   - 依存: T1-3
   - 画面: S00
+  - 実施メモ: S00 は `app.html` の静的マークアップ(`#splash`)+ `theme/splash.css`(トークン参照のみ)。スプライトも `app.html` に置いた(ブランドのマークは固定色のため CSS 検査の対象外にしたい)。`+page.svelte` の `onMount` で `#splash` を取り除く。画面は `'settings' | 'timer'` の状態で切り替える枠だけ(中身は T2-5・T2-7)。`theme.svelte.ts` は ThemeChoice と `theme.set()`(`data-theme` の付け外し)。Playwright で、ビルドを開いて S00 が消え枠が出ることを確認(Chromium を導入済み)。S00 の見た目のユーザー確認は W1 で行う
 
 ## Phase 2: タイマーの核と最小の計測（持ち時間だけで計れる）
 - [ ] T2-1 【エージェント】`core/time.ts`（時刻源の型、表示の変換）を実装する
