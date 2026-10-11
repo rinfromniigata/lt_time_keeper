@@ -43,8 +43,9 @@
   - 画面: S01, S01a
   - 実施メモ: `ui/screens/SettingsScreen.svelte`（ヘッダー・持ち時間パネル・表示名パネル・開始バー）と `ui/parts/Panel.svelte` を追加。`+page.svelte` で `SettingsStore` を持ち、開始で `timer` に切り替える（計測画面は仮置きで、S01 に戻る「終了」だけ。開始は画面が settings のときだけ受け付ける）。広い画面の配置は、`base.css` に `.app`（コンテナ）と `.screen` の値（`--settings-columns` など）を置き、720px の判定をそこ1か所にした。各画面は `class="screen"` の要素でその値を読む（T2-7 の計測画面もこの方式）。右の列（ベル・音）は T3-5 で足すため、広い画面では左の列だけが表示される。開始バーの件数表示も T3-5。モバイル幅・デスクトップ幅・ライト・ダーク・0:00 のエラーをスクリーンショットで確認。e2e（`e2e/settings.e2e.ts` 3件：反映・0:00 と上限・横スクロールなし）を追加し通過。W2-3・W2-6 の確認の一部は済んだが、項目のチェックは W2 で行う
   - ベル・音・テーマのボタンは Phase 3・4 で足す
-- [ ] T2-6 【エージェント】`session/session.svelte.ts` の第1段階を実装する（タイマーの駆動、rAF のループ、表示用の値、一時停止・再開、終了の確認、Space・Esc・Enter のキー操作）
+- [x] T2-6 【エージェント】`session/session.svelte.ts` の第1段階を実装する（タイマーの駆動、rAF のループ、表示用の値、一時停止・再開、終了の確認、Space・Esc・Enter のキー操作）
   - 依存: T2-2, T2-3
+  - 実施メモ: `Session`（deps は `now`・`onfinish`・テスト用の `frames`）。`snapshot`（毎フレーム取り直す）、`display`（`digits`・`state`・`sub`）、`confirming`、`start`・`togglePause`・`requestFinish`・`cancelFinish`・`confirmFinish`・`finish`・`handleKey`。imple からの差分：(1) `display` に `state`（一時停止を優先した表示用の状態）を足し、`sub` は通常のときだけ文字列・それ以外は null（状態ラベルを出す位置のため）、(2) 「終了する」の確定は `confirmFinish()`（`finish()` で後片付けしたあと `onfinish` で S01 へ戻す）。(3) `next`・`warnings`・`controlsHidden`・`poke`・`dismissWarning` と deps の `ringer`・`wakeLock` は T3-6・T4-2 で足す。予鈴の時点（`warnAtElapsedMs`）は null で渡しており、T3-6 で bells から求めて渡す。キー操作は `handleKey` が受けるだけで、`window` への登録は T2-7 の計測画面が行う。Space はボタンにフォーカスがあるとボタン自身に任せ、確認中は無視。確認中の Enter は `preventDefault` して、フォーカス中の「続ける」が押されないようにする。単体テスト `session.test.ts` 15件（累計47件）、`check`、`check:tokens` 通過
 - [ ] T2-7 【エージェント】計測画面を実装する（表示名、リング、数字、経過／持ち時間、状態ラベル、超過の明滅、一時停止、終了の確認、キー操作の案内、広い画面の配置）。終了で S01 に戻り、値が残ること
   - 依存: T2-4, T2-5, T2-6
   - 画面: S03, S03b, S03c, S03f
