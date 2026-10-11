@@ -38,9 +38,10 @@
   - 依存: T1-3, T1-5
   - 画面: S90
   - 実施メモ: `src/lib/ui/parts/` に Button（主・通常・ゴースト・危険・危険の塗り、md／lg、アイコンのみ）、Icon、NumberField、DurationInput（分・秒・増減・0:00〜99:59）、PresetChips、TextField、StatePill、Ring、ConfirmDialog、FieldError、`state.ts`（DisplayState）を作成。hover・focus・disabled はモックのような `is-hover` 等のクラスではなく、実際の `:hover`・`:focus-visible`・`:disabled` で持たせた（hover は disabled 時に効かない）。値はトークン参照のみ。リングは `pathLength="100"`、超過の明滅は `prefers-reduced-motion` で止める。確認は、使い捨ての試験ページ（削除済み）を Playwright で操作して行った：増減・プリセット・直接入力（秒75→59、分の3桁目は入らない）・矢印キー・0:00 での「−」無効・ダイアログの初期フォーカスが「続ける」・Tab が2ボタンの間で回ること。見た目のスクリーンショットも確認。ダイアログの Enter・Esc は未実装（T2-6 のセッションが担い、フォーカス中のボタンの Enter と二重にならないよう注意する）。警告バナー・ベルの行・シート・セグメント・スイッチ・スライダー・空の状態は T3-4 以降
-- [ ] T2-5 【エージェント】設定画面の第1段階を実装する（ヘッダーのブランド表示、持ち時間、表示名、開始バー、持ち時間0のエラー）
+- [x] T2-5 【エージェント】設定画面の第1段階を実装する（ヘッダーのブランド表示、持ち時間、表示名、開始バー、持ち時間0のエラー）
   - 依存: T2-3, T2-4
   - 画面: S01, S01a
+  - 実施メモ: `ui/screens/SettingsScreen.svelte`（ヘッダー・持ち時間パネル・表示名パネル・開始バー）と `ui/parts/Panel.svelte` を追加。`+page.svelte` で `SettingsStore` を持ち、開始で `timer` に切り替える（計測画面は仮置きで、S01 に戻る「終了」だけ。開始は画面が settings のときだけ受け付ける）。広い画面の配置は、`base.css` に `.app`（コンテナ）と `.screen` の値（`--settings-columns` など）を置き、720px の判定をそこ1か所にした。各画面は `class="screen"` の要素でその値を読む（T2-7 の計測画面もこの方式）。右の列（ベル・音）は T3-5 で足すため、広い画面では左の列だけが表示される。開始バーの件数表示も T3-5。モバイル幅・デスクトップ幅・ライト・ダーク・0:00 のエラーをスクリーンショットで確認。e2e（`e2e/settings.e2e.ts` 3件：反映・0:00 と上限・横スクロールなし）を追加し通過。W2-3・W2-6 の確認の一部は済んだが、項目のチェックは W2 で行う
   - ベル・音・テーマのボタンは Phase 3・4 で足す
 - [ ] T2-6 【エージェント】`session/session.svelte.ts` の第1段階を実装する（タイマーの駆動、rAF のループ、表示用の値、一時停止・再開、終了の確認、Space・Esc・Enter のキー操作）
   - 依存: T2-2, T2-3

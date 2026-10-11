@@ -74,3 +74,39 @@ svg {
     scroll-behavior: auto;
   }
 }
+
+/* アプリの枠。720px以上かどうかは、この .app をコンテナにして判定する */
+.app {
+  container: app / size;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;
+  overflow: hidden;
+  background: var(--color-bg);
+  color: var(--color-text);
+}
+
+/* 画面の最上位の要素（class="screen"）に、幅に応じた配置の値を渡す。
+   ブレークポイントの値は、ここ1か所にだけ書く */
+.screen {
+  --settings-padding: var(--space-4);
+  --settings-columns: 1fr;
+  --settings-gap: var(--space-4);
+  --start-bar-direction: column;
+  --start-bar-gap: var(--space-2);
+  --start-width: 100%;
+  --start-min-width: 0;
+}
+
+@container app (min-width: 720px) {
+  .screen {
+    --settings-padding: var(--space-6);
+    --settings-columns: 1fr 1fr;
+    --settings-gap: var(--space-5);
+    --start-bar-direction: row;
+    --start-bar-gap: var(--space-5);
+    --start-width: auto;
+    --start-min-width: var(--start-button-min);
+  }
+}
