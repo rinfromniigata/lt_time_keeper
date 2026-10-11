@@ -12,9 +12,10 @@
 		value: number;
 		error?: boolean;
 		idPrefix?: string;
+		steppers?: boolean; // 増減ボタンを出すか（ベルの編集では出さない）
 	}
 
-	let { value = $bindable(), error = false, idPrefix = 'duration' }: Props = $props();
+	let { value = $bindable(), error = false, idPrefix = 'duration', steppers = true }: Props = $props();
 
 	const minutes = $derived(Math.floor(value / MINUTE));
 	const seconds = $derived(Math.floor(value / SECOND) % 60);
@@ -34,37 +35,41 @@
 	<div class="num-box">
 		<NumberField id="{idPrefix}-min" label="分" max={99} {error} bind:value={() => minutes, setMinutes} />
 		<span class="unit">分</span>
-		<div class="steppers">
-			<Button iconOnly aria-label="1分減らす" disabled={value < MINUTE} onclick={() => add(-MINUTE)}>
-				<Icon name="minus" />
-			</Button>
-			<Button
-				iconOnly
-				aria-label="1分増やす"
-				disabled={value + MINUTE > MAX_INPUT_MS}
-				onclick={() => add(MINUTE)}
-			>
-				<Icon name="plus" />
-			</Button>
-		</div>
+		{#if steppers}
+			<div class="steppers">
+				<Button iconOnly aria-label="1分減らす" disabled={value < MINUTE} onclick={() => add(-MINUTE)}>
+					<Icon name="minus" />
+				</Button>
+				<Button
+					iconOnly
+					aria-label="1分増やす"
+					disabled={value + MINUTE > MAX_INPUT_MS}
+					onclick={() => add(MINUTE)}
+				>
+					<Icon name="plus" />
+				</Button>
+			</div>
+		{/if}
 	</div>
 	<div class="colon" aria-hidden="true">:</div>
 	<div class="num-box">
 		<NumberField id="{idPrefix}-sec" label="秒" max={59} {error} bind:value={() => seconds, setSeconds} />
 		<span class="unit">秒</span>
-		<div class="steppers">
-			<Button iconOnly aria-label="10秒減らす" disabled={value < TEN_SECONDS} onclick={() => add(-TEN_SECONDS)}>
-				<Icon name="minus" />
-			</Button>
-			<Button
-				iconOnly
-				aria-label="10秒増やす"
-				disabled={value + TEN_SECONDS > MAX_INPUT_MS}
-				onclick={() => add(TEN_SECONDS)}
-			>
-				<Icon name="plus" />
-			</Button>
-		</div>
+		{#if steppers}
+			<div class="steppers">
+				<Button iconOnly aria-label="10秒減らす" disabled={value < TEN_SECONDS} onclick={() => add(-TEN_SECONDS)}>
+					<Icon name="minus" />
+				</Button>
+				<Button
+					iconOnly
+					aria-label="10秒増やす"
+					disabled={value + TEN_SECONDS > MAX_INPUT_MS}
+					onclick={() => add(TEN_SECONDS)}
+				>
+					<Icon name="plus" />
+				</Button>
+			</div>
+		{/if}
 	</div>
 </div>
 

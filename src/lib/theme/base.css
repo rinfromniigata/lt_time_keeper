@@ -102,6 +102,11 @@ svg {
   --controls-flex: 1 1 0;
   --controls-padding: var(--space-4);
   --kbd-hints-display: none;
+  --sheet-align: end;
+  --sheet-layer-padding: 0;
+  --sheet-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  --sheet-max-width: none;
+  --sheet-grabber-display: block;
 }
 
 @container app (min-width: 720px) {
@@ -118,5 +123,10 @@ svg {
     --controls-flex: none;
     --controls-padding: var(--space-7);
     --kbd-hints-display: flex;
+    --sheet-align: center;
+    --sheet-layer-padding: var(--space-4);
+    --sheet-radius: var(--radius-lg);
+    --sheet-max-width: calc(var(--start-button-min) * 1.2);
+    --sheet-grabber-display: none;
   }
 }

@@ -61,9 +61,10 @@
 - [x] T3-3 【エージェント】`output/`（Ringer インターフェース、Web Audio のベル音、振動、まとめ役）を実装する
   - 依存: T3-1
   - 実施メモ: `src/lib/output/` に `ringer.ts`（`Ringer`、音と振動で共有する打ち始めの間隔 `STRIKE_INTERVAL_MS` = 700ms）、`audio_ringer.ts`、`vibration_ringer.ts`、`composite_ringer.ts` を追加。`AudioRinger` は `unlock` で AudioContext を作って resume し（作れない・resume できない環境でも例外は出さず `blocked` で伝える）、ベル音は基音880Hzに倍音2つ（2.4倍・4.1倍）を重ねた正弦波を指数減衰させ、複数回は間隔をあけて先にスケジュールする。音量は GainNode で、unlock 前の `setVolume` も保持する。`VibrationRinger` は `isSupported()` と、回数分のパルスを返す `vibrationPattern` を持つ。`CompositeRinger` は Ringer の配列を受け取り、imple の「振動オフなら音だけ」は、振動の Ringer を渡さないことで表す（組み立ては T3-6）。`blocked` はどれかが blocked なら true。単体テスト 13件追加（累計98件、AudioContext は代役で確認）、`check`、`check:tokens` 通過。実際の音の聞こえ方は T3-5 の「鳴らしてみる」ができてから W3 で確認する
-- [ ] T3-4 【エージェント】部品を足す（ベルの行、編集シート／ダイアログ、セグメント、スイッチ、音量スライダー、空の状態）
+- [x] T3-4 【エージェント】部品を足す（ベルの行、編集シート／ダイアログ、セグメント、スイッチ、音量スライダー、空の状態）
   - 依存: T2-4
   - 画面: S90
+  - 実施メモ: `ui/parts/` に `BellRow`・`BellEditor`（`BellValues` も export）・`Segmented`・`Switch`・`VolumeSlider`・`EmptyState` を追加。(1) `BellRow` はモックの「行全体が1つのリンク」を、入れ子のボタンを避けるため「行の本体＝編集を開くボタン」と「右端の×＝削除ボタン」の2つに分けた。補足文は `bellNote` の結果（`'warn'|'over'|'silent'|null`）を受け、silent は行の枠を危険色にする。(2) `BellEditor` は `mode='add'|'edit'`（edit は 削除／決定、add は キャンセル／決定）。編集中の値は決定まで反映しない。Esc・暗い背景のクリックは取りやめ（`oncancel`）、Tab はシート内で回り、閉じたら元のフォーカスに戻す。狭い画面は下のシート、広い画面は中央のダイアログで、配置の値（`--sheet-*`）は `base.css` の `.screen` に追加した（720px の判定は1か所のまま）。時刻の入力は `DurationInput` に `steppers` 引数を足して増減ボタンを出さない形で再利用（モックのシートに増減ボタンがないため）。(3) `Segmented` は radiogroup で、選択中だけが Tab で止まり矢印キーで移る。(4) `Switch` は `role="switch"`、見た目の溝より高い押せる領域を持たせた。(5) `VolumeSlider` は 0〜1 を `bind:value` で受ける。ラベル（「音量」）と「鳴らしてみる」は T3-5。確認は、使い捨ての試験ページ（削除済み）を Playwright で操作して行った：行の開く／削除、スイッチのクリック・Space・disabled、スライダーの Home／End、セグメントの矢印キーとフォーカス移動、追加・編集シートの 決定・キャンセル・削除・Esc・背景クリック、Tab がシートの外へ出ないこと、フォーカスの復帰、モバイルでシートが下端・デスクトップで中央、横スクロールなし。ライト・ダーク、モバイル・デスクトップのスクリーンショットも確認。`check`・`check:tokens`・`build`・単体テスト98件通過
 - [ ] T3-5 【エージェント】設定画面にベルと音を足す（一覧・番号・補足文・追加・削除、ベルなし、ベル多数、編集シート、鳴らないベルの警告、音量・鳴らしてみる・振動のスイッチ、開始バーの件数）
   - 依存: T3-2, T3-3, T3-4, T2-5
   - 画面: S01, S01a, S01b, S01c, S01d
