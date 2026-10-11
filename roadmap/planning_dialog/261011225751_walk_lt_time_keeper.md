@@ -138,9 +138,9 @@
 - [x] W5-5 【エージェント】Chrome の Lighthouse（またはDevToolsのApplication）で、インストール可能と判定される
   - 依存: T5-1, T5-3
   - 実施メモ: `e2e/pwa.e2e.ts`。Lighthouse には PWA カテゴリが残っていないため、DevTools の Application が使うものと同じ CDP の `Page.getInstallabilityErrors` と `Page.getAppManifest` を Chromium で確認した。インストール可否のエラーが0件、manifest の読み込みエラーが0件。通過
-- [ ] W5-6 【ユーザー】Windows と macOS の Chrome で PWA としてインストールし、タスクバー・Dock・タブのアイコンの見え方を確認する。Android ではホーム画面のアイコン（丸型マスク）を確認する
+- [x] W5-6 【ユーザー】Windows と macOS の Chrome で PWA としてインストールし、タスクバー・Dock・タブのアイコンの見え方を確認する。Android ではホーム画面のアイコン（丸型マスク）を確認する
   - 依存: T5-3
-- [ ] W5-7 【ユーザー】モックと実物を並べて、更新のお知らせと、インストール後の起動画面を確認する
+- [x] W5-7 【ユーザー】モックと実物を並べて、更新のお知らせと、インストール後の起動画面を確認する
   - 依存: T5-4
   - 画面: S00, S01f
 
