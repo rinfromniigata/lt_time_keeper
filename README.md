@@ -1,54 +1,57 @@
-# sv
+# LTタイムキーパー
 
-Everything you need to build a Svelte project, powered by [`sv`](https://github.com/sveltejs/cli).
+ライトニングトークなどの持ち時間を計るタイマーです。ブラウザで動き、PWA としてインストールしてオフラインでも使えます。
 
-## Creating a project
+公開先: https://lt.rinontech.com/
 
-If you're seeing this, you've probably already done this step. Congrats!
+## 必要なもの
 
-```sh
-# create a new project
-npx sv create my-app
-```
+- [Bun](https://bun.sh/) 1.4.x
 
-To recreate this project with the same configuration:
+## 開発
 
 ```sh
-# recreate this project
-bun x sv@1.1.1 create --template minimal --types ts --add vitest="usages:unit" playwright="demo:no" sveltekit-adapter="adapter:static" --no-download-check --install bun .
+bun install
+bun run dev
 ```
 
-## Adding features
-
-Add features to your project with `sv add`:
+## 確認
 
 ```sh
-npx sv add
+bun run check:tokens   # トークンの一致と、色・寸法の直書きがないことを検査
+bun run check          # 型検査（svelte-check、Service Worker の tsc）
+bun run test:unit      # 単体テスト（Vitest。監視モード。1回だけなら末尾に --run）
+bun run test           # 単体テスト（1回）と e2e（Playwright）
 ```
 
-For example, to add Tailwind CSS:
+`bun run test` の e2e は、実行前に Playwright のブラウザを入れ、ビルドしてプレビューを起動します。
+
+## ビルド
 
 ```sh
-npx sv add tailwindcss
+bun run build     # 静的サイトを build/ に出力
+bun run preview   # build/ をローカルで確認
 ```
 
-## Developing
+## アイコン生成
 
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
+アイコン一式・OGP 画像・`manifest.webmanifest` は、`roadmap/specs/` の最新版のマスターSVGとトークンから生成します。
 
 ```sh
-npm run dev
-
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
+bun run gen:icons
 ```
 
-## Building
+出力は `static/icons/` と `static/manifest.webmanifest` で、生成物はリポジトリに含めます（CI では生成しません）。マスターSVGやトークンを更新したときに実行し、`app.html` の `theme-color` も合わせて確認してください。
 
-To create a production version of your app:
+## リリース
 
-```sh
-npm run build
-```
+`v*` タグを push すると、GitHub Actions が検査とビルドを通し、`build/` の zip を添付したドラフトリリースを作ります。変更履歴は [CHANGELOG.md](CHANGELOG.md) に記録します。公開先へのデプロイは Cloudflare Pages の GitHub 連携で行います。
 
-You can preview the production build with `npm run preview`.
+## ドキュメント
+
+- `docs/brand/`: ブランド資料とマスターSVG
+- `roadmap/`: 仕様・設計・実装計画・検証の記録
+
+## ライセンス
+
+[LICENSE](LICENSE) を参照してください。

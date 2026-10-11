@@ -119,7 +119,8 @@
 - [x] T6-2 【エージェント】`.github/workflows/release.yml` を作る（`v*` タグで起動、check:tokens・check・test・build、build の zip をドラフトリリースに添付）
   - 実施メモ: `.github/workflows/release.yml` を追加。`v*` タグで起動し、ubuntu-latest で setup-bun（1.4.3）→ `bun install --frozen-lockfile` → `check:tokens` → `check` → Playwright のシステム依存（`playwright install-deps chromium`）→ `test` → `build` → `build/` を `lt-time-keeper-<タグ>.zip` にして softprops/action-gh-release でドラフトリリースに添付。権限は `contents: write` のみ。アクションの版は GitHub の最新リリースで確認（checkout v7、setup-bun v2、action-gh-release v3）。実行手順の検証は W6-1
   - 依存: T1-4
-- [ ] T6-3 【エージェント】`README.md` に開発・ビルド・アイコン生成のコマンドを書く
+- [x] T6-3 【エージェント】`README.md` に開発・ビルド・アイコン生成のコマンドを書く
+  - 実施メモ: `README.md` をひな形（sv の案内）から日本語に書き直した。概要・必要なもの（Bun 1.4.x）・開発・確認（check:tokens／check／test:unit／test）・ビルド・アイコン生成（`gen:icons`、入力は specs の最新版、生成物はリポジトリに含める）・リリース・ドキュメント・ライセンス。コマンドは `package.json` の scripts と照合した
   - 依存: T5-2
 - [ ] T6-4 【ユーザー】Cloudflare Pages のプロジェクトを作り、GitHub 連携・ビルド設定（`bun run build`、`build`、`BUN_VERSION=1.4.3`）・独自ドメイン `lt.rinontech.com` を設定する
 - [ ] T6-5 【エージェント】リリース前の確認をする（ローカルビルド、アイコンが specs の最新のマスターSVGから生成されていること）。コミットメッセージとタグのコマンドを提示する
