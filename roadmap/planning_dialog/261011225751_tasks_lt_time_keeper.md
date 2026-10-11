@@ -113,7 +113,8 @@
   - 実施メモ: `src/lib/pwa/update.svelte.ts` に `UpdateNotifier`（`available`・`dismissed`・`start`・`stop`・`reload`・`dismiss`）を追加。ブラウザの API は注入できる形（`WorkerContainer`・`WorkerRegistration`）にして単体テスト10件（累計150件）。(1) 検知: `serviceWorker.ready` のあとで、待機中の SW があるか、`updatefound` → `installed` で待機に入ったら `available`。ただし `controller` がない（初回の有効化）ときは更新とみなさない。(2) 切り替え: `reload()` は待機中の SW に `SKIP_WAITING` を送り、`controllerchange` で読み込み直す（自分が選んだときだけ。初回の有効化の `clients.claim` では読み込み直さない）。待機中の SW がなければそのまま読み込み直す。(3) imple にない追加: 開いたとき1回と、画面が見える状態に戻ったときに `registration.update()` を呼ぶ（開きっぱなしのタブでも更新を拾うため）。表示は `SettingsScreen` の上部に既存の `Banner`（お知らせの色）を、列の数にかかわらず1行で置く。文言はモックどおり、「再読み込み」ボタンと×。S01 のときだけ出るのは、`SettingsScreen` にしか置いていないため（計測中に受け取っても S01 に戻ると出る）。×で閉じたあとは同じページを開いているあいだ出さない（`dismissed`）。`+page.svelte` で `onMount` に `start`、後片付けで `stop`。e2e 3件を `e2e/pwa.e2e.ts` に追加（全51件通過）：待機→お知らせ→（値が残ったまま）再読み込みで初期値に戻りお知らせが消える、×で閉じる、計測中は出さず S01 に戻ると出る。新しい版は、プレビューが配信する `.svelte-kit/output/client/service-worker.js` に1行足して作り、終了時に戻す（`context.route` は SW 本体の更新取得に効かなかったため）。SKIP_WAITING による実際の切り替えもここで確認済み。スクリーンショット（モバイル・デスクトップ）も確認。モバイル幅では文面が狭い列で折り返す。モックとの見比べは W5 でユーザーが行う
 
 ## Phase 6: リリース準備
-- [ ] T6-1 【エージェント】`CHANGELOG.md`（Keep a Changelog）を作り、`package.json` の version を 0.1.0 にする
+- [x] T6-1 【エージェント】`CHANGELOG.md`（Keep a Changelog）を作り、`package.json` の version を 0.1.0 にする
+  - 実施メモ: `CHANGELOG.md` を Keep a Changelog 形式で新規作成（`[Unreleased]` と `[0.1.0] - 2026-10-11`、比較リンクは origin の `rinfromniigata/lt_time_keeper`）。`package.json` の version を 0.0.1 → 0.1.0 に更新。バージョン表記は `package.json` だけ（Tauri 等なし）で、他に 0.0.1 の残りなし。Service Worker のキャッシュ名はビルド時に `cache-0.1.0+…` になる（W6-2 で実ビルドを確認する）
   - 依存: T5-4
 - [ ] T6-2 【エージェント】`.github/workflows/release.yml` を作る（`v*` タグで起動、check:tokens・check・test・build、build の zip をドラフトリリースに添付）
   - 依存: T1-4
