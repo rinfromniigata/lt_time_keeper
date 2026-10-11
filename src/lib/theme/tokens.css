@@ -1,0 +1,194 @@
+/* lt_time_keeper デザイントークン（確定・値の正本） */
+
+:root {
+  color-scheme: light;
+
+  /* ---- 色：ライト ---- */
+  --color-bg: #f4f3ef;            /* 紙色の地 */
+  --color-surface: #ffffff;
+  --color-surface-raised: #fbfaf7;
+  --color-border: #d9d7d0;
+  --color-text: #1c1d20;
+  --color-text-muted: #5e6066;
+  --color-text-inverse: #ffffff;
+
+  --color-accent: #2a5bd7;        /* 操作系（ボタン・フォーカス） */
+  --color-accent-hover: #234cb5;
+  --color-accent-soft: #e3ebfb;
+  --color-focus-ring: #2a5bd7;
+
+  --color-ring-track: #e4e2db;    /* プログレスリングの地 */
+
+  --color-state-ok: #1e8e4e;      /* 通常 */
+  --color-state-ok-soft: #dcf1e4;
+  --color-state-warn: #b77800;    /* 予鈴 */
+  --color-state-warn-soft: #fbedc9;
+  --color-state-over: #c8312b;    /* 超過 */
+  --color-state-over-soft: #f8dcda;
+  --color-state-paused: #5e6066;  /* 一時停止 */
+  --color-state-paused-soft: #e8e6e0;
+
+  --color-danger: #c8312b;
+  --color-disabled-bg: #e8e6e0;
+  --color-disabled-text: #9a9ca1;
+  --color-scrim: rgb(0 0 0 / 0.40);
+
+  /* ---- タイポグラフィ ---- */
+  --font-sans: "Hiragino Sans", "Noto Sans JP", "Yu Gothic UI", system-ui, sans-serif;
+  --font-digits: "SF Mono", "Roboto Mono", "Cascadia Mono", ui-monospace, monospace;
+  --font-digits-variant: tabular-nums;
+
+  --font-size-xs: 0.75rem;
+  --font-size-sm: 0.875rem;
+  --font-size-md: 1rem;
+  --font-size-lg: 1.25rem;
+  --font-size-xl: 1.75rem;
+  --font-size-timer: clamp(4rem, 18vw, 16rem);        /* 数字だけを大きく出す場合 */
+  --font-size-timer-sub: clamp(1.25rem, 4vw, 2.5rem);
+
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-bold: 700;
+  --font-weight-timer: 600;
+
+  --line-height-tight: 1.1;
+  --line-height-normal: 1.6;
+  --letter-spacing-timer: -0.02em;
+
+  /* ---- 余白（4px基準） ---- */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.5rem;
+  --space-6: 2rem;
+  --space-7: 3rem;
+  --space-8: 4rem;
+  --space-gutter-mobile: 1rem;
+  --tap-target-min: 44px;
+  --tap-target-lg: 3.5rem;
+
+  /* ---- 線・部品寸法 ---- */
+  --border-width: 1px;
+  --border-width-strong: 2px;
+  --focus-ring-width: 3px;
+  --focus-ring-offset: 2px;
+  --icon-size: 1.25rem;
+  --field-num-width: 3.5ch;
+  --layout-settings-max: 64rem;
+  --layout-result-max: 40rem;
+  --start-button-min: 20rem;
+
+  /* ---- 角丸 ---- */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 14px;
+  --radius-full: 9999px;
+
+  /* ---- 影 ---- */
+  --shadow-sm: 0 1px 2px rgb(0 0 0 / 0.08);
+  --shadow-md: 0 4px 12px rgb(0 0 0 / 0.10);
+  --shadow-lg: 0 12px 32px rgb(0 0 0 / 0.14);
+
+  /* ---- 残り時間の表示 ---- */
+  --ring-stroke-width: 6;          /* viewBox 100 に対する線幅 */
+  --ring-size: min(80vw, 70vh);
+  --ring-digit-ratio: 0.24;        /* リング直径に対する数字の大きさ */
+  --progress-bar-height: 1rem;
+
+  /* ---- モーション ---- */
+  --duration-fast: 120ms;
+  --duration-normal: 220ms;
+  --duration-slow: 400ms;
+  --easing-standard: cubic-bezier(0.2, 0, 0, 1);
+  --easing-exit: cubic-bezier(0.4, 0, 1, 1);
+  --blink-period-over: 1600ms;    /* 超過時のゆっくりした明滅 */
+  --blink-dim-opacity: 0.55;
+  --spinner-period: 900ms;
+  --controls-hide-delay: 5s;      /* 計測中に操作ボタンが隠れるまで */
+}
+
+/* ---- 色：ダーク（OS設定に追従、明示指定がライトなら除外） ---- */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --color-bg: #121316;          /* 墨色の地 */
+    --color-surface: #1b1d21;
+    --color-surface-raised: #24272c;
+    --color-border: #34373d;
+    --color-text: #f2f2f0;
+    --color-text-muted: #a3a6ad;
+    --color-text-inverse: #121316;
+
+    --color-accent: #7aa2ff;
+    --color-accent-hover: #9ab8ff;
+    --color-accent-soft: #1d2a4a;
+    --color-focus-ring: #7aa2ff;
+
+    --color-ring-track: #2a2d33;
+
+    --color-state-ok: #3ccf7a;
+    --color-state-ok-soft: #173826;
+    --color-state-warn: #f5b93a;
+    --color-state-warn-soft: #3d2f12;
+    --color-state-over: #ff5a50;
+    --color-state-over-soft: #45191a;
+    --color-state-paused: #a3a6ad;
+    --color-state-paused-soft: #2a2d33;
+
+    --color-danger: #ff5a50;
+    --color-disabled-bg: #26282d;
+    --color-disabled-text: #63666d;
+    --color-scrim: rgb(0 0 0 / 0.60);
+
+    --shadow-sm: 0 1px 2px rgb(0 0 0 / 0.40);
+    --shadow-md: 0 4px 12px rgb(0 0 0 / 0.45);
+    --shadow-lg: 0 12px 32px rgb(0 0 0 / 0.55);
+  }
+}
+
+/* ---- 色：ダーク（明示指定） ---- */
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --color-bg: #121316;
+  --color-surface: #1b1d21;
+  --color-surface-raised: #24272c;
+  --color-border: #34373d;
+  --color-text: #f2f2f0;
+  --color-text-muted: #a3a6ad;
+  --color-text-inverse: #121316;
+
+  --color-accent: #7aa2ff;
+  --color-accent-hover: #9ab8ff;
+  --color-accent-soft: #1d2a4a;
+  --color-focus-ring: #7aa2ff;
+
+  --color-ring-track: #2a2d33;
+
+  --color-state-ok: #3ccf7a;
+  --color-state-ok-soft: #173826;
+  --color-state-warn: #f5b93a;
+  --color-state-warn-soft: #3d2f12;
+  --color-state-over: #ff5a50;
+  --color-state-over-soft: #45191a;
+  --color-state-paused: #a3a6ad;
+  --color-state-paused-soft: #2a2d33;
+
+  --color-danger: #ff5a50;
+  --color-disabled-bg: #26282d;
+  --color-disabled-text: #63666d;
+  --color-scrim: rgb(0 0 0 / 0.60);
+
+  --shadow-sm: 0 1px 2px rgb(0 0 0 / 0.40);
+  --shadow-md: 0 4px 12px rgb(0 0 0 / 0.45);
+  --shadow-lg: 0 12px 32px rgb(0 0 0 / 0.55);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --duration-fast: 0ms;
+    --duration-normal: 0ms;
+    --duration-slow: 0ms;
+    --blink-period-over: 0ms;
+  }
+}

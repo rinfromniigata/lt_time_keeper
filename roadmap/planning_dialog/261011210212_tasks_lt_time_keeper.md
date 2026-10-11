@@ -13,8 +13,9 @@
   - 依存: T1-1
   - コマンドとオプションは、インストールした `sv` の版のドキュメントで確認する
   - 実施メモ: `sv` 1.1.1 で `--template minimal --types ts --add vitest=usages:unit playwright=demo:no sveltekit-adapter=adapter:static --install bun` を実行。adapter-static 4.0.0、kit 3.x、vite 8、vitest 4。ひな形のデモ（vitest-examples・e2e サンプル）は削除し、`.gitignore` に `roadmap/archived/` を戻した。`+layout.ts` に prerender・ssr、test スクリプトと Playwright の webServer を bun に変更。ユニットテストがまだ無いため `passWithNoTests` を有効化。`bun run check`・`bun run build` 通過
-- [ ] T1-3 【エージェント】トークンとブランド資料を配置する（specs の tokens を `src/lib/theme/tokens.css` へ、brand.md とマスターSVGを `docs/brand/` へコピーし、`base.css` を作る）
+- [x] T1-3 【エージェント】トークンとブランド資料を配置する（specs の tokens を `src/lib/theme/tokens.css` へ、brand.md とマスターSVGを `docs/brand/` へコピーし、`base.css` を作る）
   - 依存: T1-2
+  - 実施メモ: tokens は `lt_time_keeper_tokens_v1.css` を無変更で `src/lib/theme/tokens.css` へ（`cmp` で一致確認）。brand.md とマスターSVGは版番号付きのまま `docs/brand/` へ。`base.css` は reset・フォーカスリング・reduced-motion のみ（720px のブレークポイントは T2-7 で必要になった時点で足す）。`+layout.svelte` で両 CSS を読み込み
 - [ ] T1-4 【エージェント】`scripts/check_tokens.ts` を作り、`bun run check:tokens` で実行できるようにする
   - 依存: T1-3
 - [ ] T1-5 【エージェント】起動画面と画面の土台を作る（`app.html` に S00 の静的マークアップ、UIアイコンのスプライト、`+page.svelte` の画面切り替えの枠、`theme.svelte.ts`）
