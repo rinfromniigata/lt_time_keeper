@@ -356,4 +356,78 @@ test.describe('計測中のベル', () => {
 		expect(await strikes(page)).toBe(0);
 		await expect(page.getByRole('timer')).toHaveText('+1:40');
 	});
+	test('一時停止中はベルが鳴らず、再開すると続きの時間で鳴る', async ({ page }) => {
+		await openWithFakeAudio(page);
+		await page.getByRole('button', { name: '開始' }).click();
+		await advance(page, 239_000); // 経過 3:59
+		await page.keyboard.press('Space');
+		await expect(page.getByText('一時停止中')).toBeVisible();
+		await advance(page, 600_000);
+		expect(await strikes(page)).toBe(0);
+		await page.keyboard.press('Space');
+		await advance(page, 1_000); // 経過 4:00 → 1鈴
+		await expect.poll(() => strikes(page)).toBe(1);
+	});
+
+	test('ベルの時点をまたいで画面を隠すと、戻してもそのベルは鳴らず、表示と状態は戻った時点の値になる', async ({ page }) => {
+		await openWithFakeAudio(page);
+		const setVisibility = (state: 'visible' | 'hidden') =>
+			page.evaluate((s) => {
+				Object.defineProperty(document, 'visibilityState', { value: s, configurable: true });
+				document.dispatchEvent(new Event('visibilitychange'));
+			}, state);
+		await page.getByRole('button', { name: '開始' }).click();
+		await advance(page, 180_000); // 経過 3:00
+		await setVisibility('hidden');
+		await advance(page, 150_000); // 経過 5:30。1鈴（4:00）と2鈴（5:00）が過ぎる
+		await setVisibility('visible');
+		await advance(page, 100);
+		expect(await strikes(page)).toBe(0);
+		await expect(page.getByRole('timer')).toHaveText('+0:30');
+		await expect(page.getByText('超過', { exact: true })).toBeVisible();
+		await expect(page.locator('.next-bell')).toContainText('3鈴まで');
+
+		await advance(page, 30_000); // 経過 6:00 → 見えているので 3鈴は鳴る
+		await expect.poll(() => strikes(page)).toBe(3);
+	});
+
+});
+
+test('ベル8件でもパネルの中にスクロールは出ず、画面全体（.settings）が伸びてスクロールする', async ({ page }) => {
+	await open(page);
+	for (let i = 0; i < 5; i++) {
+		await button(page, 'ベルを追加').click();
+		await button(page, '決定').click();
+	}
+	await expect(rows(page)).toHaveCount(8);
+	for (const width of [390, 1280]) {
+		await page.setViewportSize({ width, height: 720 });
+		const r = await page.evaluate(() => {
+			const panel = [...document.querySelectorAll('.panel')].find((p) => p.querySelector('.bell-list'))!;
+			const list = panel.querySelector('.bell-list')!;
+			const settings = document.querySelector('.settings')!;
+			return {
+				panelScrolls: panel.scrollHeight > panel.clientHeight + 1,
+				listOverflow: getComputedStyle(list).overflowY,
+				listScrolls: list.scrollHeight > list.clientHeight + 1,
+				pageScrolls: settings.scrollHeight > settings.clientHeight
+			};
+		});
+		expect(r.panelScrolls).toBe(false);
+		expect(r.listScrolls).toBe(false);
+		expect(r.listOverflow).toBe('visible');
+		if (width === 390) expect(r.pageScrolls).toBe(true);
+	}
+});
+
+test('持ち時間0:00 と鳴らないベルが重なっても、エラーと警告が両方出て、開始は止まる（S01a）', async ({ page }) => {
+	await open(page);
+	await page.locator('#duration-min').fill('0');
+	await page.locator('#duration-min').press('Enter');
+	await page.locator('#duration-sec').fill('0');
+	await page.locator('#duration-sec').press('Enter');
+	await expect(page.getByText('持ち時間を1秒以上にしてください。')).toBeVisible();
+	await expect(button(page, '開始')).toBeDisabled();
+	await expect(rows(page).nth(0)).toContainText('持ち時間より長いため鳴りません'); // 残り 1:00
+	await expect(rows(page).nth(1)).toContainText('ここで赤（超過）に'); // 残り 0:00
 });

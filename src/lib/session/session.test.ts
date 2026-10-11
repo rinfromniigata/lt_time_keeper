@@ -474,3 +474,27 @@ describe('ベル', () => {
 		expect(visibility.listeners()).toBe(0);
 	});
 });
+
+describe('表示の秒とベルの同期', () => {
+	it('数字が「1:00」に変わるのと同じフレームで、1鈴が鳴る', async () => {
+		const { session, rung, advance } = setup();
+		await session.start();
+		advance(4 * MIN - 1); // 残り 60.001 秒 → 切り上げで 1:01。まだ鳴らない
+		expect(session.display.digits).toBe('1:01');
+		expect(rung.rings).toEqual([]);
+		advance(1); // 同じフレームで 1:00 になり、鳴る
+		expect(session.display.digits).toBe('1:00');
+		expect(rung.rings).toEqual([1]);
+	});
+
+	it('残り 0:00 でも、数字が +0:00 に変わるのと同じフレームで2鈴が鳴る', async () => {
+		const { session, rung, advance } = setup();
+		await session.start();
+		advance(5 * MIN - 1);
+		expect(session.display.digits).toBe('0:01');
+		expect(rung.rings).toEqual([1]);
+		advance(1);
+		expect(session.display.digits).toBe('+0:00');
+		expect(rung.rings).toEqual([1, 2]);
+	});
+});
