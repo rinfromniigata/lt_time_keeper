@@ -7,11 +7,12 @@
 ---
 
 ## Phase 1: 土台とトークン（起動画面まで）
-- [ ] T1-1 【ユーザー】ローカルの Bun を 1.4.x に上げる（`bun upgrade`）
+- [x] T1-1 【ユーザー】ローカルの Bun を 1.4.x に上げる（`bun upgrade`）
   - 現在 1.3.14。`bun --version` が 1.4.x になったら完了を知らせる
-- [ ] T1-2 【エージェント】SvelteKit 3 のプロジェクトを作る（`sv create` minimal・TypeScript・Bun、Vitest・Playwright のアドオン、adapter-static、`vite.config.ts` に設定、全ページ prerender、`#lib` の imports）
+- [x] T1-2 【エージェント】SvelteKit 3 のプロジェクトを作る（`sv create` minimal・TypeScript・Bun、Vitest・Playwright のアドオン、adapter-static、`vite.config.ts` に設定、全ページ prerender、`#lib` の imports）
   - 依存: T1-1
   - コマンドとオプションは、インストールした `sv` の版のドキュメントで確認する
+  - 実施メモ: `sv` 1.1.1 で `--template minimal --types ts --add vitest=usages:unit playwright=demo:no sveltekit-adapter=adapter:static --install bun` を実行。adapter-static 4.0.0、kit 3.x、vite 8、vitest 4。ひな形のデモ（vitest-examples・e2e サンプル）は削除し、`.gitignore` に `roadmap/archived/` を戻した。`+layout.ts` に prerender・ssr、test スクリプトと Playwright の webServer を bun に変更。ユニットテストがまだ無いため `passWithNoTests` を有効化。`bun run check`・`bun run build` 通過
 - [ ] T1-3 【エージェント】トークンとブランド資料を配置する（specs の tokens を `src/lib/theme/tokens.css` へ、brand.md とマスターSVGを `docs/brand/` へコピーし、`base.css` を作る）
   - 依存: T1-2
 - [ ] T1-4 【エージェント】`scripts/check_tokens.ts` を作り、`bun run check:tokens` で実行できるようにする
