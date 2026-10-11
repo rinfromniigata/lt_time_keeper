@@ -1,4 +1,4 @@
-import type { Bell, BellBase, Strikes } from '../core/bells.ts';
+import { isSilent, type Bell, type BellBase, type Strikes } from '../core/bells.ts';
 
 export type { Bell, BellBase, Strikes };
 
@@ -33,8 +33,8 @@ export interface SettingsIssues {
 export function validate(s: Settings): SettingsIssues {
 	return {
 		durationZero: s.durationMs <= 0,
-		// 鳴らないベルの検出は T3-2 で足す
-		silentBellIds: []
+		// 残りが持ち時間より長いベル。警告だけで、開始は止めない
+		silentBellIds: s.bells.filter((b) => isSilent(b, s.durationMs)).map((b) => b.id)
 	};
 }
 

@@ -55,8 +55,9 @@
 - [x] T3-1 【エージェント】`core/bells.ts` の関数（並べ替え、時点、鳴らないベル、予鈴の時点、番号と「次のベル」の表記、補足文、区間内のベル、次のベル）を実装する
   - 依存: T2-3
   - 実施メモ: imple §3.3 のとおり、`bellAtElapsed`・`sortBells`・`isSilent`・`warnAtElapsed`・`bellBadge`・`nextBellLabel`・`bellNote`・`dueStrikes`・`nextBell` を実装。解釈を決めた点：(1) `bellBadge`・`nextBellLabel`・`nextBell` の `index` は 0 始まりで、番号は index+1。(2) 鳴らないベルも並び順（番号）には数えるが、予鈴の基準・`dueStrikes`・`nextBell` の対象からは除く。(3) `bellNote` は silent を最優先、持ち時間と同じ時点は 'over'、予鈴の時点の最初のベル（同時点では回数の多い方）だけ 'warn'。(4) `sortBells` は元の配列を変えず、同点・同回数は元の順。単体テスト `bells.test.ts` 29件（累計76件）、`check`、`check:tokens` 通過
-- [ ] T3-2 【エージェント】設定に、鳴らないベルの検証と、ベルの追加・変更・削除を足す
+- [x] T3-2 【エージェント】設定に、鳴らないベルの検証と、ベルの追加・変更・削除を足す
   - 依存: T3-1
+  - 実施メモ: `validate` の `silentBellIds` を `isSilent` で求めるようにした（警告のみで `canStart` は変わらない）。`SettingsStore` に `addBell(bell)`（採番した id を返す）・`updateBell(id, patch)`・`removeBell(id)` を追加。id は `bell-n` で、読み込んだ設定の id と重ならないよう確認して振る。時刻は 0..99:59 に収め、該当 id がなければ何もせず `save` も呼ばない。変更ごとに `save` を呼ぶ。並べ替えは保存せず、表示側が `sortBells` で求める。単体テスト 9件追加（累計85件）、`check`、`check:tokens` 通過
 - [ ] T3-3 【エージェント】`output/`（Ringer インターフェース、Web Audio のベル音、振動、まとめ役）を実装する
   - 依存: T3-1
 - [ ] T3-4 【エージェント】部品を足す（ベルの行、編集シート／ダイアログ、セグメント、スイッチ、音量スライダー、空の状態）
