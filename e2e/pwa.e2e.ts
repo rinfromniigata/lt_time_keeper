@@ -154,7 +154,9 @@ test('W5-2: 版の違うビルドでは、再読み込みのあとに古いキ�
 	// 待機中は、古いキャッシュと新しいキャッシュが並ぶ
 	await expect.poll(async () => (await cacheNames(page)).length).toBe(2);
 
-	await page.getByRole('button', { name: '再読み込み' }).click();
+	// 持ち時間はもともと 5:00 で、文言の表示では読み込み直しの完了を判別できない。load イベントで待つ
+	await Promise.all([page.waitForEvent('load'), page.getByRole('button', { name: '再読み込み' }).click()]);
+	await expect(page.locator('#splash')).toHaveCount(0);
 	await expect(page.getByText('持ち時間 5:00')).toBeVisible();
 	await expect.poll(() => cacheNames(page)).toHaveLength(1);
 	const [newName] = await cacheNames(page);
