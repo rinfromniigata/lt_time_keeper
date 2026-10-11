@@ -122,7 +122,8 @@
 - [x] T6-3 【エージェント】`README.md` に開発・ビルド・アイコン生成のコマンドを書く
   - 実施メモ: `README.md` をひな形（sv の案内）から日本語に書き直した。概要・必要なもの（Bun 1.4.x）・開発・確認（check:tokens／check／test:unit／test）・ビルド・アイコン生成（`gen:icons`、入力は specs の最新版、生成物はリポジトリに含める）・リリース・ドキュメント・ライセンス。コマンドは `package.json` の scripts と照合した
   - 依存: T5-2
-- [ ] T6-4 【ユーザー】Cloudflare Pages のプロジェクトを作り、GitHub 連携・ビルド設定（`bun run build`、`build`、`BUN_VERSION=1.4.3`）・独自ドメイン `lt.rinontech.com` を設定する
+- [x] T6-4 【ユーザー】Cloudflare Pages のプロジェクトを作り、GitHub 連携・ビルド設定（`bun run build`、`build`、`BUN_VERSION=1.4.3`）・独自ドメイン `lt.rinontech.com` を設定する
+  - 実施メモ: ユーザーが Cloudflare Pages のプロジェクト作成・GitHub 連携・ビルド設定・独自ドメインの設定を完了（完了報告を受けて記録）。ビルドの成功と本番での表示は T6-6 の push 後に W6-3 で確認する
 - [ ] T6-5 【エージェント】リリース前の確認をする（ローカルビルド、アイコンが specs の最新のマスターSVGから生成されていること）。コミットメッセージとタグのコマンドを提示する
   - 依存: T6-1, T6-2, T6-3
 - [ ] T6-6 【ユーザー】コミットして main に push し、`v0.1.0` タグを push する。Actions の完了後、ドラフトリリースを公開する
