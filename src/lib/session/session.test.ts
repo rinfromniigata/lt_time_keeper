@@ -2,7 +2,14 @@ import { describe, expect, it } from 'vitest';
 import type { Bell, Strikes } from '../core/bells.ts';
 import type { Ringer } from '../output/ringer.ts';
 import { DEFAULT_SETTINGS, type Settings } from '../settings/settings.ts';
-import { Session, type FrameDriver, type KeyInput } from './session.svelte.ts';
+import type { WakeLockControl } from '../device/wake_lock.ts';
+import {
+	parseCssDuration,
+	Session,
+	type FrameDriver,
+	type KeyInput,
+	type TimeoutDriver
+} from './session.svelte.ts';
 
 /** 呼び出しを記録する Ringer。unlock の完了は手動で進められる */
 function fakeRinger() {
@@ -40,11 +47,44 @@ function fakeVisibility() {
 	};
 }
 
+/** 取得・解除を記録する WakeLockControl。acquire の結果は変えられる */
+function fakeWakeLock() {
+	const calls = { acquire: 0, release: 0 };
+	const state = { result: true };
+	const wakeLock: WakeLockControl = {
+		supported: true,
+		acquire: async () => (calls.acquire++, state.result),
+		release: async () => void calls.release++
+	};
+	return { wakeLock, calls, state };
+}
+
+/** 手動で進められるタイマー */
+function fakeTimeouts() {
+	let next = 1;
+	const timers = new Map<number, () => void>();
+	const driver: TimeoutDriver = {
+		set: (cb) => (timers.set(next, cb), next++),
+		clear: (h) => void timers.delete(h as number)
+	};
+	return {
+		driver,
+		pendingCount: () => timers.size,
+		fire() {
+			const all = [...timers.values()];
+			timers.clear();
+			for (const cb of all) cb();
+		}
+	};
+}
+
 function setup(durationMs = 300000, overrides: Partial<Settings> = {}) {
 	let t = 5000;
 	let pending: (() => void) | null = null;
 	let finished = 0;
 	const r = fakeRinger();
+	const wl = fakeWakeLock();
+	const timeouts = fakeTimeouts();
 	const vis = fakeVisibility();
 	const frames: FrameDriver = {
 		request: (cb) => {
@@ -57,10 +97,22 @@ function setup(durationMs = 300000, overrides: Partial<Settings> = {}) {
 	};
 	const session = new Session(
 		{ ...structuredClone(DEFAULT_SETTINGS), durationMs, ...overrides },
-		{ now: () => t, frames, ringer: r.ringer, visibility: vis.driver, onfinish: () => void finished++ }
+		{
+			now: () => t,
+			frames,
+			ringer: r.ringer,
+			wakeLock: wl.wakeLock,
+			timeouts: timeouts.driver,
+			controlsHideDelayMs: () => 5000,
+			visibility: vis.driver,
+			onfinish: () => void finished++
+		}
 	);
 	return {
 		session,
+		ringer: r.ringer,
+		wl,
+		timeouts,
 		rung: r.calls,
 		holdUnlock: r.holdUnlock,
 		releaseUnlock: r.releaseUnlock,
@@ -496,5 +548,153 @@ describe('表示の秒とベルの同期', () => {
 		advance(1);
 		expect(session.display.digits).toBe('+0:00');
 		expect(rung.rings).toEqual([1, 2]);
+	});
+});
+
+describe('スリープ防止', () => {
+	it('開始で取得し、終了で解除する', async () => {
+		const t = setup();
+		await t.session.start();
+		expect(t.wl.calls.acquire).toBe(1);
+		expect(t.session.warnings).toEqual([]);
+		t.session.finish();
+		expect(t.wl.calls.release).toBe(1);
+	});
+
+	it('取れなければ警告を出し、閉じると同じ計測のあいだは出し直さない', async () => {
+		const t = setup();
+		t.wl.state.result = false;
+		await t.session.start();
+		expect(t.session.warnings).toEqual(['wakeLock']);
+		t.session.dismissWarning('wakeLock');
+		expect(t.session.warnings).toEqual([]);
+		t.visibility.set(false);
+		t.visibility.set(true);
+		await Promise.resolve();
+		await Promise.resolve();
+		expect(t.session.warnings).toEqual([]);
+	});
+
+	it('見える状態に戻ったら取り直し、取れれば警告も消える', async () => {
+		const t = setup();
+		t.wl.state.result = false;
+		await t.session.start();
+		expect(t.session.warnings).toEqual(['wakeLock']);
+		t.wl.state.result = true;
+		t.visibility.set(false);
+		expect(t.wl.calls.acquire).toBe(1);
+		t.visibility.set(true);
+		await Promise.resolve();
+		await Promise.resolve();
+		expect(t.wl.calls.acquire).toBe(2);
+		expect(t.session.warnings).toEqual([]);
+	});
+});
+
+describe('音の警告', () => {
+	it('unlock のあとも音を出せなければ警告を出し、閉じられる', async () => {
+		const t = setup();
+		(t.ringer as { blocked: boolean }).blocked = true;
+		await t.session.start();
+		expect(t.session.warnings).toEqual(['audio']);
+		t.session.dismissWarning('audio');
+		expect(t.session.warnings).toEqual([]);
+	});
+
+	it('出せていれば警告なし', async () => {
+		const t = setup();
+		await t.session.start();
+		expect(t.session.warnings).toEqual([]);
+	});
+
+	it('unlock が長引いて1秒を過ぎても出せなければ警告し、準備が終わって出せるようになれば消す', async () => {
+		const t = setup();
+		t.holdUnlock();
+		(t.ringer as { blocked: boolean }).blocked = true;
+		void t.session.start();
+		t.advance(1000);
+		expect(t.session.warnings).toEqual(['audio']);
+		(t.ringer as { blocked: boolean }).blocked = false;
+		t.releaseUnlock();
+		await Promise.resolve();
+		await Promise.resolve();
+		expect(t.session.warnings).toEqual([]);
+	});
+});
+
+describe('操作ボタンを隠す', () => {
+	it('開始後、隠すまでの時間が過ぎると隠れ、poke で出て数え直す', async () => {
+		const t = setup();
+		await t.session.start();
+		expect(t.session.controlsHidden).toBe(false);
+		t.timeouts.fire();
+		expect(t.session.controlsHidden).toBe(true);
+		t.session.poke();
+		expect(t.session.controlsHidden).toBe(false);
+		expect(t.timeouts.pendingCount()).toBe(1);
+	});
+
+	it('poke を続けるあいだはタイマーが1本だけ', async () => {
+		const t = setup();
+		await t.session.start();
+		t.session.poke();
+		t.session.poke();
+		expect(t.timeouts.pendingCount()).toBe(1);
+	});
+
+	it('一時停止中は隠さず、再開すると数え始める', async () => {
+		const t = setup();
+		await t.session.start();
+		t.timeouts.fire();
+		t.session.togglePause();
+		expect(t.session.controlsHidden).toBe(false);
+		expect(t.timeouts.pendingCount()).toBe(0);
+		t.session.togglePause();
+		expect(t.timeouts.pendingCount()).toBe(1);
+		t.timeouts.fire();
+		expect(t.session.controlsHidden).toBe(true);
+	});
+
+	it('確認中は隠さず、閉じると数え始める', async () => {
+		const t = setup();
+		await t.session.start();
+		t.session.requestFinish();
+		expect(t.timeouts.pendingCount()).toBe(0);
+		t.session.cancelFinish();
+		expect(t.timeouts.pendingCount()).toBe(1);
+	});
+
+	it('キー操作でも出る', async () => {
+		const t = setup();
+		await t.session.start();
+		t.timeouts.fire();
+		t.session.handleKey(key('a'));
+		expect(t.session.controlsHidden).toBe(false);
+	});
+
+	it('開始前・終了後は poke しても何も起きない', async () => {
+		const t = setup();
+		t.session.finish();
+		t.session.poke();
+		expect(t.timeouts.pendingCount()).toBe(0);
+	});
+
+	it('終了でタイマーを止める', async () => {
+		const t = setup();
+		await t.session.start();
+		t.session.finish();
+		expect(t.timeouts.pendingCount()).toBe(0);
+		expect(t.session.controlsHidden).toBe(false);
+	});
+});
+
+describe('parseCssDuration', () => {
+	it('s と ms を読む。読めなければ null', () => {
+		expect(parseCssDuration(' 5s')).toBe(5000);
+		expect(parseCssDuration('1.5s')).toBe(1500);
+		expect(parseCssDuration('400ms')).toBe(400);
+		expect(parseCssDuration('')).toBeNull();
+		expect(parseCssDuration('5')).toBeNull();
+		expect(parseCssDuration('var(--x)')).toBeNull();
 	});
 });

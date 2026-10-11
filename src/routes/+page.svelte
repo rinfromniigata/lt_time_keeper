@@ -2,6 +2,7 @@
 	import { onMount } from 'svelte';
 	import { SettingsStore } from '#lib/settings/store.svelte.ts';
 	import { Session } from '#lib/session/session.svelte.ts';
+	import { BrowserWakeLock } from '#lib/device/wake_lock.ts';
 	import { AudioRinger } from '#lib/output/audio_ringer.ts';
 	import { CompositeRinger } from '#lib/output/composite_ringer.ts';
 	import { VibrationRinger } from '#lib/output/vibration_ringer.ts';
@@ -34,6 +35,7 @@
 		session = new Session(snapshot, {
 			now: () => performance.now(),
 			ringer,
+			wakeLock: new BrowserWakeLock(),
 			onfinish: leave
 		});
 		screen = 'timer';
