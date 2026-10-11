@@ -116,7 +116,8 @@
 - [x] T6-1 【エージェント】`CHANGELOG.md`（Keep a Changelog）を作り、`package.json` の version を 0.1.0 にする
   - 実施メモ: `CHANGELOG.md` を Keep a Changelog 形式で新規作成（`[Unreleased]` と `[0.1.0] - 2026-10-11`、比較リンクは origin の `rinfromniigata/lt_time_keeper`）。`package.json` の version を 0.0.1 → 0.1.0 に更新。バージョン表記は `package.json` だけ（Tauri 等なし）で、他に 0.0.1 の残りなし。Service Worker のキャッシュ名はビルド時に `cache-0.1.0+…` になる（W6-2 で実ビルドを確認する）
   - 依存: T5-4
-- [ ] T6-2 【エージェント】`.github/workflows/release.yml` を作る（`v*` タグで起動、check:tokens・check・test・build、build の zip をドラフトリリースに添付）
+- [x] T6-2 【エージェント】`.github/workflows/release.yml` を作る（`v*` タグで起動、check:tokens・check・test・build、build の zip をドラフトリリースに添付）
+  - 実施メモ: `.github/workflows/release.yml` を追加。`v*` タグで起動し、ubuntu-latest で setup-bun（1.4.3）→ `bun install --frozen-lockfile` → `check:tokens` → `check` → Playwright のシステム依存（`playwright install-deps chromium`）→ `test` → `build` → `build/` を `lt-time-keeper-<タグ>.zip` にして softprops/action-gh-release でドラフトリリースに添付。権限は `contents: write` のみ。アクションの版は GitHub の最新リリースで確認（checkout v7、setup-bun v2、action-gh-release v3）。実行手順の検証は W6-1
   - 依存: T1-4
 - [ ] T6-3 【エージェント】`README.md` に開発・ビルド・アイコン生成のコマンドを書く
   - 依存: T5-2

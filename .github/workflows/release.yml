@@ -1,0 +1,42 @@
+name: release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.4.3
+
+      - run: bun install --frozen-lockfile
+
+      - run: bun run check:tokens
+
+      - run: bun run check
+
+      - name: Install Playwright system dependencies
+        run: bunx playwright install-deps chromium
+
+      - run: bun run test
+
+      - run: bun run build
+
+      - name: Create zip
+        run: |
+          cd build
+          zip -r "../lt-time-keeper-${GITHUB_REF_NAME}.zip" .
+
+      - uses: softprops/action-gh-release@v3
+        with:
+          draft: true
+          files: lt-time-keeper-${{ github.ref_name }}.zip
