@@ -151,7 +151,8 @@
 - [x] W6-2 【エージェント】`package.json` の version が 0.1.0、CHANGELOG に 0.1.0 の項目がある。Service Worker のキャッシュ名に 0.1.0 が含まれる
   - 実施メモ: `package.json` の version は 0.1.0、`CHANGELOG.md` に `## [0.1.0] - 2026-10-11` がある。ビルドした `build/service-worker.js` の version は `0.1.0+<ビルド時刻>` で、キャッシュ名（`cache-` ＋ version）に 0.1.0 が含まれる
   - 依存: T6-1
-- [ ] W6-3 【ユーザー】Pages のビルドが成功し、`https://lt.rinontech.com/` で開けて、本番から PWA をインストールできる
+- [x] W6-3 【ユーザー】Pages のビルドが成功し、`https://lt.rinontech.com/` で開けて、本番から PWA をインストールできる
+  - 実施メモ: ユーザーが確認して通過の報告（Pages のビルド成功、`https://lt.rinontech.com/` で開ける、本番から PWA をインストールできる）
   - 依存: T6-4, T6-6
 - [ ] W6-4 【ユーザー】`v0.1.0` タグで Actions が成功し、ドラフトリリースに zip が添付されている
   - 依存: T6-6
