@@ -52,8 +52,9 @@
   - 実施メモ: `ui/screens/TimerScreen.svelte` と `ui/parts/Kbd.svelte` を追加。`+page.svelte` が開始で `Session` を作り（設定は `snapshot()` の複製）、`onfinish` で破棄して S01 に戻す。`window` の keydown を `session.handleKey` に渡す。一時停止と再開は同じボタンの表示を切り替える（フォーカスを保つため）。広い画面の値（余白・表示名の大きさ・ボタンの幅・キー操作の案内の出し分け）は T2-5 と同じ方式で `base.css` の `.screen` に追加。確認ダイアログのキー操作の案内も同じ値で出し分ける（`ConfirmDialog` の `.hints`）。`Session` に `durationMs` の getter を追加。キー操作の案内に F は含めていない（T4-3）。次のベルの表示は T3-7、警告バナー・操作ボタンを隠す処理・全画面は T4-3。e2e（`e2e/timer.e2e.ts` 7件）を追加し、全10件通過：数字・経過・超過の切り替わり、明滅の有無（reduced-motion）、Space、Esc・Enter・確認中の進行・値の保持、横スクロールと案内の出し分け。Playwright の時計は、長い時間を `runFor` で進めると全フレームを再生して遅いため `fastForward` で飛ばしてから少し進める。スクリーンショット（モバイル通常・一時停止、デスクトップ超過・確認）も確認。W2 の項目のチェックは W2 で行う
 
 ## Phase 3: ベル
-- [ ] T3-1 【エージェント】`core/bells.ts` の関数（並べ替え、時点、鳴らないベル、予鈴の時点、番号と「次のベル」の表記、補足文、区間内のベル、次のベル）を実装する
+- [x] T3-1 【エージェント】`core/bells.ts` の関数（並べ替え、時点、鳴らないベル、予鈴の時点、番号と「次のベル」の表記、補足文、区間内のベル、次のベル）を実装する
   - 依存: T2-3
+  - 実施メモ: imple §3.3 のとおり、`bellAtElapsed`・`sortBells`・`isSilent`・`warnAtElapsed`・`bellBadge`・`nextBellLabel`・`bellNote`・`dueStrikes`・`nextBell` を実装。解釈を決めた点：(1) `bellBadge`・`nextBellLabel`・`nextBell` の `index` は 0 始まりで、番号は index+1。(2) 鳴らないベルも並び順（番号）には数えるが、予鈴の基準・`dueStrikes`・`nextBell` の対象からは除く。(3) `bellNote` は silent を最優先、持ち時間と同じ時点は 'over'、予鈴の時点の最初のベル（同時点では回数の多い方）だけ 'warn'。(4) `sortBells` は元の配列を変えず、同点・同回数は元の順。単体テスト `bells.test.ts` 29件（累計76件）、`check`、`check:tokens` 通過
 - [ ] T3-2 【エージェント】設定に、鳴らないベルの検証と、ベルの追加・変更・削除を足す
   - 依存: T3-1
 - [ ] T3-3 【エージェント】`output/`（Ringer インターフェース、Web Audio のベル音、振動、まとめ役）を実装する
