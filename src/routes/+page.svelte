@@ -2,6 +2,7 @@
 	import { onMount } from 'svelte';
 	import { SettingsStore } from '#lib/settings/store.svelte.ts';
 	import { Session } from '#lib/session/session.svelte.ts';
+	import { AudioRinger } from '#lib/output/audio_ringer.ts';
 	import SettingsScreen from '#lib/ui/screens/SettingsScreen.svelte';
 	import TimerScreen from '#lib/ui/screens/TimerScreen.svelte';
 
@@ -12,6 +13,9 @@
 
 	// 設定はページを開いてから閉じるまで残る（計測から S01 に戻っても値が残る）
 	const settings = new SettingsStore();
+
+	// 「鳴らしてみる」用。AudioContext は、最初に鳴らす操作のときに作られる
+	const previewRinger = new AudioRinger();
 
 	// 計測セッションは、開始で作り、終了で捨てる。設定は開始時点の複製を渡す
 	let session = $state<Session | null>(null);
@@ -40,7 +44,7 @@
 
 <main class="app" data-screen={screen}>
 	{#if screen === 'settings'}
-		<SettingsScreen {settings} onstart={start} />
+		<SettingsScreen {settings} {previewRinger} onstart={start} />
 	{:else if session}
 		<TimerScreen {session} title={settings.title} />
 	{/if}

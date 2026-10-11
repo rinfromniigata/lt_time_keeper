@@ -102,6 +102,8 @@ svg {
   --controls-flex: 1 1 0;
   --controls-padding: var(--space-4);
   --kbd-hints-display: none;
+  --settings-col-display: contents;
+  --sound-test-flex: 1 1 100%;
   --sheet-align: end;
   --sheet-layer-padding: 0;
   --sheet-radius: var(--radius-lg) var(--radius-lg) 0 0;
@@ -123,6 +125,8 @@ svg {
     --controls-flex: none;
     --controls-padding: var(--space-7);
     --kbd-hints-display: flex;
+    --settings-col-display: flex;
+    --sound-test-flex: none;
     --sheet-align: center;
     --sheet-layer-padding: var(--space-4);
     --sheet-radius: var(--radius-lg);

@@ -1,10 +1,16 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
 
-	let { title, hint, children }: { title: string; hint?: string; children: Snippet } = $props();
+	// order: 狭い画面（列が1つ）での並び順。広い画面では列の中での並び順になる
+	let {
+		title,
+		hint,
+		order,
+		children
+	}: { title: string; hint?: string; order?: number; children: Snippet } = $props();
 </script>
 
-<section class="panel">
+<section class="panel" style:order>
 	<div class="panel-head">
 		<h3>{title}</h3>
 		{#if hint}<span class="hint">{hint}</span>{/if}
