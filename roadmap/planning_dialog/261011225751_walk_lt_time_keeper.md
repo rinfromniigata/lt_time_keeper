@@ -145,9 +145,11 @@
   - 画面: S00, S01f
 
 ## Phase 6: リリース準備
-- [ ] W6-1 【エージェント】ワークフローと同じ手順（`bun install --frozen-lockfile` から zip 作成まで）をローカルで実行して通る。ワークフローの YAML に構文の誤りがない
+- [x] W6-1 【エージェント】ワークフローと同じ手順（`bun install --frozen-lockfile` から zip 作成まで）をローカルで実行して通る。ワークフローの YAML に構文の誤りがない
+  - 実施メモ: ワークフローと同じ手順をローカルで実行して全通過。YAML は Bun の `Bun.YAML.parse` で構文エラーなく読め、`on.push.tags=v*`・`permissions.contents=write`・10 ステップ（checkout・setup-bun・install・check:tokens・check・install-deps・test・build・zip・release）を確認。`bun install --frozen-lockfile`・`check:tokens`・`check`（0 エラー）・`test`（単体 161 件＋e2e 56 件）・`build` が通った。`playwright install-deps` は Ubuntu 専用のためローカルでは省略。ローカルに `zip` コマンドがないため、zip 作成は PowerShell の Compress-Archive で `build/` の中身が 26 エントリ（`index.html`・`service-worker.js` を含む）の zip になることで代替確認した（Actions 側は ubuntu-latest 標準の `zip`）。実際の Actions の実行は W6-4 で確認する
   - 依存: T6-2
-- [ ] W6-2 【エージェント】`package.json` の version が 0.1.0、CHANGELOG に 0.1.0 の項目がある。Service Worker のキャッシュ名に 0.1.0 が含まれる
+- [x] W6-2 【エージェント】`package.json` の version が 0.1.0、CHANGELOG に 0.1.0 の項目がある。Service Worker のキャッシュ名に 0.1.0 が含まれる
+  - 実施メモ: `package.json` の version は 0.1.0、`CHANGELOG.md` に `## [0.1.0] - 2026-10-11` がある。ビルドした `build/service-worker.js` の version は `0.1.0+<ビルド時刻>` で、キャッシュ名（`cache-` ＋ version）に 0.1.0 が含まれる
   - 依存: T6-1
 - [ ] W6-3 【ユーザー】Pages のビルドが成功し、`https://lt.rinontech.com/` で開けて、本番から PWA をインストールできる
   - 依存: T6-4, T6-6
