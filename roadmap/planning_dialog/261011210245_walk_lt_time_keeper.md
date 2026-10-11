@@ -11,8 +11,9 @@
 - [x] W1-1 【エージェント】`bun run check`・`bun run test`・`bun run build` がエラーなしで終わり、`build/index.html` が出力される
   - 依存: T1-2, T1-5
   - 実施メモ: 初回は不合格。(1) `bun run test` の Playwright が「テストなし」で終了コード1、(2) 先に起動したままの preview サーバー(ポート4173)と衝突。(1) は `test:e2e` に `--pass-with-no-tests` を付けて修正(e2e のテストが入ったら外す)、(2) は preview を停止して解消。修正後 check(0エラー)・test(0件で成功)・build が通り、`build/index.html` を出力。修正の記録: `261011212036_fix_e2e_pass_with_no_tests.md`
-- [ ] W1-2 【エージェント】`bun run check:tokens` が通る（`src/` の tokens と specs の tokens が一致し、色・寸法の直書きがない）。わざと直書きを1か所入れると失敗することも確かめる
+- [x] W1-2 【エージェント】`bun run check:tokens` が通る（`src/` の tokens と specs の tokens が一致し、色・寸法の直書きがない）。わざと直書きを1か所入れると失敗することも確かめる
   - 依存: T1-3, T1-4
+  - 実施メモ: `check:tokens` は通過。色の直書き(`#fff`)を入れた一時ファイルで失敗(終了コード1、1件検出)し、削除後は再び通過。tokens の改変による不一致の検出は T1-4 で確認済み
 - [ ] W1-3 【エージェント】JavaScript を無効にして開くと起動画面が出て、有効にすると起動画面が消えて本体の枠に切り替わる
   - 依存: T1-5
   - 画面: S00
