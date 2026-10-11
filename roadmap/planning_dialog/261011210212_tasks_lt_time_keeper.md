@@ -58,8 +58,9 @@
 - [x] T3-2 【エージェント】設定に、鳴らないベルの検証と、ベルの追加・変更・削除を足す
   - 依存: T3-1
   - 実施メモ: `validate` の `silentBellIds` を `isSilent` で求めるようにした（警告のみで `canStart` は変わらない）。`SettingsStore` に `addBell(bell)`（採番した id を返す）・`updateBell(id, patch)`・`removeBell(id)` を追加。id は `bell-n` で、読み込んだ設定の id と重ならないよう確認して振る。時刻は 0..99:59 に収め、該当 id がなければ何もせず `save` も呼ばない。変更ごとに `save` を呼ぶ。並べ替えは保存せず、表示側が `sortBells` で求める。単体テスト 9件追加（累計85件）、`check`、`check:tokens` 通過
-- [ ] T3-3 【エージェント】`output/`（Ringer インターフェース、Web Audio のベル音、振動、まとめ役）を実装する
+- [x] T3-3 【エージェント】`output/`（Ringer インターフェース、Web Audio のベル音、振動、まとめ役）を実装する
   - 依存: T3-1
+  - 実施メモ: `src/lib/output/` に `ringer.ts`（`Ringer`、音と振動で共有する打ち始めの間隔 `STRIKE_INTERVAL_MS` = 700ms）、`audio_ringer.ts`、`vibration_ringer.ts`、`composite_ringer.ts` を追加。`AudioRinger` は `unlock` で AudioContext を作って resume し（作れない・resume できない環境でも例外は出さず `blocked` で伝える）、ベル音は基音880Hzに倍音2つ（2.4倍・4.1倍）を重ねた正弦波を指数減衰させ、複数回は間隔をあけて先にスケジュールする。音量は GainNode で、unlock 前の `setVolume` も保持する。`VibrationRinger` は `isSupported()` と、回数分のパルスを返す `vibrationPattern` を持つ。`CompositeRinger` は Ringer の配列を受け取り、imple の「振動オフなら音だけ」は、振動の Ringer を渡さないことで表す（組み立ては T3-6）。`blocked` はどれかが blocked なら true。単体テスト 13件追加（累計98件、AudioContext は代役で確認）、`check`、`check:tokens` 通過。実際の音の聞こえ方は T3-5 の「鳴らしてみる」ができてから W3 で確認する
 - [ ] T3-4 【エージェント】部品を足す（ベルの行、編集シート／ダイアログ、セグメント、スイッチ、音量スライダー、空の状態）
   - 依存: T2-4
   - 画面: S90
