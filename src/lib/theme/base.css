@@ -97,6 +97,11 @@ svg {
   --start-bar-gap: var(--space-2);
   --start-width: 100%;
   --start-min-width: 0;
+  --timer-padding: var(--space-4);
+  --talk-title-size: var(--font-size-lg);
+  --controls-flex: 1 1 0;
+  --controls-padding: var(--space-4);
+  --kbd-hints-display: none;
 }
 
 @container app (min-width: 720px) {
@@ -108,5 +113,10 @@ svg {
     --start-bar-gap: var(--space-5);
     --start-width: auto;
     --start-min-width: var(--start-button-min);
+    --timer-padding: var(--space-5) var(--space-6);
+    --talk-title-size: var(--font-size-xl);
+    --controls-flex: none;
+    --controls-padding: var(--space-7);
+    --kbd-hints-display: flex;
   }
 }

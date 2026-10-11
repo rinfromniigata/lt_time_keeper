@@ -1,7 +1,9 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { SettingsStore } from '#lib/settings/store.svelte.ts';
+	import { Session } from '#lib/session/session.svelte.ts';
 	import SettingsScreen from '#lib/ui/screens/SettingsScreen.svelte';
+	import TimerScreen from '#lib/ui/screens/TimerScreen.svelte';
 
 	type Screen = 'settings' | 'timer';
 
@@ -11,13 +13,22 @@
 	// 設定はページを開いてから閉じるまで残る（計測から S01 に戻っても値が残る）
 	const settings = new SettingsStore();
 
+	// 計測セッションは、開始で作り、終了で捨てる。設定は開始時点の複製を渡す
+	let session = $state<Session | null>(null);
+
 	function start() {
 		// 開始を続けて押しても、2回目は何もしない
-		if (screen !== 'settings' || !settings.canStart) return;
+		if (session || !settings.canStart) return;
+		session = new Session(settings.snapshot(), {
+			now: () => performance.now(),
+			onfinish: leave
+		});
 		screen = 'timer';
+		void session.start();
 	}
 
-	function finish() {
+	function leave() {
+		session = null;
 		screen = 'settings';
 	}
 
@@ -30,9 +41,7 @@
 <main class="app" data-screen={screen}>
 	{#if screen === 'settings'}
 		<SettingsScreen {settings} onstart={start} />
-	{:else}
-		<!-- 計測画面は T2-7 で実装する。それまでは S01 に戻れるだけの仮置き -->
-		<p>計測画面（T2-7 で実装）</p>
-		<button type="button" onclick={finish}>終了</button>
+	{:else if session}
+		<TimerScreen {session} title={settings.title} />
 	{/if}
 </main>

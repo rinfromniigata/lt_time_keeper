@@ -46,9 +46,10 @@
 - [x] T2-6 【エージェント】`session/session.svelte.ts` の第1段階を実装する（タイマーの駆動、rAF のループ、表示用の値、一時停止・再開、終了の確認、Space・Esc・Enter のキー操作）
   - 依存: T2-2, T2-3
   - 実施メモ: `Session`（deps は `now`・`onfinish`・テスト用の `frames`）。`snapshot`（毎フレーム取り直す）、`display`（`digits`・`state`・`sub`）、`confirming`、`start`・`togglePause`・`requestFinish`・`cancelFinish`・`confirmFinish`・`finish`・`handleKey`。imple からの差分：(1) `display` に `state`（一時停止を優先した表示用の状態）を足し、`sub` は通常のときだけ文字列・それ以外は null（状態ラベルを出す位置のため）、(2) 「終了する」の確定は `confirmFinish()`（`finish()` で後片付けしたあと `onfinish` で S01 へ戻す）。(3) `next`・`warnings`・`controlsHidden`・`poke`・`dismissWarning` と deps の `ringer`・`wakeLock` は T3-6・T4-2 で足す。予鈴の時点（`warnAtElapsedMs`）は null で渡しており、T3-6 で bells から求めて渡す。キー操作は `handleKey` が受けるだけで、`window` への登録は T2-7 の計測画面が行う。Space はボタンにフォーカスがあるとボタン自身に任せ、確認中は無視。確認中の Enter は `preventDefault` して、フォーカス中の「続ける」が押されないようにする。単体テスト `session.test.ts` 15件（累計47件）、`check`、`check:tokens` 通過
-- [ ] T2-7 【エージェント】計測画面を実装する（表示名、リング、数字、経過／持ち時間、状態ラベル、超過の明滅、一時停止、終了の確認、キー操作の案内、広い画面の配置）。終了で S01 に戻り、値が残ること
+- [x] T2-7 【エージェント】計測画面を実装する（表示名、リング、数字、経過／持ち時間、状態ラベル、超過の明滅、一時停止、終了の確認、キー操作の案内、広い画面の配置）。終了で S01 に戻り、値が残ること
   - 依存: T2-4, T2-5, T2-6
   - 画面: S03, S03b, S03c, S03f
+  - 実施メモ: `ui/screens/TimerScreen.svelte` と `ui/parts/Kbd.svelte` を追加。`+page.svelte` が開始で `Session` を作り（設定は `snapshot()` の複製）、`onfinish` で破棄して S01 に戻す。`window` の keydown を `session.handleKey` に渡す。一時停止と再開は同じボタンの表示を切り替える（フォーカスを保つため）。広い画面の値（余白・表示名の大きさ・ボタンの幅・キー操作の案内の出し分け）は T2-5 と同じ方式で `base.css` の `.screen` に追加。確認ダイアログのキー操作の案内も同じ値で出し分ける（`ConfirmDialog` の `.hints`）。`Session` に `durationMs` の getter を追加。キー操作の案内に F は含めていない（T4-3）。次のベルの表示は T3-7、警告バナー・操作ボタンを隠す処理・全画面は T4-3。e2e（`e2e/timer.e2e.ts` 7件）を追加し、全10件通過：数字・経過・超過の切り替わり、明滅の有無（reduced-motion）、Space、Esc・Enter・確認中の進行・値の保持、横スクロールと案内の出し分け。Playwright の時計は、長い時間を `runFor` で進めると全フレームを再生して遅いため `fastForward` で飛ばしてから少し進める。スクリーンショット（モバイル通常・一時停止、デスクトップ超過・確認）も確認。W2 の項目のチェックは W2 で行う
 
 ## Phase 3: ベル
 - [ ] T3-1 【エージェント】`core/bells.ts` の関数（並べ替え、時点、鳴らないベル、予鈴の時点、番号と「次のベル」の表記、補足文、区間内のベル、次のベル）を実装する

@@ -87,6 +87,10 @@ export class Session {
 		this.snapshot = this.#timer.snapshot();
 	}
 
+	get durationMs(): number {
+		return this.#durationMs;
+	}
+
 	/** 開始ボタンの処理の中で呼ぶ。開始済み・終了後は何もしない */
 	async start(): Promise<void> {
 		if (this.#started || this.#finished) return;

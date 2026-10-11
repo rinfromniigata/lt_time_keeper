@@ -49,7 +49,7 @@
 	<div bind:this={dialog} class="dialog" role="alertdialog" aria-modal="true" aria-labelledby={titleId} {onkeydown}>
 		<h3 id={titleId}>{title}</h3>
 		{#if children}<p class="body">{@render children()}</p>{/if}
-		{#if hints}<p class="body">{@render hints()}</p>{/if}
+		{#if hints}<p class="body hints">{@render hints()}</p>{/if}
 		<div class="actions">
 			<Button variant="primary" onclick={oncancel}>{cancelLabel}</Button>
 			<Button variant="danger-fill" onclick={onconfirm}>{confirmLabel}</Button>
@@ -91,6 +91,11 @@
 		color: var(--color-text-muted);
 		font-size: var(--font-size-sm);
 		font-variant-numeric: var(--font-digits-variant);
+	}
+	/* キー操作の案内は、広い画面（.screen が渡す値）でだけ出す */
+	.hints {
+		display: var(--kbd-hints-display, flex);
+		gap: var(--space-3);
 	}
 	.actions {
 		display: flex;
