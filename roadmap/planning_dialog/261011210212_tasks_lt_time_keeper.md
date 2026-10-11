@@ -34,9 +34,10 @@
 - [x] T2-3 【エージェント】`core/bells.ts` の型定義（Bell・BellBase・Strikes）だけを先に置き、`settings/`（設定の型・初期値・持ち時間0の検証、保存インターフェースと「何もしない」実装、設定ストア）を実装する
   - 依存: T2-1
   - 実施メモ: `bells.ts` は型のみ。`settings/` は `settings.ts`（`Settings`・`DEFAULT_SETTINGS`・`validate`・`canStart`）、`repository.ts`（`SettingsRepository`・`NoopRepository`）、`store.svelte.ts`（`SettingsStore`）。`validate` の `silentBellIds` は常に空配列で、鳴らないベルの検出は T3-2 で足す。ストアは setter（持ち時間は 0..99:59 に、音量は 0..1 に収める）ごとに `save` を呼び、`snapshot()` でセッション用の複製を返す。ベルの追加・変更・削除は T3-2。ストアのテストは `$state` を使うため、`store.test.ts`（`.svelte.test.ts` は vitest の対象外）に置いた。単体テスト累計31件、`check`、`check:tokens` 通過
-- [ ] T2-4 【エージェント】部品を作る（ボタン各種、数値入力・持ち時間入力、プリセット、文字入力、状態ラベル、リング、確認ダイアログ）。S90 の状態をすべて持たせる
+- [x] T2-4 【エージェント】部品を作る（ボタン各種、数値入力・持ち時間入力、プリセット、文字入力、状態ラベル、リング、確認ダイアログ）。S90 の状態をすべて持たせる
   - 依存: T1-3, T1-5
   - 画面: S90
+  - 実施メモ: `src/lib/ui/parts/` に Button（主・通常・ゴースト・危険・危険の塗り、md／lg、アイコンのみ）、Icon、NumberField、DurationInput（分・秒・増減・0:00〜99:59）、PresetChips、TextField、StatePill、Ring、ConfirmDialog、FieldError、`state.ts`（DisplayState）を作成。hover・focus・disabled はモックのような `is-hover` 等のクラスではなく、実際の `:hover`・`:focus-visible`・`:disabled` で持たせた（hover は disabled 時に効かない）。値はトークン参照のみ。リングは `pathLength="100"`、超過の明滅は `prefers-reduced-motion` で止める。確認は、使い捨ての試験ページ（削除済み）を Playwright で操作して行った：増減・プリセット・直接入力（秒75→59、分の3桁目は入らない）・矢印キー・0:00 での「−」無効・ダイアログの初期フォーカスが「続ける」・Tab が2ボタンの間で回ること。見た目のスクリーンショットも確認。ダイアログの Enter・Esc は未実装（T2-6 のセッションが担い、フォーカス中のボタンの Enter と二重にならないよう注意する）。警告バナー・ベルの行・シート・セグメント・スイッチ・スライダー・空の状態は T3-4 以降
 - [ ] T2-5 【エージェント】設定画面の第1段階を実装する（ヘッダーのブランド表示、持ち時間、表示名、開始バー、持ち時間0のエラー）
   - 依存: T2-3, T2-4
   - 画面: S01, S01a
