@@ -4,7 +4,9 @@
 	import { formatClock } from '../../core/time.ts';
 	import { VibrationRinger } from '../../output/vibration_ringer.ts';
 	import type { Ringer } from '../../output/ringer.ts';
+	import type { UpdateNotifier } from '../../pwa/update.svelte.ts';
 	import type { SettingsStore } from '../../settings/store.svelte.ts';
+	import Banner from '../parts/Banner.svelte';
 	import BellEditor, { type BellValues } from '../parts/BellEditor.svelte';
 	import BellRow from '../parts/BellRow.svelte';
 	import ThemeMenu from '../parts/ThemeMenu.svelte';
@@ -23,8 +25,9 @@
 	let {
 		settings,
 		previewRinger,
+		update,
 		onstart
-	}: { settings: SettingsStore; previewRinger: Ringer; onstart: () => void } = $props();
+	}: { settings: SettingsStore; previewRinger: Ringer; update: UpdateNotifier; onstart: () => void } = $props();
 
 	const durationZero = $derived(settings.issues.durationZero);
 
@@ -97,6 +100,20 @@
 
 	<div class="settings">
 		<div class="settings-grid">
+			{#if update.available && !update.dismissed}
+				<div class="update">
+					<Banner
+						tone="info"
+						message="新しいバージョンがあります。"
+						detail="再読み込みすると、入力中の値は初期値に戻ります。"
+						onclose={() => update.dismiss()}
+					>
+						{#snippet actions()}
+							<Button variant="primary" onclick={() => update.reload()}>再読み込み</Button>
+						{/snippet}
+					</Banner>
+				</div>
+			{/if}
 			<div class="col">
 				<Panel title="持ち時間" order={1}>
 					<DurationInput bind:value={() => settings.durationMs, (ms) => settings.setDuration(ms)} error={durationZero} />
@@ -234,6 +251,10 @@
 		max-width: var(--layout-settings-max);
 		margin-inline: auto;
 		align-items: start;
+	}
+	/* お知らせは、列の数にかかわらず上に1行で出す */
+	.update {
+		grid-column: 1 / -1;
 	}
 	/* 狭い画面では列を解いて、パネルを order の順に1列で並べる */
 	.col {

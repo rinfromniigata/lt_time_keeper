@@ -7,6 +7,7 @@
 	import { AudioRinger } from '#lib/output/audio_ringer.ts';
 	import { CompositeRinger } from '#lib/output/composite_ringer.ts';
 	import { VibrationRinger } from '#lib/output/vibration_ringer.ts';
+	import { UpdateNotifier } from '#lib/pwa/update.svelte.ts';
 	import SettingsScreen from '#lib/ui/screens/SettingsScreen.svelte';
 	import TimerScreen from '#lib/ui/screens/TimerScreen.svelte';
 
@@ -51,15 +52,20 @@
 		screen = 'settings';
 	}
 
+	// 新しいバージョンの検知はページを開いてから閉じるまで1つ。知らせるのは S01 のときだけ（SettingsScreen が出す）
+	const update = new UpdateNotifier();
+
 	// 起動画面（S00）は app.html の静的マークアップ。表示できる状態になったら取り除く
 	onMount(() => {
 		document.getElementById('splash')?.remove();
+		void update.start();
+		return () => update.stop();
 	});
 </script>
 
 <main class="app" data-screen={screen}>
 	{#if screen === 'settings'}
-		<SettingsScreen {settings} previewRinger={audioRinger} onstart={start} />
+		<SettingsScreen {settings} previewRinger={audioRinger} {update} onstart={start} />
 	{:else if session}
 		<TimerScreen {session} title={settings.title} {fullscreen} />
 	{/if}
