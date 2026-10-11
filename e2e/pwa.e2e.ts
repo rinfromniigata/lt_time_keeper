@@ -63,9 +63,11 @@ test('再登録すると、古い版のキャッシュは消え、関係ない�
 const WORKER_FILE = fileURLToPath(new URL('../.svelte-kit/output/client/service-worker.js', import.meta.url));
 let originalWorker: string | null = null;
 
-function serveNewWorker() {
+function serveNewWorker(options: { newVersion?: boolean } = {}) {
 	originalWorker ??= readFileSync(WORKER_FILE, 'utf8');
-	writeFileSync(WORKER_FILE, originalWorker + `
+	// 版の名前（キャッシュ名に使う）も変えると、キャッシュ名の違う別の版になる
+	const base = options.newVersion ? originalWorker.replace(/version:`([^`]+)`/, 'version:`$1-next`') : originalWorker;
+	writeFileSync(WORKER_FILE, base + `
 // new version ${Date.now()}`);
 }
 
@@ -128,4 +130,88 @@ test('計測中に新しい版を受け取っても計測画面には出さず�
 	await page.keyboard.press('Escape');
 	await page.getByRole('button', { name: '終了する' }).click();
 	await expect(banner(page)).toBeVisible();
+});
+
+test('W5-1: 一度開いたあと通信を切って再読み込みしても、起動して計測できる', async ({ page, context }) => {
+	await open(page);
+	await context.setOffline(true);
+	await page.reload();
+	await expect(page.getByText('持ち時間 5:00')).toBeVisible();
+
+	await page.getByRole('button', { name: '開始' }).click();
+	await expect(page.getByRole('button', { name: '一時停止' })).toBeVisible();
+	// 時間が進む（5:00 → 4:5x）
+	await expect(page.getByText(/^4:5\d$/).first()).toBeVisible();
+});
+
+test('W5-2: 版の違うビルドでは、再読み込みのあとに古いキャッシュだけが消える', async ({ page }) => {
+	await open(page);
+	const [oldName] = await cacheNames(page);
+
+	serveNewWorker({ newVersion: true });
+	await page.evaluate(async () => (await navigator.serviceWorker.ready).update());
+	await expect(banner(page)).toBeVisible();
+	// 待機中は、古いキャッシュと新しいキャッシュが並ぶ
+	await expect.poll(async () => (await cacheNames(page)).length).toBe(2);
+
+	await page.getByRole('button', { name: '再読み込み' }).click();
+	await expect(page.getByText('持ち時間 5:00')).toBeVisible();
+	await expect.poll(() => cacheNames(page)).toHaveLength(1);
+	const [newName] = await cacheNames(page);
+	expect(newName).not.toBe(oldName);
+	expect(newName).toMatch(/-next$/);
+	await expect(banner(page)).toHaveCount(0);
+});
+
+test('W5-2: ×で閉じた場合は、そのページを閉じて次に開いたときに新しい版になる', async ({ page, context }) => {
+	await open(page);
+	const [oldName] = await cacheNames(page);
+
+	serveNewWorker({ newVersion: true });
+	await page.evaluate(async () => (await navigator.serviceWorker.ready).update());
+	await expect(banner(page)).toBeVisible();
+	await page.getByRole('button', { name: '閉じる' }).click();
+	// 閉じただけでは切り替わらない
+	expect(await cacheNames(page)).toContain(oldName);
+
+	await page.close();
+	const next = await context.newPage();
+	await next.goto(`${ORIGIN}/`);
+	await expect(next.locator('#splash')).toHaveCount(0);
+	await expect.poll(() => cacheNames(next)).toHaveLength(1);
+	expect((await cacheNames(next))[0]).toMatch(/-next$/);
+	await expect(banner(next)).toHaveCount(0);
+});
+
+test('W5-3: ページの読み込みから計測終了まで、自分のオリジン以外への通信がない', async ({ page, context }) => {
+	const urls: string[] = [];
+	context.on('request', (request) => urls.push(request.url()));
+
+	await page.goto(`${ORIGIN}/`);
+	await expect(page.locator('#splash')).toHaveCount(0);
+	await page.evaluate(() => navigator.serviceWorker.ready.then(() => undefined));
+	await page.getByRole('button', { name: '開始' }).click();
+	await expect(page.getByRole('button', { name: '一時停止' })).toBeVisible();
+	await page.waitForTimeout(1500);
+	await page.keyboard.press('Escape');
+	await page.getByRole('button', { name: '終了する' }).click();
+	await expect(page.getByText('持ち時間 5:00')).toBeVisible();
+
+	const resources = await page.evaluate(() => performance.getEntriesByType('resource').map((entry) => entry.name));
+	const external = [...urls, ...resources].filter((url) => /^https?:/.test(url) && new URL(url).origin !== ORIGIN);
+	expect(urls.length).toBeGreaterThan(5);
+	expect(external).toEqual([]);
+});
+
+test('W5-5: インストール可能と判定される（DevTools の Application と同じ検査）', async ({ page, context }) => {
+	await open(page);
+	const cdp = await context.newCDPSession(page);
+	const { installabilityErrors } = (await cdp.send('Page.getInstallabilityErrors')) as {
+		installabilityErrors: { errorId: string }[];
+	};
+	expect(installabilityErrors).toEqual([]);
+
+	const { url, errors } = (await cdp.send('Page.getAppManifest')) as { url: string; errors: { message: string }[] };
+	expect(url).toBe(`${ORIGIN}/manifest.webmanifest`);
+	expect(errors).toEqual([]);
 });

@@ -58,6 +58,7 @@ const og = `<svg xmlns="http://www.w3.org/2000/svg" width="${OG_WIDTH}" height="
 write('og.png', png(og, OG_WIDTH));
 
 const manifest = {
+	id: 'com.rinontech.lt-time-keeper', // スペックシート §10 の識別子
 	name: 'LTタイムキーパー',
 	short_name: 'LTタイマー',
 	description: 'LTやプレゼンテーションの持ち時間を計り、ベルで知らせるタイムキーパー',

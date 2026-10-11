@@ -1,4 +1,5 @@
 {
+	"id": "com.rinontech.lt-time-keeper",
 	"name": "LTタイムキーパー",
 	"short_name": "LTタイマー",
 	"description": "LTやプレゼンテーションの持ち時間を計り、ベルで知らせるタイムキーパー",
