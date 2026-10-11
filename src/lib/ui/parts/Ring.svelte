@@ -35,8 +35,8 @@
 <style>
 	.ring {
 		position: relative;
-		width: var(--ring-size);
-		height: var(--ring-size);
+		width: var(--ring-fit, var(--ring-size));
+		height: var(--ring-fit, var(--ring-size));
 	}
 	svg {
 		position: absolute;

@@ -169,6 +169,9 @@
 	.main {
 		flex: 1;
 		min-height: 0;
+		/* 警告バナーなどで高さが足りないときも、リングが操作ボタンに重ならないよう、この領域に収める */
+		container-type: size;
+		--ring-fit: min(var(--ring-size), 100cqmin);
 		display: grid;
 		place-items: center;
 	}
@@ -179,11 +182,11 @@
 		font-weight: var(--font-weight-timer);
 		letter-spacing: var(--letter-spacing-timer);
 		line-height: var(--line-height-tight);
-		font-size: calc(var(--ring-size) * var(--ring-digit-ratio));
+		font-size: calc(var(--ring-fit) * var(--ring-digit-ratio));
 		color: var(--color-text);
 	}
 	.sub-time {
-		font-size: calc(var(--ring-size) * var(--ring-digit-ratio) * 0.22);
+		font-size: calc(var(--ring-fit) * var(--ring-digit-ratio) * 0.22);
 		color: var(--color-text-muted);
 		font-variant-numeric: var(--font-digits-variant);
 	}
