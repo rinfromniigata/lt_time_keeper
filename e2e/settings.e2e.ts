@@ -49,3 +49,20 @@ test('設定画面は横スクロールが出ない', async ({ page }) => {
 		expect(overflow).toBe(false);
 	}
 });
+
+test('720px を境に、設定画面の配置と開始ボタンの幅が切り替わる', async ({ page }) => {
+	const layout = () =>
+		page.evaluate(() => {
+			const grid = getComputedStyle(document.querySelector('.settings-grid')!);
+			const start = document.querySelector('.start-bar button')!.getBoundingClientRect().width;
+			return { columns: grid.gridTemplateColumns.split(' ').length, startWidth: start };
+		});
+	await page.setViewportSize({ width: 719, height: 800 });
+	const narrow = await layout();
+	expect(narrow.columns).toBe(1);
+	expect(narrow.startWidth).toBeGreaterThan(600); // 画面幅いっぱい
+	await page.setViewportSize({ width: 720, height: 800 });
+	const wide = await layout();
+	expect(wide.columns).toBe(2);
+	expect(wide.startWidth).toBeLessThan(400);
+});

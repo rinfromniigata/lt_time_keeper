@@ -118,3 +118,59 @@ test('390px と 1280px で横スクロールが出ず、広い画面でだけキ
 		else await expect(hint).toBeHidden();
 	}
 });
+
+// 計算後の色を、トークン（CSS カスタムプロパティ）を解決した値と比べる
+async function tokenColor(page: Page, token: string): Promise<string> {
+	return page.evaluate((name) => {
+		const probe = document.createElement('i');
+		probe.style.color = `var(${name})`;
+		document.body.append(probe);
+		const color = getComputedStyle(probe).color;
+		probe.remove();
+		return color;
+	}, token);
+}
+const ringStroke = (page: Page) => page.locator('circle.progress').evaluate((el) => getComputedStyle(el).stroke);
+const ringOffset = (page: Page) =>
+	page.locator('circle.progress').evaluate((el) => Number.parseFloat(getComputedStyle(el).strokeDashoffset));
+
+test('リングは残りの割合で減り、通常は緑・超過は赤で満ちる', async ({ page }) => {
+	await open(page);
+	await page.getByRole('button', { name: '開始' }).click();
+	await advance(page, 108_000); // 残り 64%
+	expect(await ringOffset(page)).toBeCloseTo(36, 0);
+	await expect.poll(() => ringStroke(page)).toBe(await tokenColor(page, '--color-state-ok'));
+
+	await advance(page, 192_000); // 5:00 経過
+	await expect(digits(page)).toHaveText('+0:00');
+	expect(await ringOffset(page)).toBeCloseTo(0, 0);
+	await expect.poll(() => ringStroke(page)).toBe(await tokenColor(page, '--color-state-over'));
+	expect(await digits(page).evaluate((el) => getComputedStyle(el).color)).toBe(
+		await tokenColor(page, '--color-state-over')
+	);
+});
+
+test('一時停止中はリングと数字が灰色になり、「再開」は主ボタンの色になる', async ({ page }) => {
+	await open(page);
+	await page.getByRole('button', { name: '開始' }).click();
+	await advance(page, 10_000);
+	await page.keyboard.press('Space');
+	await expect.poll(() => ringStroke(page)).toBe(await tokenColor(page, '--color-state-paused'));
+	expect(await digits(page).evaluate((el) => getComputedStyle(el).color)).toBe(
+		await tokenColor(page, '--color-text-muted')
+	);
+	const resume = page.getByRole('button', { name: '再開' });
+	await expect
+		.poll(() => resume.evaluate((el) => getComputedStyle(el).backgroundColor))
+		.toBe(await tokenColor(page, '--color-accent'));
+});
+
+test('720px を境に、キー操作の案内が切り替わる', async ({ page }) => {
+	await open(page);
+	await page.getByRole('button', { name: '開始' }).click();
+	const hint = page.getByText('一時停止・再開');
+	await page.setViewportSize({ width: 719, height: 800 });
+	await expect(hint).toBeHidden();
+	await page.setViewportSize({ width: 720, height: 800 });
+	await expect(hint).toBeVisible();
+});
