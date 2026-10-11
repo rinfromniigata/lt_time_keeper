@@ -258,3 +258,102 @@ test('ベルが多くても長い表示名でも、横スクロールは出な�
 	expect(Math.abs(box.x + box.width / 2 - 640)).toBeLessThan(2);
 	expect(Math.abs(box.y + box.height / 2 - 360)).toBeLessThan(2);
 });
+
+test.describe('計測中のベル', () => {
+	// 鳴った回数は、AudioContext の代役が数えた「ベル1打ち＝発振器3本」から求める
+	async function openWithFakeAudio(page: Page, vibrate = false) {
+		await page.addInitScript((withVibrate) => {
+			const w = window as unknown as Record<string, unknown>;
+			const log = { oscillators: 0, resumed: 0, vibrations: [] as number[][] };
+			w.__audio = log;
+			class FakeContext {
+				state = 'suspended';
+				currentTime = 0;
+				destination = {};
+				createGain() {
+					return {
+						gain: { value: 0, setValueAtTime() {}, linearRampToValueAtTime() {}, exponentialRampToValueAtTime() {} },
+						connect: () => ({ connect() {} })
+					};
+				}
+				createOscillator() {
+					log.oscillators++;
+					return { type: '', frequency: { value: 0 }, connect: () => ({ connect() {} }), start() {}, stop() {} };
+				}
+				async resume() {
+					log.resumed++;
+					this.state = 'running';
+				}
+			}
+			w.AudioContext = FakeContext;
+			if (withVibrate) {
+				Object.defineProperty(Navigator.prototype, 'vibrate', {
+					value: (p: number[]) => (log.vibrations.push(p), true),
+					configurable: true,
+					writable: true
+				});
+			} else {
+				delete (Navigator.prototype as unknown as Record<string, unknown>).vibrate;
+			}
+		}, vibrate);
+		await page.clock.install();
+		await page.goto('http://localhost:4173/');
+		await expect(page.locator('#splash')).toHaveCount(0);
+	}
+	const strikes = (page: Page) =>
+		page.evaluate(() => (window as unknown as { __audio: { oscillators: number } }).__audio.oscillators / 3);
+	async function advance(page: Page, ms: number) {
+		const tail = Math.min(ms, 100);
+		if (ms > tail) await page.clock.fastForward(ms - tail);
+		await page.clock.runFor(tail);
+	}
+
+	test('開始で unlock し、1鈴（残り1:00）・2鈴（残り0:00）・3鈴（+1:00）の時点で、回数ぶん1度ずつ鳴る', async ({ page }) => {
+		await openWithFakeAudio(page);
+		await page.getByRole('button', { name: '開始' }).click();
+		await expect(page.getByRole('timer')).toHaveText('5:00');
+		expect(await page.evaluate(() => (window as unknown as { __audio: { resumed: number } }).__audio.resumed)).toBe(1);
+		expect(await strikes(page)).toBe(0);
+
+		await advance(page, 239_000); // 経過 3:59
+		expect(await strikes(page)).toBe(0);
+		await advance(page, 1_000);
+		await expect.poll(() => strikes(page)).toBe(1);
+		await advance(page, 5_000);
+		expect(await strikes(page)).toBe(1); // 二度鳴らない
+
+		await advance(page, 55_000); // 経過 5:00
+		await expect.poll(() => strikes(page)).toBe(3);
+		await advance(page, 60_000); // 経過 6:00
+		await expect.poll(() => strikes(page)).toBe(6);
+		await advance(page, 120_000);
+		expect(await strikes(page)).toBe(6);
+	});
+
+	test('振動に対応した端末で設定がオンなら、ベルと同時に振動する。オフなら振動しない', async ({ page }) => {
+		await openWithFakeAudio(page, true);
+		await page.getByRole('button', { name: '開始' }).click();
+		await advance(page, 240_000);
+		await expect.poll(() => strikes(page)).toBe(1);
+		const vibrations = () => page.evaluate(() => (window as unknown as { __audio: { vibrations: number[][] } }).__audio.vibrations);
+		expect((await vibrations()).length).toBe(1);
+
+		// 設定でオフにして、もう一度
+		await page.keyboard.press('Escape');
+		await page.keyboard.press('Enter');
+		await page.getByRole('switch', { name: 'ベルと同時に振動する' }).click();
+		await page.getByRole('button', { name: '開始' }).click();
+		await advance(page, 240_000);
+		await expect.poll(() => strikes(page)).toBe(2);
+		expect((await vibrations()).length).toBe(1);
+	});
+
+	test('ベルを全部消して開始すると、何も鳴らさず計測は続く', async ({ page }) => {
+		await openWithFakeAudio(page);
+		for (let i = 0; i < 3; i++) await page.getByRole('button', { name: /を削除/ }).first().click();
+		await page.getByRole('button', { name: '開始' }).click();
+		await advance(page, 400_000);
+		expect(await strikes(page)).toBe(0);
+		await expect(page.getByRole('timer')).toHaveText('+1:40');
+	});
+});
