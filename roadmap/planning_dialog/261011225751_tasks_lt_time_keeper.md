@@ -98,8 +98,9 @@
   - 実施メモ: `ConfirmDialog` に `initialFocus`（既定は従来どおりキャンセル側）を追加し、計測画面は `confirm` を渡す。Space は keydown・keyup とも `preventDefault` してボタンを押させない（案A）。キー割り当て（Enter・Esc）と Tab の循環は変更なし
 
 ## Phase 5: PWA とアイコン
-- [ ] T5-1 【エージェント】Service Worker を実装する（インストールした版のドキュメントで登録の挙動を確認、全資源の事前キャッシュ、版を含むキャッシュ名、古いキャッシュの削除、SKIP_WAITING）
+- [x] T5-1 【エージェント】Service Worker を実装する（インストールした版のドキュメントで登録の挙動を確認、全資源の事前キャッシュ、版を含むキャッシュ名、古いキャッシュの削除、SKIP_WAITING）
   - 依存: T1-2
+  - 実施メモ: Kit 3.0.1 の型定義とソースで確認。登録は `serviceWorker.register`（既定 true）により、ページの `load` 後に `navigator.serviceWorker.register('service-worker.js', { type: 'module' })` が自動で呼ばれる。自前登録は不要で、T5-4 は `navigator.serviceWorker.getRegistration()` から `updatefound` を拾えるため、自動登録のままにする。`src/service-worker/index.ts`（と `tsconfig.json`）を追加：`install` で `immutable`・`assets`・`prerendered` を `cache: 'reload'` で事前キャッシュし、`activate` で `cache-` で始まる古いキャッシュだけを消して `clients.claim()`、`message` の `SKIP_WAITING` でのみ `skipWaiting()`（それまでは waiting に残る）。`fetch` はキャッシュ優先で、なければネットワーク、オフラインの遷移はルートのページで答える。imple からの差分：(1) `$app/paths` の `resolve` ではなく、登録範囲（`registration.scope`）を基準に絶対 URL へ直した。マニフェストの path は先頭に `/` のない相対パスで、ルートのページは空文字のため、そのまま `Request` に渡すと SW 自身の URL に解決されたため。(2) 照合に `ignoreVary: true` を付けた。モジュールの読み込みは `Origin` 付きの要求で、事前キャッシュ時の要求と `Vary` が合わず、オフラインで JS だけ取れなかったため。キャッシュ名は `vite.config.ts` の `version.name`（`<package.json の version>+<ビルド時刻の36進>`）から `cache-0.0.1+…` になる。tsconfig のルートから `src/service-worker` を除外し（Kit の検証が要求）、`check` に `tsc -p src/service-worker/tsconfig.json` を足した。e2e（`e2e/pwa.e2e.ts` 3件：登録とキャッシュの中身・名前、オフラインの再読み込みで起動、再登録で古い版のキャッシュだけが消える）を追加し、全48件通過。`check`・`check:tokens`・単体テスト140件・`build` 通過。SKIP_WAITING の実際の切り替えは、waiting の SW を作れる T5-4 で確認する
 - [ ] T5-2 【エージェント】`scripts/gen_icons.ts` を作り、アイコン一式と OGP 画像、`manifest.webmanifest`（色はトークンから読む）を生成する
   - 依存: T1-3
 - [ ] T5-3 【エージェント】`app.html` に manifest・アイコン・OGP の参照を足す

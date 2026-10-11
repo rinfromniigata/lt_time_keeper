@@ -3,6 +3,7 @@
 	"compilerOptions": {
 		"strict": true
 	},
+	"exclude": ["src/service-worker"],
 	"include": [
 		"src",
 		"vite.config.ts",
