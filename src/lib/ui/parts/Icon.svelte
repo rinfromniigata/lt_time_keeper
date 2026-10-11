@@ -10,7 +10,8 @@
 		| 'bell'
 		| 'alert'
 		| 'back'
-		| 'moon';
+		| 'moon'
+		| 'github';
 </script>
 
 <script lang="ts">

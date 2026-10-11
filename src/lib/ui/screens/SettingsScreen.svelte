@@ -95,7 +95,18 @@
 			<svg class="brand-icon" aria-hidden="true"><use href="#ic-brand" /></svg>
 			<span>LTタイムキーパー</span>
 		</div>
-		<ThemeMenu />
+		<div class="header-actions">
+			<a
+				class="repo-link"
+				href="https://github.com/rinfromniigata/lt_time_keeper"
+				target="_blank"
+				rel="noopener noreferrer"
+				aria-label="GitHub リポジトリを開く"
+			>
+				<Icon name="github" filled />
+			</a>
+			<ThemeMenu />
+		</div>
 	</header>
 
 	<div class="settings">
@@ -229,6 +240,23 @@
 		align-items: center;
 		gap: var(--space-2);
 		font-weight: var(--font-weight-bold);
+	}
+	.header-actions {
+		display: flex;
+		align-items: center;
+		gap: var(--space-1);
+	}
+	.repo-link {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		width: var(--tap-target-min);
+		min-height: var(--tap-target-min);
+		border-radius: var(--radius-md);
+		color: var(--color-text);
+	}
+	.repo-link:hover {
+		background: var(--color-surface-raised);
 	}
 	.brand-icon {
 		width: calc(var(--icon-size) * 1.2);
