@@ -25,8 +25,9 @@
   - 実施メモ: S00 は `app.html` の静的マークアップ(`#splash`)+ `theme/splash.css`(トークン参照のみ)。スプライトも `app.html` に置いた(ブランドのマークは固定色のため CSS 検査の対象外にしたい)。`+page.svelte` の `onMount` で `#splash` を取り除く。画面は `'settings' | 'timer'` の状態で切り替える枠だけ(中身は T2-5・T2-7)。`theme.svelte.ts` は ThemeChoice と `theme.set()`(`data-theme` の付け外し)。Playwright で、ビルドを開いて S00 が消え枠が出ることを確認(Chromium を導入済み)。S00 の見た目のユーザー確認は W1 で行う
 
 ## Phase 2: タイマーの核と最小の計測（持ち時間だけで計れる）
-- [ ] T2-1 【エージェント】`core/time.ts`（時刻源の型、表示の変換）を実装する
+- [x] T2-1 【エージェント】`core/time.ts`（時刻源の型、表示の変換）を実装する
   - 依存: T1-2
+  - 実施メモ: `Now`・`SECOND`・`MAX_INPUT_MS`・`formatRemaining`（切り上げ）・`formatOver`（切り捨て、先頭に +）・`formatClock`（切り捨て）を imple どおりに実装。分は 99 を超えても繰り上げない（100:00 のように出る）。負の値は 0 に丸める。単体テスト `time.test.ts` 12件が通過。`check`・`check:tokens` も通過
 - [ ] T2-2 【エージェント】`core/timer.ts`（開始・一時停止・再開、スナップショット）を実装する
   - 依存: T2-1
 - [ ] T2-3 【エージェント】`core/bells.ts` の型定義（Bell・BellBase・Strikes）だけを先に置き、`settings/`（設定の型・初期値・持ち時間0の検証、保存インターフェースと「何もしない」実装、設定ストア）を実装する
