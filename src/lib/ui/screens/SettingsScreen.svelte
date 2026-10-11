@@ -7,6 +7,7 @@
 	import type { SettingsStore } from '../../settings/store.svelte.ts';
 	import BellEditor, { type BellValues } from '../parts/BellEditor.svelte';
 	import BellRow from '../parts/BellRow.svelte';
+	import ThemeMenu from '../parts/ThemeMenu.svelte';
 	import Button from '../parts/Button.svelte';
 	import DurationInput from '../parts/DurationInput.svelte';
 	import EmptyState from '../parts/EmptyState.svelte';
@@ -91,6 +92,7 @@
 			<svg class="brand-icon" aria-hidden="true"><use href="#ic-brand" /></svg>
 			<span>LTタイムキーパー</span>
 		</div>
+		<ThemeMenu />
 	</header>
 
 	<div class="settings">
