@@ -174,3 +174,63 @@ test('720px を境に、キー操作の案内が切り替わる', async ({ page 
 	await page.setViewportSize({ width: 720, height: 800 });
 	await expect(hint).toBeVisible();
 });
+
+test('次のベルが上部に出て、秒が数字とそろって減り、鳴るたびに次へ進み、最後は消える', async ({ page }) => {
+	await open(page);
+	const next = page.locator('.next-bell');
+	await page.getByRole('button', { name: '開始' }).click();
+	await expect(next).toContainText('1鈴まで');
+	await expect(next.locator('strong')).toHaveText('4:00');
+
+	await advance(page, 108_000); // 残り 3:12 のとき、1鈴（残り 1:00）まで 2:12
+	await expect(digits(page)).toHaveText('3:12');
+	await expect(next.locator('strong')).toHaveText('2:12');
+
+	await advance(page, 132_000); // 1鈴の時点（経過 4:00）→ 次は 2鈴
+	await expect(next).toContainText('2鈴まで');
+	await expect(next.locator('strong')).toHaveText('1:00');
+	await advance(page, 60_000);
+	await expect(next).toContainText('3鈴まで');
+	await advance(page, 60_000);
+	await expect(next).toHaveCount(0);
+});
+
+test('1鈴で予鈴（黄）になり、状態ラベルが「予鈴」に変わる', async ({ page }) => {
+	await open(page);
+	await page.getByRole('button', { name: '開始' }).click();
+	await advance(page, 239_000);
+	await expect(page.getByText('予鈴', { exact: true })).toHaveCount(0);
+	await advance(page, 1_000);
+	await expect(page.getByText('予鈴', { exact: true })).toBeVisible();
+	await expect(page.getByText('経過', { exact: false })).toHaveCount(0); // 予鈴では経過の代わりに状態ラベル
+	await advance(page, 60_000);
+	await expect(page.getByText('超過', { exact: true })).toBeVisible();
+});
+
+test('ベルが0件なら次のベルは出ず、予鈴にならずに超過へ進む', async ({ page }) => {
+	await open(page);
+	for (let i = 0; i < 3; i++) await page.getByRole('button', { name: /を削除/ }).first().click();
+	await page.getByRole('button', { name: '開始' }).click();
+	await expect(page.locator('.next-bell')).toHaveCount(0);
+	await advance(page, 299_000);
+	await expect(page.getByText('予鈴', { exact: true })).toHaveCount(0);
+});
+
+test('長い表示名は省略され、次のベルは隠れない。見出し「次のベル」は広い画面だけ', async ({ page }) => {
+	await open(page);
+	await page.getByLabel('表示名').fill('基調講演「小さなチームで続けるプロダクト開発 ── 10年分の失敗とそこから学んだ設計の習慣について」');
+	await page.getByRole('button', { name: '開始' }).click();
+	for (const width of [390, 1280]) {
+		await page.setViewportSize({ width, height: 800 });
+		const title = await page.locator('.talk-title').evaluate((el) => ({
+			clipped: el.scrollWidth > el.clientWidth,
+			right: el.getBoundingClientRect().right
+		}));
+		expect(title.clipped).toBe(true);
+		const box = (await page.locator('.next-bell').boundingBox())!;
+		expect(box.x).toBeGreaterThanOrEqual(title.right - 1);
+		expect(box.x + box.width).toBeLessThanOrEqual(width);
+		expect(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth)).toBe(false);
+		await expect(page.locator('.next-bell .prefix')).toBeVisible({ visible: width === 1280 });
+	}
+});

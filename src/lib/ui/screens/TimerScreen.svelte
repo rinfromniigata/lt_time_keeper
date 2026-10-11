@@ -19,6 +19,11 @@
 <div class="screen timer {display.state}">
 	<div class="top">
 		<p class="talk-title">{title}</p>
+		{#if display.next}
+			<span class="next-bell">
+				<span class="prefix">次のベル　</span>{display.next.label} <strong>{display.next.in}</strong>
+			</span>
+		{/if}
 	</div>
 
 	<div class="main">
@@ -98,6 +103,21 @@
 		text-overflow: ellipsis;
 		min-width: 0;
 		min-height: var(--line-height-normal);
+	}
+
+	/* 広い画面では文字を大きくし、「次のベル」の見出しを付ける（値は .screen が渡す） */
+	.next-bell {
+		flex: none;
+		font-size: var(--next-bell-size);
+		color: var(--color-text-muted);
+		font-variant-numeric: var(--font-digits-variant);
+	}
+	.next-bell strong {
+		color: var(--color-text);
+		font-family: var(--font-digits);
+	}
+	.prefix {
+		display: var(--next-bell-prefix-display);
 	}
 
 	.main {
