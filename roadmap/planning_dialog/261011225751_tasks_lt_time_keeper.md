@@ -104,8 +104,9 @@
 - [x] T5-2 【エージェント】`scripts/gen_icons.ts` を作り、アイコン一式と OGP 画像、`manifest.webmanifest`（色はトークンから読む）を生成する
   - 依存: T1-3
   - 実施メモ: `@resvg/resvg-js` 2.6.2 を devDependencies に追加し、`bun run gen:icons` で実行する。入力は `roadmap/specs/` の最新版のマスターSVGとトークン。`static/icons/` に `favicon.svg`（コピー）・`favicon-32.png`・`apple-touch-icon.png`（180）・`icon-192.png`・`icon-512.png`・`icon-maskable-512.png`・`og.png`（1200×630）を、`static/manifest.webmanifest` を生成した（寸法は PNG のヘッダーで確認、ビルド出力にも入る）。maskable は、マスターが全面塗りでモチーフが安全領域内にあるため、拡大・移動せず通常版と同じ描画にした。OGP は、地をマスターSVGの背景色（最初の rect の fill）、アイコンを中央（高さいっぱい）に置いた。manifest の `background_color`・`theme_color` は、テーマで切り替えられないため、tokens のダーク側の `--color-bg`（#121316。アイコンの地と同じ）を読んで入れる。`name` は「LTタイムキーパー」、`short_name` は「LTタイマー」、`start_url`・`scope` は `/`、`display` は `standalone`（スペックシートに指定がなかったための判断）。32px の見え方と OGP を目視で確認。`app.html` への参照は T5-3、WindowsとmacOSでの見え方のユーザー確認は W5
-- [ ] T5-3 【エージェント】`app.html` に manifest・アイコン・OGP の参照を足す
+- [x] T5-3 【エージェント】`app.html` に manifest・アイコン・OGP の参照を足す
   - 依存: T5-2
+  - 実施メモ: `<head>` に description・theme-color・manifest・favicon（SVG と 32px PNG）・apple-touch-icon・OGP（og:type/title/description/url/image と画像の寸法）・twitter:card（summary_large_image）を追加。ローカルの資源は `/` から始まるパスで、OGP の url・image はスペックシート §10 の公開URL `https://lt.rinontech.com/` の絶対 URL（SNS が絶対 URL を要求するため）。theme-color は manifest と同じ `#121316` で、`app.html` は検査（check_tokens）の対象外のため直書きになっており、コメントに出どころを残した（トークンが変わったら `gen:icons` の結果と合わせて直す）。ビルドした `index.html` に反映されること、`check`・`check:tokens`・e2e 48件通過を確認。ブラウザのタブ・ホーム画面での見え方は W5 でユーザーが確認する
 - [ ] T5-4 【エージェント】更新のお知らせを実装する（UpdateNotifier、S01 のときだけバナーを出す、再読み込み、閉じる）
   - 依存: T5-1, T2-5
   - 画面: S01f
