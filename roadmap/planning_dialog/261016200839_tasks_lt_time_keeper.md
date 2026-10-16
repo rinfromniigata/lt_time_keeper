@@ -152,9 +152,10 @@
   - 実施メモ: `CONTRIBUTING.md` を新規作成（指定の8節）。README の「必要なもの」「開発」「確認」「ビルド」「アイコン生成」「リリース」を移し、`check:tokens` の説明に文字色の検査を足し、リリース手順を番号つきに整えた。README には概要・公開先・`CONTRIBUTING.md` へのリンク1行・ドキュメント・ライセンスだけを残した（書き直しは T11-2）。判断: 「受け付け方針」はスペックシートに記載がなかったため、Issue での報告・要望を受け付け、PR は Issue で事前に相談、確定仕様の変更提案は合意が先、Apache-2.0 での提供に同意したものとして扱う、という案で書いた（方針と違えば直す）。リポジトリ構成は現状（v0.1.0 の層）のもので、`i18n/`・`storage/`・`prefs/` などは作った時点で、仕上げは T11-3。`check:i18n` の追記は T8-7
 
 ## Phase 8: i18n の基盤と既存画面の多言語化
-- [ ] T8-1 【エージェント】`src/lib/i18n/` に、3言語の辞書（`locales/{ja,en,zh-Hans}.json`）、`messages.ts`（`MessageKey`・`Message`・`msg`・`format`。複数形は `Intl.PluralRules`、引数に別のメッセージを入れられる、欠けたキーは ja にフォールバック）、`detect.ts`（`detectLocale`）を作り、単体テストを書く
+- [x] T8-1 【エージェント】`src/lib/i18n/` に、3言語の辞書（`locales/{ja,en,zh-Hans}.json`）、`messages.ts`（`MessageKey`・`Message`・`msg`・`format`。複数形は `Intl.PluralRules`、引数に別のメッセージを入れられる、欠けたキーは ja にフォールバック）、`detect.ts`（`detectLocale`）を作り、単体テストを書く
   - 辞書には、モックの辞書のうち既存画面（S00〜S03f）が使うキーだけを移す。S05〜S05c と S03f のチェックボックス・ヘッダーの歯車のキーは、使う画面を作るとき（T9-5・T9-6・T9-7・T10-3・T10-4）に足す。`sample.*` は移さない
   - en・zh-Hans の辞書は `satisfies` で型を検査する
+  - 実施メモ: `src/lib/i18n/` に `locales/{ja,en,zh-Hans}.json`・`messages.ts`・`detect.ts`・`messages.test.ts` を追加。辞書はモックの辞書（124キー）から、次を除いた82キーを移した：`sample.*`、`header.open_prefs`、`prefs.title`、`prefs.tab.general|about`、`prefs.language.*`、`prefs.end_confirm.*`、`prefs.about.*`、`privacy.*`、`end_confirm.dont_ask*`、`prefs.sound.vibrate_hint`（使う画面の項目で足す）。残した `prefs.theme.*`・`prefs.tab.sound`・`prefs.sound.*` は T8-5 で、テーマのメニューと音のパネルが使う。ThemeMenu の「テーマを切り替える」に当たるキーはモックにないため、`prefs.theme.title` を当てるかは T8-5 で決める。`format` は複数形を `args.n` と `Intl.PluralRules` で選び、`{name}` を置き換え、引数が `Message` なら同じ言語で再帰的に組み立てる。キーが当該言語になければ ja、どこにもなければキー名を返す。足りない引数は `{name}` のまま残す。`en.json`・`zh-Hans.json` の `satisfies Dictionary` はテストの読み込み箇所に置いた（`i18n.svelte.ts` ができたら T8-2 で本番の読み込み側にも置く）。単体テスト 11件追加（累計172件）、`check` 0エラー、`check:tokens` 通過
 - [ ] T8-2 【エージェント】`i18n.svelte.ts`（`locale` の状態、`t`・`tm`、`<html lang>` と `document.title` の反映）と `LOCALE_NAMES` を作り、`+page.svelte` で起動時の言語を `detectLocale(navigator.languages)` から決める
   - 依存: T8-1
 - [ ] T8-3 【エージェント】`core/bells.ts` の `bellBadge`・`nextBellName`（旧 `nextBellLabel`）と、`session` の `display`（`sub`・`next`）を、辞書のメッセージを返す形に変え、単体テストを直す
