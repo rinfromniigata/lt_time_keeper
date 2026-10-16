@@ -1,4 +1,4 @@
-// トークンの一致と、色・寸法の直書きを検査する（CI でも実行する）
+// トークンの一致と、色・寸法の直書き、文字色の状態色（-text）を検査する（CI でも実行する）
 import { readdirSync, readFileSync, statSync } from 'node:fs';
 import { join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -33,6 +33,8 @@ if (!specTokens) {
 // 2. .svelte・.css に色と寸法の直書きがないこと
 const COLOR = /#[0-9a-fA-F]{3,8}\b|\brgba?\(|\bhsla?\(/;
 const DIMENSION = /(?<![\w.-])\d*\.?\d+(?:px|rem|ms)\b/;
+// 文字色（color:）に無印の状態色を使っていない（文字には -text を使う。リング・点・アイコンは無印でよい）
+const STATE_TEXT = /(?<![\w-])color\s*:[^;}]*var\(\s*--color-state-(?:ok|warn|over|paused)\s*[,)]/;
 
 function walk(dir: string): string[] {
 	return readdirSync(dir).flatMap((name) => {
@@ -57,6 +59,8 @@ for (const file of walk(srcDir)) {
 			for (const a of ALLOWED) if (a.file === rel) rest = rest.replaceAll(a.text, '');
 			if (COLOR.test(rest)) problems.push(`${rel}:${i + 1} 色の直書き: ${line.trim()}`);
 			if (DIMENSION.test(rest)) problems.push(`${rel}:${i + 1} 寸法の直書き: ${line.trim()}`);
+			if (STATE_TEXT.test(rest))
+				problems.push(`${rel}:${i + 1} 文字色に無印の状態色（-text を使う）: ${line.trim()}`);
 		});
 }
 
