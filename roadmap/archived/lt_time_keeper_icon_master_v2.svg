@@ -1,6 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
-  <!-- lt_time_keeper アイコン（マスター）。背景は全面塗り、モチーフは中央・直径680pxの円の内側 -->
-  <rect width="1024" height="1024" fill="#121316"/>
-  <circle cx="512" cy="512" r="280" fill="none" stroke="#2a2d33" stroke-width="120"/>
-  <path d="M512 232 A280 280 0 1 1 245.7 598.5" fill="none" stroke="#3ccf7a" stroke-width="120" stroke-linecap="round"/>
-</svg>

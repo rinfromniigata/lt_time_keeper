@@ -1,8 +1,10 @@
 # lt_time_keeper 実装項目（tasks）
 
-- 設計: `261011225751_imple_lt_time_keeper.md`
-- 検証: `261011225751_walk_lt_time_keeper.md`（同じ Phase 番号の W 項目）
+- 設計: `261016200839_imple_lt_time_keeper.md`
+- 検証: `261016200839_walk_lt_time_keeper.md`（同じ Phase 番号の W 項目）
 - 進め方: Tn をすべて終えたら Wn を行い、Wn がすべて通過してから Phase n+1 に進む
+- 版の経緯: Phase 1〜6 は v0.1.0（前版 `archived/261011225751_tasks_lt_time_keeper.md`）の項目で、ID・チェック・実施メモをそのまま引き継いだ。Phase 7〜11 は v0.2.0（仕様変更 `development/261016195942_change_v0_2_0_update.md`）の項目
+  - Phase 1〜6 の実施メモにある `_v2` のファイル名は、当時の版を指す
 
 ---
 
@@ -130,3 +132,95 @@
 - [x] T6-6 【ユーザー】コミットして main に push し、`v0.1.0` タグを push する。Actions の完了後、ドラフトリリースを公開する
   - 実施メモ: main への push と `v0.1.0` タグの push を行った。1回目の Actions は e2e の不安定なテストで失敗したため、修正（`development/261011235534_fix_pwa_e2e_reload_race.md`）後にリモートのタグを削除して打ち直し、2回目が成功。ドラフトリリース v0.1.0 をユーザーが公開（`gh` で公開済みを確認）
   - 依存: T6-4, T6-5
+
+---
+
+以下、v0.2.0（プランアセット v3）。
+
+## Phase 7: トークン v3 と既存画面の色
+- [ ] T7-1 【エージェント】specs の `lt_time_keeper_tokens_v3.css` を `src/lib/theme/tokens.css` へ無変更でコピーし、`brand_v3.md`・`icon_master_v3.svg` を `docs/brand/` へコピーする（`docs/brand/` の v2 の写しは削除する）
+- [ ] T7-2 【エージェント】`scripts/check_tokens.ts` に、`color:` に無印の `--color-state-*` を使っていないか（文字には `-text` を使うか）の検査を足す
+  - 依存: T7-1
+- [ ] T7-3 【エージェント】既存の部品・画面に v3 のトークンを適用する。状態色の文字（状態ラベル・ベルの行の補足文・次のベル）は `--color-state-*-text`、入力欄・数値入力・スイッチ・セグメント・プリセットの境界は `--color-border-input`、パネルや行の区切りは `--color-border` のままにする
+  - 依存: T7-2
+  - 画面: S01, S01a, S01c, S01d, S03, S03a, S03b, S03c, S90
+- [ ] T7-4 【エージェント】`CONTRIBUTING.md` の骨格（受け付け方針、開発環境、セットアップ、確認・テスト、ビルド、アイコン生成、リリース、リポジトリ構成）を作り、`README.md` の開発・ビルド・リリースの節をそこへ移す。README には `CONTRIBUTING.md` へのリンクを1行置く（README の書き直しは T11-2）
+
+## Phase 8: i18n の基盤と既存画面の多言語化
+- [ ] T8-1 【エージェント】`src/lib/i18n/` に、3言語の辞書（`locales/{ja,en,zh-Hans}.json`）、`messages.ts`（`MessageKey`・`Message`・`msg`・`format`。複数形は `Intl.PluralRules`、引数に別のメッセージを入れられる、欠けたキーは ja にフォールバック）、`detect.ts`（`detectLocale`）を作り、単体テストを書く
+  - 辞書には、モックの辞書のうち既存画面（S00〜S03f）が使うキーだけを移す。S05〜S05c と S03f のチェックボックス・ヘッダーの歯車のキーは、使う画面を作るとき（T9-5・T9-6・T9-7・T10-3・T10-4）に足す。`sample.*` は移さない
+  - en・zh-Hans の辞書は `satisfies` で型を検査する
+- [ ] T8-2 【エージェント】`i18n.svelte.ts`（`locale` の状態、`t`・`tm`、`<html lang>` と `document.title` の反映）と `LOCALE_NAMES` を作り、`+page.svelte` で起動時の言語を `detectLocale(navigator.languages)` から決める
+  - 依存: T8-1
+- [ ] T8-3 【エージェント】`core/bells.ts` の `bellBadge`・`nextBellName`（旧 `nextBellLabel`）と、`session` の `display`（`sub`・`next`）を、辞書のメッセージを返す形に変え、単体テストを直す
+  - 依存: T8-1
+- [ ] T8-4 【エージェント】`hooks.server.ts` の `transformPageChunk` で、S00 の文言・言語ごとのアプリ名・`description`・OGP を辞書から `app.html` に差し込み、`app.html` の先頭に、ブラウザの言語から `lang` と題名を描画前に決めるインラインスクリプトを置く
+  - 依存: T8-1
+  - 画面: S00
+- [ ] T8-5 【エージェント】既存の画面と部品の文言をすべて辞書の参照に置き換える。ヘッダーの GitHub リンクは廃止する（リンクは T10-3 で S05b に置く）。テーマのメニューと音のパネルは、v3 のモックで移った先のキー（`prefs.theme.*`・`prefs.tab.sound`・`prefs.sound.*`）を使い、T9-6 で取り除くまで残す
+  - 依存: T8-2, T8-3, T8-4
+  - 画面: S01, S01a, S01b, S01c, S01d, S01f, S03, S03a, S03b, S03c, S03d, S03e, S03f
+- [ ] T8-6 【エージェント】疑似ロケール（`pseudo.ts`）を作り、開発サーバーと `VITE_PSEUDO_LOCALE=1` のビルドで、`?pseudo` を付けて開いたときだけ有効にする
+  - 依存: T8-2
+- [ ] T8-7 【エージェント】`scripts/check_i18n.ts` を作り、`bun run check:i18n` で、キーの一致、プレースホルダの一致、未使用キー、`.svelte` の文字の直書きを検査する。`release.yml` の `check:tokens` の後に足し、`CONTRIBUTING.md` に追記する
+  - 依存: T8-5, T7-4
+- [ ] T8-8 【エージェント】`playwright.config.ts` の既定のロケールを `ja-JP` にし、言語ごとの e2e（`ja-JP`・`en-US`・`zh-TW`・`fr-FR` で開いたときの言語・題名・S00・S01 の文言）を足す
+  - 依存: T8-5
+
+## Phase 9: 保存・環境設定（一般・音）と S01・S03f の改修
+- [ ] T9-1 【エージェント】`storage/storage.ts`（`KeyValueStorage`、`LocalStorageKV`、`MemoryKV`）、`prefs/prefs.ts`（型と初期値）、`storage/prefs_codec.ts`（版番号つきの形の符号化と、項目ごとの検証）を作り、単体テストを書く
+- [ ] T9-2 【エージェント】`prefs/store.svelte.ts`（`PrefsStore`。変えるたびに保存）を作る。`Settings` から `volume`・`vibrate` を外して `prefs` に移し、`theme.svelte.ts` を `theme.ts`（`prefs.theme` を `data-theme` に反映）に置き換え、起動時の言語を `prefs.locale ?? detectLocale(...)` にする。単体テストを直す
+  - 依存: T9-1, T8-2
+- [ ] T9-3 【エージェント】`app.html` のインラインスクリプトで、保存値の言語・テーマを描画前に反映する（キー名と形は `prefs_codec.ts` の定数を `hooks.server.ts` から渡す）
+  - 依存: T9-1, T8-4
+  - 画面: S00
+- [ ] T9-4 【エージェント】部品 `Tabs`（WAI-ARIA の tabs）と `Checkbox` を作る。S90 の通常・hover・focus・disabled を持たせ、境界は `--color-border-input`
+  - 依存: T7-3
+  - 画面: S90
+- [ ] T9-5 【エージェント】`PrefsScreen.svelte` に「一般」「音」の2つのタブを作る（720px 以上はダイアログ、未満は全画面。×・Esc で閉じ、歯車へフォーカスを戻す）。一般は言語・表示テーマ・終了の確認、音は音量・鳴らしてみる・振動（対応端末だけ）。使うキーを辞書に足す
+  - 依存: T9-2, T9-4
+  - 画面: S05, S05a
+- [ ] T9-6 【エージェント】S01 のヘッダーを歯車のボタンだけにし（`ThemeMenu.svelte` を削除）、音のパネルを外す。`+page.svelte` に環境設定の開閉を足す。使うキーを辞書に足す
+  - 依存: T9-5
+  - 画面: S01, S01b, S01c, S01f
+- [ ] T9-7 【エージェント】終了の確認に「今後この確認を表示しない」を足し、`Session` に `shouldConfirmEnd`・`onDontAskAgain`・`confirmFinish(dontAskAgain)` を足す。確認を出さない設定では「終了」ボタンも Esc もすぐ S01 に戻す。使うキーを辞書に足し、単体テストを書く
+  - 依存: T9-2, T9-4
+  - 画面: S03f
+- [ ] T9-8 【エージェント】e2e を足し、既存の e2e を直す（S01 の音のパネル・テーマのメニュー・GitHub リンクを前提にしたもの）。保存の e2e は `page.addInitScript` で `localStorage` を用意して開く
+  - 依存: T9-3, T9-6, T9-7
+
+## Phase 10: アプリ情報・プライバシーポリシー・PWA の名前
+- [ ] T10-1 【エージェント】`vite.config.ts` の `define` で `package.json` の `version` を `__APP_VERSION__` として埋め込み、型を宣言する
+- [ ] T10-2 【エージェント】`scripts/oss_collect.ts`（Vite プラグイン）と、`routes/oss.json/+server.ts`・`routes/third_party_licenses.txt/+server.ts` を作る。インストールした版で、クライアントのビルドが書き出しより先に終わることを確かめ、成り立たなければ imple §3.11 の代わりの方法に切り替えて imple を直す
+- [ ] T10-3 【エージェント】環境設定に「アプリ情報」タブ（S05b）を足す。アイコン・アプリ名・ひとこと説明・バージョン・ソースコードへのリンク（新しいタブ）・ライセンス・OSS 一覧（`oss.json`）・プライバシーポリシーへの入口。使うキーを辞書に足す
+  - 依存: T10-1, T10-2, T9-5
+  - 画面: S05b
+- [ ] T10-4 【エージェント】プライバシーポリシー（S05c）を作る。S05b から開き、「アプリ情報」で戻る。`{version}` に `__APP_VERSION__` を入れる。使うキーを辞書に足す
+  - 依存: T10-3
+  - 画面: S05c
+- [ ] T10-5 【エージェント】`scripts/gen_icons.ts` の manifest を英語表記にする（`name` "LT Timekeeper"、`short_name` "LT Timer"、`description` は en の辞書から、`lang` "en"、`id` は変えない）。`bun run gen:icons` を実行し、アイコンに差分がないことを確かめる
+  - 依存: T8-1
+- [ ] T10-6 【エージェント】S05b・S05c・manifest・オフラインの e2e を足す
+  - 依存: T10-4, T10-5
+- [ ] T10-7 【エージェント】英語・中国語の訳を見直し（意味を変えない範囲）、確認用の一覧（キー・ja・en・zh-Hans・画面ID）を `development/` に作る
+  - 依存: T10-4
+- [ ] T10-8 【ユーザー】T10-7 の一覧で訳を確認し、直したい箇所を伝える
+  - 依存: T10-7
+- [ ] T10-9 【エージェント】T10-8 の指摘を辞書に反映する（言い回しの修正は fix として記録する）
+  - 依存: T10-8
+
+## Phase 11: リリース準備（v0.2.0）
+- [ ] T11-1 【エージェント】README 用のスクリーンショットを3言語で撮り、`docs/images/screenshot_{ja,en,zh-Hans}.png` に置く。`docs/lt_time_keeper_pr_v0.1.0.png` は参照をなくしてから削除する
+  - 依存: T10-9
+- [ ] T11-2 【エージェント】`README.md`（日本語）を利用者向けに書き直し、`README.en.md`・`README.zh-Hans.md` を作る。冒頭に言語のリンク、中身は目的・スクリーンショット・特徴・使い方・対応環境・プライバシー・ライセンス
+  - 依存: T11-1
+- [ ] T11-3 【エージェント】`CONTRIBUTING.md` を仕上げる（疑似ロケール、`check:i18n`、OSS 一覧の生成、保存のキー名、リポジトリ構成の更新）
+  - 依存: T10-9
+- [ ] T11-4 【エージェント】GitHub の About 欄の文案（英語の説明文・Webサイト・トピック）を提示する
+  - 依存: T11-2
+- [ ] T11-5 【エージェント】`CHANGELOG.md` に 0.2.0 を書き、`package.json` の version を 0.2.0 にする
+  - 依存: T11-2, T11-3
+- [ ] T11-6 【エージェント】リリース前の確認をする（ワークフローと同じ手順のローカル実行、アイコン一式が specs の最新のマスターSVGから生成されたものか、README の特徴・使い方・スクリーンショット・対応環境が実物と一致するか、各言語の README が `README.md` に追従しているか、訳がユーザーに確認済みか）。コミットメッセージとタグのコマンドを提示して停止する
+  - 依存: T11-4, T11-5
+- [ ] T11-7 【ユーザー】コミットして main に push し、`v0.2.0` タグを push する。Actions の完了後、ドラフトリリースを公開し、About 欄を設定する
+  - 依存: T11-6
