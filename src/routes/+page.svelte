@@ -1,5 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import { detectLocale } from '#lib/i18n/detect.ts';
+	import { i18n } from '#lib/i18n/i18n.svelte.ts';
 	import { SettingsStore } from '#lib/settings/store.svelte.ts';
 	import { Session } from '#lib/session/session.svelte.ts';
 	import { BrowserFullscreen } from '#lib/device/fullscreen.ts';
@@ -55,8 +57,15 @@
 	// 新しいバージョンの検知はページを開いてから閉じるまで1つ。知らせるのは S01 のときだけ（SettingsScreen が出す）
 	const update = new UpdateNotifier();
 
+	// 言語が変わるたびに <html lang> と題名を合わせる
+	$effect(() => {
+		i18n.apply();
+	});
+
 	// 起動画面（S00）は app.html の静的マークアップ。表示できる状態になったら取り除く
 	onMount(() => {
+		// 言語は起動時にブラウザの言語から決める（書き出した HTML は1言語でしか描けないため、S00 を消す前に切り替える）
+		i18n.setLocale(detectLocale(navigator.languages));
 		document.getElementById('splash')?.remove();
 		void update.start();
 		return () => update.stop();
