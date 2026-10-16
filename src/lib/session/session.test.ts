@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { Bell, Strikes } from '../core/bells.ts';
+import { msg } from '../i18n/messages.ts';
 import type { Ringer } from '../output/ringer.ts';
 import { DEFAULT_SETTINGS, type Settings } from '../settings/settings.ts';
 import type { WakeLockControl } from '../device/wake_lock.ts';
@@ -163,12 +164,12 @@ describe('Session の表示', () => {
 		expect(session.display).toEqual({
 			digits: '5:00',
 			state: 'ok',
-			sub: '経過 0:00 ／ 5:00',
-			next: { label: '1鈴まで', in: '4:00' }
+			sub: msg('timer.elapsed', { elapsed: '0:00', total: '5:00' }),
+			next: { name: msg('settings.bells.label_ordinal', { n: 1 }), in: '4:00' }
 		});
 		advance(108000);
 		expect(session.display.digits).toBe('3:12');
-		expect(session.display.sub).toBe('経過 1:48 ／ 5:00');
+		expect(session.display.sub).toEqual(msg('timer.elapsed', { elapsed: '1:48', total: '5:00' }));
 	});
 
 	it('持ち時間を過ぎると +m:ss で数え上げ、サブ表示は消える', async () => {
@@ -181,7 +182,7 @@ describe('Session の表示', () => {
 			digits: '+0:00',
 			state: 'over',
 			sub: null,
-			next: { label: '3鈴まで', in: '1:00' }
+			next: { name: msg('settings.bells.label_ordinal', { n: 3 }), in: '1:00' }
 		});
 		advance(42900);
 		expect(session.display.digits).toBe('+0:42');
@@ -493,21 +494,24 @@ describe('ベル', () => {
 		const { session, advance } = setup();
 		await session.start();
 		advance(1);
-		expect(session.display.next).toEqual({ label: '1鈴まで', in: '4:00' });
+		expect(session.display.next).toEqual({ name: msg('settings.bells.label_ordinal', { n: 1 }), in: '4:00' });
 		advance(4 * MIN - 1);
-		expect(session.display.next).toEqual({ label: '2鈴まで', in: '1:00' });
+		expect(session.display.next).toEqual({ name: msg('settings.bells.label_ordinal', { n: 2 }), in: '1:00' });
 		advance(MIN);
-		expect(session.display.next).toEqual({ label: '3鈴まで', in: '1:00' });
+		expect(session.display.next).toEqual({ name: msg('settings.bells.label_ordinal', { n: 3 }), in: '1:00' });
 		advance(MIN);
 		expect(session.display.next).toBeNull();
 	});
 
-	it('4件以上のときは「n番目のベルまで」と出る', async () => {
+	it('4件以上のときは「n番目のベル」の名前になる', async () => {
 		const bells = [1, 2, 3, 4].map((i) => bell(`b${i}`, 'remaining', i * MIN, 1));
 		const { session } = setup(300000, { bells });
 		await session.start();
 		// 時刻順は 残り4:00・3:00・2:00・1:00 の順なので、最初に来るのは残り4:00（経過1:00）の1番目
-		expect(session.display.next).toEqual({ label: '1番目のベルまで', in: '1:00' });
+		expect(session.display.next).toEqual({
+			name: msg('timer.bell_ordinal_long', { n: 1 }),
+			in: '1:00'
+		});
 	});
 
 	it('設定を後から変えても、開始時点の値で動く', async () => {

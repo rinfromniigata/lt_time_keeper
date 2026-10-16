@@ -1,3 +1,5 @@
+import { msg, type Message } from '../i18n/messages.ts';
+
 export type BellBase = 'remaining' | 'over'; // 残り／超過後
 export type Strikes = 1 | 2 | 3;
 
@@ -39,14 +41,23 @@ export function warnAtElapsed(bells: Bell[], durationMs: number): number | null 
 	return at < durationMs ? at : null;
 }
 
-/** 並び順の番号の表記。index は 0 始まり。3件以下 "1鈴"、4件以上 "1" */
-export function bellBadge(index: number, count: number): string {
-	return count <= 3 ? `${index + 1}鈴` : `${index + 1}`;
+/**
+ * 並び順の番号の表記。index は 0 始まり。
+ * 3件以下は settings.bells.label_ordinal（1鈴・Bell 1）、4件以上は settings.bells.label_number（1）
+ */
+export function bellBadge(index: number, count: number): Message {
+	return count <= 3
+		? msg('settings.bells.label_ordinal', { n: index + 1 })
+		: msg('settings.bells.label_number', { n: index + 1 });
 }
 
-/** 「次のベル」の表記。index は 0 始まり。3件以下 "1鈴まで"、4件以上 "4番目のベルまで" */
-export function nextBellLabel(index: number, count: number): string {
-	return count <= 3 ? `${index + 1}鈴まで` : `${index + 1}番目のベルまで`;
+/**
+ * 「次のベル」の文に入れるベルの名前。index は 0 始まり。
+ * 3件以下は bellBadge と同じ、4件以上は timer.bell_ordinal_long（4番目のベル）。
+ * 「〜まで」は timer.next_bell_long・timer.next_bell_short の側で組む
+ */
+export function nextBellName(index: number, count: number): Message {
+	return count <= 3 ? bellBadge(index, count) : msg('timer.bell_ordinal_long', { n: index + 1 });
 }
 
 /**

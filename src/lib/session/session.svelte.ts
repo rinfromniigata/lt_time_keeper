@@ -1,7 +1,8 @@
-import { dueStrikes, nextBell, nextBellLabel, warnAtElapsed, type Bell } from '../core/bells.ts';
+import { dueStrikes, nextBell, nextBellName, warnAtElapsed, type Bell } from '../core/bells.ts';
 import { formatClock, formatOver, formatRemaining, SECOND, type Now } from '../core/time.ts';
 import { Timer, type TimerSnapshot } from '../core/timer.ts';
 import type { WakeLockControl } from '../device/wake_lock.ts';
+import { msg, type Message } from '../i18n/messages.ts';
 import type { Ringer } from '../output/ringer.ts';
 import type { Settings } from '../settings/settings.ts';
 import type { DisplayState } from '../ui/parts/state.ts';
@@ -88,8 +89,8 @@ export interface KeyInput {
 export interface SessionDisplay {
 	digits: string; // 残り（切り上げ）または超過「+m:ss」
 	state: DisplayState; // 一時停止を優先した、画面に出す状態
-	sub: string | null; // 「経過 1:48 ／ 5:00」。通常のときだけ。それ以外は状態ラベルを出すので null
-	next: { label: string; in: string } | null; // 「1鈴まで」「0:42」。残りのベルがなければ null
+	sub: Message | null; // timer.elapsed（「経過 1:48 ／ 5:00」）。通常のときだけ。それ以外は状態ラベルを出すので null
+	next: { name: Message; in: string } | null; // 画面が timer.next_bell_long・_short に入れる。残りのベルがなければ null
 }
 
 const INTERACTIVE_TAGS = new Set(['BUTTON', 'A', 'INPUT', 'TEXTAREA', 'SELECT']);
@@ -145,7 +146,10 @@ export class Session {
 			state,
 			sub:
 				state === 'ok'
-					? `経過 ${formatClock(s.elapsedMs)} ／ ${formatClock(this.#durationMs)}`
+					? msg('timer.elapsed', {
+							elapsed: formatClock(s.elapsedMs),
+							total: formatClock(this.#durationMs)
+						})
 					: null,
 			next: this.#nextDisplay(s.elapsedMs)
 		};
@@ -355,7 +359,7 @@ export class Session {
 		const next = nextBell(this.#bells, this.#durationMs, elapsedMs);
 		if (next === null) return null;
 		// 残り時間と同じ切り上げで出す（大きな数字と秒が切り替わるタイミングをそろえる）
-		return { label: nextBellLabel(next.index, this.#bells.length), in: formatRemaining(next.inMs) };
+		return { name: nextBellName(next.index, this.#bells.length), in: formatRemaining(next.inMs) };
 	}
 }
 

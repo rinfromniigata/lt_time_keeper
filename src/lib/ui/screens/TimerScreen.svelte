@@ -7,6 +7,7 @@
 	import ConfirmDialog from '../parts/ConfirmDialog.svelte';
 	import Icon from '../parts/Icon.svelte';
 	import Kbd from '../parts/Kbd.svelte';
+	import { i18n } from '#lib/i18n/i18n.svelte.ts';
 	import Ring from '../parts/Ring.svelte';
 	import StatePill from '../parts/StatePill.svelte';
 
@@ -59,7 +60,7 @@
 		<p class="talk-title">{title}</p>
 		{#if display.next}
 			<span class="next-bell">
-				<span class="prefix">次のベル　</span>{display.next.label} <strong>{display.next.in}</strong>
+				<span class="prefix">次のベル　</span>{i18n.tm(display.next.name)}まで <strong>{display.next.in}</strong>
 			</span>
 		{/if}
 	</div>
@@ -68,7 +69,7 @@
 		<Ring progress={session.snapshot.progress} state={display.state}>
 			<span class="digits" role="timer">{display.digits}</span>
 			{#if display.sub !== null}
-				<span class="sub-time">{display.sub}</span>
+				<span class="sub-time">{i18n.tm(display.sub)}</span>
 			{:else}
 				<StatePill state={display.state} />
 			{/if}

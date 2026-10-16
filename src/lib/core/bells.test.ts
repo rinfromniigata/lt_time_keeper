@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { msg } from '../i18n/messages.ts';
 import {
 	bellAtElapsed,
 	bellBadge,
@@ -6,7 +7,7 @@ import {
 	dueStrikes,
 	isSilent,
 	nextBell,
-	nextBellLabel,
+	nextBellName,
 	sortBells,
 	warnAtElapsed,
 	type Bell,
@@ -88,18 +89,18 @@ describe('warnAtElapsed', () => {
 	});
 });
 
-describe('bellBadge / nextBellLabel', () => {
-	it('3件以下は「n鈴」、4件以上は数字だけ', () => {
-		expect(bellBadge(0, 1)).toBe('1鈴');
-		expect(bellBadge(2, 3)).toBe('3鈴');
-		expect(bellBadge(0, 4)).toBe('1');
-		expect(bellBadge(3, 4)).toBe('4');
+describe('bellBadge / nextBellName', () => {
+	it('3件以下は label_ordinal、4件以上は label_number（番号は index + 1）', () => {
+		expect(bellBadge(0, 1)).toEqual(msg('settings.bells.label_ordinal', { n: 1 }));
+		expect(bellBadge(2, 3)).toEqual(msg('settings.bells.label_ordinal', { n: 3 }));
+		expect(bellBadge(0, 4)).toEqual(msg('settings.bells.label_number', { n: 1 }));
+		expect(bellBadge(3, 4)).toEqual(msg('settings.bells.label_number', { n: 4 }));
 	});
 
-	it('次のベルは、3件以下で「n鈴まで」、4件以上で「n番目のベルまで」', () => {
-		expect(nextBellLabel(0, 3)).toBe('1鈴まで');
-		expect(nextBellLabel(2, 3)).toBe('3鈴まで');
-		expect(nextBellLabel(3, 4)).toBe('4番目のベルまで');
+	it('次のベルの名前は、3件以下で bellBadge と同じ、4件以上で bell_ordinal_long', () => {
+		expect(nextBellName(0, 3)).toEqual(bellBadge(0, 3));
+		expect(nextBellName(2, 3)).toEqual(msg('settings.bells.label_ordinal', { n: 3 }));
+		expect(nextBellName(3, 4)).toEqual(msg('timer.bell_ordinal_long', { n: 4 }));
 	});
 });
 

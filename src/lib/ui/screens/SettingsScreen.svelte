@@ -18,6 +18,7 @@
 	import Panel from '../parts/Panel.svelte';
 	import PresetChips from '../parts/PresetChips.svelte';
 	import Switch from '../parts/Switch.svelte';
+	import { i18n } from '#lib/i18n/i18n.svelte.ts';
 	import TextField from '../parts/TextField.svelte';
 	import VolumeSlider from '../parts/VolumeSlider.svelte';
 
@@ -35,9 +36,9 @@
 	const rows = $derived(
 		sortBells(settings.bells, settings.durationMs).map((bell, index, all) => ({
 			bell,
-			badge: bellBadge(index, all.length),
+			badge: i18n.tm(bellBadge(index, all.length)),
 			// 4件以上では、編集シートの見出しを「4番目のベルを編集」にする
-			editTitle: all.length <= 3 ? `${bellBadge(index, all.length)}を編集` : `${index + 1}番目のベルを編集`,
+			editTitle: all.length <= 3 ? `${i18n.tm(bellBadge(index, all.length))}を編集` : `${index + 1}番目のベルを編集`,
 			when: bell.base === 'remaining' ? `残り ${formatClock(bell.offsetMs)}` : `超過 +${formatClock(bell.offsetMs)}`,
 			note: bellNote(bell, settings.bells, settings.durationMs)
 		}))
