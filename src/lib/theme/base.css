@@ -113,6 +113,18 @@ svg {
   --sheet-radius: var(--radius-lg) var(--radius-lg) 0 0;
   --sheet-max-width: none;
   --sheet-grabber-display: block;
+  --prefs-scrim-display: none;
+  --prefs-width: 100%;
+  --prefs-height: 100%;
+  --prefs-max-height: 100%;
+  --prefs-border-width: 0;
+  --prefs-radius: 0;
+  --prefs-shadow: none;
+  --prefs-head-padding: var(--space-3) var(--space-2) var(--space-3) var(--space-4);
+  --prefs-body-padding: var(--space-4);
+  --tabs-padding-inline: 0;
+  --tabs-tab-flex: 1 1 0;
+  --tabs-tab-justify: center;
 }
 
 @container app (min-width: 720px) {
@@ -140,5 +152,17 @@ svg {
     --sheet-radius: var(--radius-lg);
     --sheet-max-width: calc(var(--start-button-min) * 1.2);
     --sheet-grabber-display: none;
+    --prefs-scrim-display: block;
+    --prefs-width: min(calc(var(--start-button-min) * 1.8), calc(100% - var(--space-6)));
+    --prefs-height: auto;
+    --prefs-max-height: calc(100% - var(--space-6));
+    --prefs-border-width: var(--border-width);
+    --prefs-radius: var(--radius-lg);
+    --prefs-shadow: var(--shadow-lg);
+    --prefs-head-padding: var(--space-3) var(--space-3) var(--space-3) var(--space-5);
+    --prefs-body-padding: var(--space-5);
+    --tabs-padding-inline: var(--space-4);
+    --tabs-tab-flex: none;
+    --tabs-tab-justify: flex-start;
   }
 }

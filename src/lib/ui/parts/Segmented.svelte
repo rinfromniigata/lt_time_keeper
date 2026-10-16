@@ -1,7 +1,7 @@
 <script lang="ts" generics="T extends string | number">
 	// 2〜3択の切り替え。選択中の1つだけが Tab で止まり、矢印キーで選択を移す
 	interface Props {
-		options: { value: T; label: string }[];
+		options: { value: T; label: string; lang?: string }[]; // lang: 選択肢の文字が表示中の言語と違うとき（言語の選択）
 		value: T;
 		label: string; // グループの aria-label
 		disabled?: boolean;
@@ -35,6 +35,7 @@
 			class:selected
 			aria-checked={selected}
 			tabindex={selected ? 0 : -1}
+			lang={option.lang}
 			{disabled}
 			onclick={() => (value = option.value)}
 		>
