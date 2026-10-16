@@ -69,6 +69,10 @@ export interface SessionDeps {
 	visibility?: VisibilityDriver;
 	/** 利用者が終了を確定したとき（後片付けのあと）に呼ぶ。S01 に戻す処理を渡す */
 	onfinish?: () => void;
+	/** 終了の確認を出すか（環境設定の `confirmEnd` を読む）。出さないなら、終了の操作ですぐ終わる */
+	shouldConfirmEnd: () => boolean;
+	/** 「今後この確認を表示しない」を入れて終了したとき（`prefs.setConfirmEnd(false)` を渡す） */
+	onDontAskAgain: () => void;
 	frames?: FrameDriver;
 	timeouts?: TimeoutDriver;
 	/** 操作ボタンを隠すまでの時間（ミリ秒）。開始時に1回読む */
@@ -116,6 +120,8 @@ export class Session {
 	#timer: Timer;
 	#frames: FrameDriver;
 	#onfinish: (() => void) | undefined;
+	#shouldConfirmEnd: () => boolean;
+	#onDontAskAgain: () => void;
 	#handle: number | null = null;
 	#started = false;
 	#finished = false;
@@ -134,6 +140,8 @@ export class Session {
 		progress: 1
 	});
 	confirming = $state(false);
+	/** 確認の「今後この確認を表示しない」。確認を開くたびにオフから始め、保存はしない */
+	dontAskAgain = $state(false);
 	warnings = $state<Warning[]>([]);
 	/** 操作ボタン（とカーソル）を隠している状態 */
 	controlsHidden = $state(false);
@@ -172,6 +180,8 @@ export class Session {
 		);
 		this.#frames = deps.frames ?? browserFrames;
 		this.#onfinish = deps.onfinish;
+		this.#shouldConfirmEnd = deps.shouldConfirmEnd;
+		this.#onDontAskAgain = deps.onDontAskAgain;
 		this.snapshot = this.#timer.snapshot();
 	}
 
@@ -214,15 +224,21 @@ export class Session {
 		this.#scheduleHide();
 	}
 
-	/** 確認を出す。計測は止めない */
+	/** 確認を出す設定なら確認を出す（計測は止めない）。出さない設定なら、すぐ終了して呼び出し側に知らせる */
 	requestFinish(): void {
 		if (!this.#running) return;
+		if (!this.#shouldConfirmEnd()) {
+			this.#end();
+			return;
+		}
+		this.dontAskAgain = false;
 		this.confirming = true;
 		this.#scheduleHide();
 	}
 
 	cancelFinish(): void {
 		this.confirming = false;
+		this.dontAskAgain = false;
 		this.#scheduleHide();
 	}
 
@@ -237,9 +253,17 @@ export class Session {
 		if (this.#running) this.#scheduleHide();
 	}
 
-	/** 確認で「終了する」を選んだとき。後片付けをして、呼び出し側に知らせる */
-	confirmFinish(): void {
+	/**
+	 * 確認で「終了する」を選んだとき。後片付けをして、呼び出し側に知らせる。
+	 * dontAskAgain が真のときだけ、終了の前に onDontAskAgain を呼ぶ
+	 */
+	confirmFinish(dontAskAgain: boolean): void {
 		if (!this.#running || !this.confirming) return;
+		if (dontAskAgain) this.#onDontAskAgain();
+		this.#end();
+	}
+
+	#end(): void {
 		this.finish();
 		this.#onfinish?.();
 	}
@@ -248,6 +272,7 @@ export class Session {
 	finish(): void {
 		this.#finished = true;
 		this.confirming = false;
+		this.dontAskAgain = false;
 		this.#unsubscribe?.();
 		this.#unsubscribe = null;
 		if (this.#handle !== null) this.#frames.cancel(this.#handle);
@@ -257,7 +282,7 @@ export class Session {
 		void this.#wakeLock.release();
 	}
 
-	/** キー操作。Space：一時停止・再開、Esc：確認を出す／閉じる、確認中の Enter：終了する */
+	/** キー操作。Space：一時停止・再開、Esc：確認を出す（確認なしの設定ならすぐ終了）／閉じる、確認中の Enter：終了する（チェックの状態を反映） */
 	handleKey(e: KeyInput): void {
 		if (e.ctrlKey || e.altKey || e.metaKey || !this.#running) return;
 		this.#scheduleHide(); // どのキーでも操作ボタンを出す
@@ -278,7 +303,7 @@ export class Session {
 				// フォーカス中の「続ける」を Enter で押したことにならないよう、確認中は止める
 				if (!this.confirming) return;
 				e.preventDefault();
-				if (!e.repeat) this.confirmFinish();
+				if (!e.repeat) this.confirmFinish(this.dontAskAgain);
 				return;
 		}
 	}

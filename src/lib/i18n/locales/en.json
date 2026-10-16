@@ -83,6 +83,8 @@
 	"end_confirm.key_continue": "Keep going",
 	"end_confirm.continue": "Keep going",
 	"end_confirm.end": "End timer",
+	"end_confirm.dont_ask": "Don't ask me again",
+	"end_confirm.dont_ask_hint": "You can turn this back on in Preferences at any time.",
 	"prefs.title": "Preferences",
 	"prefs.tab.general": "General",
 	"prefs.tab.sound": "Sound",

@@ -74,6 +74,8 @@
 	"end_confirm.key_continue": "继续",
 	"end_confirm.continue": "继续计时",
 	"end_confirm.end": "结束计时",
+	"end_confirm.dont_ask": "不再显示此确认",
+	"end_confirm.dont_ask_hint": "可随时在偏好设置中恢复。",
 	"prefs.title": "偏好设置",
 	"prefs.tab.general": "常规",
 	"prefs.tab.sound": "声音",

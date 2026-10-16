@@ -53,7 +53,9 @@
 			now: () => performance.now(),
 			ringer,
 			wakeLock: new BrowserWakeLock(),
-			onfinish: leave
+			onfinish: leave,
+			shouldConfirmEnd: () => prefs.confirmEnd,
+			onDontAskAgain: () => prefs.setConfirmEnd(false)
 		});
 		screen = 'timer';
 		void session.start();

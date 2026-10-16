@@ -79,8 +79,9 @@ function fakeTimeouts() {
 	};
 }
 
-function setup(durationMs = 300000, overrides: Partial<Settings> = {}) {
+function setup(durationMs = 300000, overrides: Partial<Settings> = {}, confirmEnd = true) {
 	let t = 5000;
+	let dontAsk = 0;
 	let pending: (() => void) | null = null;
 	let finished = 0;
 	const r = fakeRinger();
@@ -106,7 +107,9 @@ function setup(durationMs = 300000, overrides: Partial<Settings> = {}) {
 			timeouts: timeouts.driver,
 			controlsHideDelayMs: () => 5000,
 			visibility: vis.driver,
-			onfinish: () => void finished++
+			onfinish: () => void finished++,
+			shouldConfirmEnd: () => confirmEnd,
+			onDontAskAgain: () => void dontAsk++
 		}
 	);
 	return {
@@ -126,7 +129,8 @@ function setup(durationMs = 300000, overrides: Partial<Settings> = {}) {
 			cb?.();
 		},
 		hasFrame: () => pending !== null,
-		finishedCount: () => finished
+		finishedCount: () => finished,
+		dontAskCount: () => dontAsk
 	};
 }
 
@@ -243,14 +247,77 @@ describe('終了の確認', () => {
 	it('確認してから終了すると、ループが止まり、通知が1回だけ届く', async () => {
 		const { session, hasFrame, finishedCount } = setup();
 		await session.start();
-		session.confirmFinish(); // 確認なしでは終了しない
+		session.confirmFinish(false); // 確認なしでは終了しない
 		expect(finishedCount()).toBe(0);
 		session.requestFinish();
-		session.confirmFinish();
-		session.confirmFinish();
+		session.confirmFinish(false);
+		session.confirmFinish(false);
 		expect(finishedCount()).toBe(1);
 		expect(hasFrame()).toBe(false);
 		expect(session.confirming).toBe(false);
+	});
+
+	it('確認を出さない設定では、requestFinish ですぐ終わり、確認は出ない', async () => {
+		const { session, hasFrame, finishedCount, dontAskCount } = setup(300000, {}, false);
+		await session.start();
+		session.requestFinish();
+		expect(session.confirming).toBe(false);
+		expect(finishedCount()).toBe(1);
+		expect(hasFrame()).toBe(false);
+		expect(dontAskCount()).toBe(0);
+	});
+
+	it('確認を出さない設定では、Esc でもすぐ終わる', async () => {
+		const { session, finishedCount } = setup(300000, {}, false);
+		await session.start();
+		session.handleKey(key('Escape'));
+		expect(finishedCount()).toBe(1);
+	});
+
+	it('confirmFinish(true) のときだけ onDontAskAgain が呼ばれてから終わる', async () => {
+		const a = setup();
+		await a.session.start();
+		a.session.requestFinish();
+		a.session.confirmFinish(true);
+		expect(a.dontAskCount()).toBe(1);
+		expect(a.finishedCount()).toBe(1);
+
+		const b = setup();
+		await b.session.start();
+		b.session.requestFinish();
+		b.session.confirmFinish(false);
+		expect(b.dontAskCount()).toBe(0);
+		expect(b.finishedCount()).toBe(1);
+	});
+
+	it('cancelFinish（続ける）では onDontAskAgain は呼ばれず、チェックはオフに戻る', async () => {
+		const { session, dontAskCount, finishedCount } = setup();
+		await session.start();
+		session.requestFinish();
+		session.dontAskAgain = true;
+		session.cancelFinish();
+		expect(dontAskCount()).toBe(0);
+		expect(finishedCount()).toBe(0);
+		expect(session.dontAskAgain).toBe(false);
+		session.requestFinish(); // 開くたびにオフから始める
+		expect(session.dontAskAgain).toBe(false);
+	});
+
+	it('確認中の Enter は、チェックの状態を反映して終了する', async () => {
+		const a = setup();
+		await a.session.start();
+		a.session.requestFinish();
+		a.session.dontAskAgain = true;
+		a.session.handleKey(key('Enter'));
+		expect(a.dontAskCount()).toBe(1);
+		expect(a.finishedCount()).toBe(1);
+
+		const b = setup();
+		await b.session.start();
+		b.session.requestFinish();
+		b.session.handleKey(key('Enter'));
+		expect(b.dontAskCount()).toBe(0);
+		expect(b.finishedCount()).toBe(1);
 	});
 
 	it('終了後は開始も確認も受け付けない', async () => {

@@ -74,6 +74,8 @@
 	"end_confirm.key_continue": "続ける",
 	"end_confirm.continue": "続ける",
 	"end_confirm.end": "終了する",
+	"end_confirm.dont_ask": "今後この確認を表示しない",
+	"end_confirm.dont_ask_hint": "環境設定でいつでも元に戻せます。",
 	"prefs.title": "環境設定",
 	"prefs.tab.general": "一般",
 	"prefs.tab.sound": "音",

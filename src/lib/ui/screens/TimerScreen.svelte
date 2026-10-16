@@ -5,6 +5,7 @@
 	import type { Session, Warning } from '../../session/session.svelte.ts';
 	import Banner from '../parts/Banner.svelte';
 	import Button from '../parts/Button.svelte';
+	import Checkbox from '../parts/Checkbox.svelte';
 	import ConfirmDialog from '../parts/ConfirmDialog.svelte';
 	import Icon from '../parts/Icon.svelte';
 	import Kbd from '../parts/Kbd.svelte';
@@ -126,7 +127,7 @@
 			title={i18n.t('end_confirm.title')}
 			confirmLabel={i18n.t('end_confirm.end')}
 			cancelLabel={i18n.t('end_confirm.continue')}
-			onconfirm={() => session.confirmFinish()}
+			onconfirm={() => session.confirmFinish(session.dontAskAgain)}
 			oncancel={() => session.cancelFinish()}
 			initialFocus="confirm"
 		>
@@ -134,6 +135,11 @@
 				elapsed: formatClock(session.snapshot.elapsedMs),
 				total: formatClock(session.durationMs)
 			})}
+			{#snippet extra()}
+				<Checkbox bind:checked={session.dontAskAgain} hint={i18n.t('end_confirm.dont_ask_hint')}>
+					{i18n.t('end_confirm.dont_ask')}
+				</Checkbox>
+			{/snippet}
 			{#snippet hints()}
 				<span><Kbd>Enter</Kbd>{i18n.t('end_confirm.key_end')}</span>
 				<span><Kbd>Esc</Kbd>{i18n.t('end_confirm.key_continue')}</span>

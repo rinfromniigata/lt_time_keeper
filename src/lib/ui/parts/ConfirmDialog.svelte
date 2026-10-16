@@ -13,6 +13,7 @@
 		oncancel: () => void;
 		initialFocus?: 'cancel' | 'confirm'; // 最初にフォーカスするボタン
 		children?: Snippet; // 本文
+		extra?: Snippet; // 本文と案内の下、ボタンの上に置く追加の操作（チェックボックスなど）
 		hints?: Snippet; // キー操作の案内
 	}
 
@@ -24,6 +25,7 @@
 		oncancel,
 		initialFocus = 'cancel',
 		children,
+		extra,
 		hints
 	}: Props = $props();
 
@@ -37,18 +39,18 @@
 		return () => previous?.focus();
 	});
 
-	// Space はボタンの標準操作（keyup で押したことになる）も含めて止める
+	// Space はボタンの標準操作（keyup で押したことになる）も含めて止める。チェックボックスの切り替えだけは通す
 	function blockSpace(e: KeyboardEvent) {
-		if (e.key === ' ') e.preventDefault();
+		if (e.key === ' ' && !(e.target instanceof HTMLInputElement)) e.preventDefault();
 	}
 
-	// フォーカスがダイアログの外へ出ないよう、Tab を2つのボタンの間で回す
+	// フォーカスがダイアログの外へ出ないよう、Tab をダイアログの中（チェックボックスと2つのボタン）で回す
 	function onkeydown(e: KeyboardEvent) {
 		blockSpace(e);
 		if (e.key !== 'Tab') return;
-		const buttons = dialog.querySelectorAll<HTMLElement>('button');
-		const first = buttons[0];
-		const last = buttons[buttons.length - 1];
+		const items = dialog.querySelectorAll<HTMLElement>('button, input');
+		const first = items[0];
+		const last = items[items.length - 1];
 		if (e.shiftKey && document.activeElement === first) {
 			e.preventDefault();
 			last.focus();
@@ -67,6 +69,7 @@
 		<h3 id={titleId}>{title}</h3>
 		{#if children}<p class="body">{@render children()}</p>{/if}
 		{#if hints}<p class="body hints">{@render hints()}</p>{/if}
+		{@render extra?.()}
 		<div class="actions">
 			<Button variant="primary" onclick={oncancel}>{cancelLabel}</Button>
 			<Button variant="danger-fill" onclick={onconfirm}>{confirmLabel}</Button>

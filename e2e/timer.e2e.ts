@@ -235,7 +235,7 @@ test('長い表示名は省略され、次のベルは隠れない。見出し�
 	}
 });
 
-test('確認中の Space は、どちらのボタンにフォーカスがあっても何もしない。Tab は2つのボタンの間で回る', async ({
+test('確認中の Space は、どちらのボタンにフォーカスがあっても何もしない。Tab はチェックボックスと2つのボタンの間で回る', async ({
 	page
 }) => {
 	await open(page);
@@ -244,18 +244,25 @@ test('確認中の Space は、どちらのボタンにフォーカスがあっ�
 	const dialog = page.getByRole('alertdialog');
 	const confirm = page.getByRole('button', { name: '終了する' });
 	const cancel = page.getByRole('button', { name: '続ける' });
+	const dontAsk = dialog.getByRole('checkbox');
 	await expect(confirm).toBeFocused();
 
 	await page.keyboard.press('Space');
 	await expect(dialog).toBeVisible();
 	await expect(digits(page)).toBeVisible();
 
+	// 順は チェックボックス → 続ける → 終了する。末尾から Tab で先頭へ回る
+	await page.keyboard.press('Tab');
+	await expect(dontAsk).toBeFocused();
 	await page.keyboard.press('Tab');
 	await expect(cancel).toBeFocused();
 	await page.keyboard.press('Space');
 	await expect(dialog).toBeVisible(); // 「続ける」も押されない
 	await page.keyboard.press('Shift+Tab');
+	await expect(dontAsk).toBeFocused();
+	await page.keyboard.press('Shift+Tab');
 	await expect(confirm).toBeFocused();
+	await page.keyboard.press('Tab');
 	await page.keyboard.press('Tab');
 	await page.keyboard.press('Tab');
 	await expect(confirm).toBeFocused();
