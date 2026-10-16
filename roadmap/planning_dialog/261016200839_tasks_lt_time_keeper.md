@@ -148,7 +148,8 @@
   - 実施メモ: (1) 文字: `StatePill` は `--state-text`（`Ring`・`StatePill` の状態クラスに `--color-state-*-text` を足した）、`BellRow` の「黄に変わる／赤に変わる」補足文、`TimerScreen` の超過の数字を `-text` に。リング・点は無印のまま。(2) 境界: `NumberField`・`TextField`・`PresetChips`・`Segmented`（外枠と区切り線）・`Switch` の溝を `--color-border-input` に。パネル・行・ダイアログ・空の状態・Kbd・ゴースト／通常ボタンの枠は `--color-border` のまま（モックどおり。ボタンの枠はモックで装飾扱い）。(3) 判断: `Banner` の警告アイコンは、モックでは無印の `--color-state-warn` だが、T7-2 の検査（`color:` に無印を使わない）に合わせて `-warn-text` にした（アイコンは地の `-soft` に対して 3:1 以上を保つ）。(4) e2e `timer.e2e.ts` の超過の数字の期待色を v2 の `--color-state-over` から `--color-state-over-text` に直した（v3 の仕様どおりで、軽微な修正）。`check:tokens` OK、`check` 0 エラー、単体161件、e2e 56件通過。モックとの見た目の照合（ライト・ダーク）はユーザーが W7 で行う。ダークの `-text` は無印と同値なので見た目は変わらない
   - 未適用: チェックボックス・タブはこれから作る部品（T9-4）。ヘッダーの月のボタンとメニュー（`ThemeMenu`）は T9-6 で取り除くため手を入れていない
   - 画面: S01, S01a, S01c, S01d, S03, S03a, S03b, S03c, S90
-- [ ] T7-4 【エージェント】`CONTRIBUTING.md` の骨格（受け付け方針、開発環境、セットアップ、確認・テスト、ビルド、アイコン生成、リリース、リポジトリ構成）を作り、`README.md` の開発・ビルド・リリースの節をそこへ移す。README には `CONTRIBUTING.md` へのリンクを1行置く（README の書き直しは T11-2）
+- [x] T7-4 【エージェント】`CONTRIBUTING.md` の骨格（受け付け方針、開発環境、セットアップ、確認・テスト、ビルド、アイコン生成、リリース、リポジトリ構成）を作り、`README.md` の開発・ビルド・リリースの節をそこへ移す。README には `CONTRIBUTING.md` へのリンクを1行置く（README の書き直しは T11-2）
+  - 実施メモ: `CONTRIBUTING.md` を新規作成（指定の8節）。README の「必要なもの」「開発」「確認」「ビルド」「アイコン生成」「リリース」を移し、`check:tokens` の説明に文字色の検査を足し、リリース手順を番号つきに整えた。README には概要・公開先・`CONTRIBUTING.md` へのリンク1行・ドキュメント・ライセンスだけを残した（書き直しは T11-2）。判断: 「受け付け方針」はスペックシートに記載がなかったため、Issue での報告・要望を受け付け、PR は Issue で事前に相談、確定仕様の変更提案は合意が先、Apache-2.0 での提供に同意したものとして扱う、という案で書いた（方針と違えば直す）。リポジトリ構成は現状（v0.1.0 の層）のもので、`i18n/`・`storage/`・`prefs/` などは作った時点で、仕上げは T11-3。`check:i18n` の追記は T8-7
 
 ## Phase 8: i18n の基盤と既存画面の多言語化
 - [ ] T8-1 【エージェント】`src/lib/i18n/` に、3言語の辞書（`locales/{ja,en,zh-Hans}.json`）、`messages.ts`（`MessageKey`・`Message`・`msg`・`format`。複数形は `Intl.PluralRules`、引数に別のメッセージを入れられる、欠けたキーは ja にフォールバック）、`detect.ts`（`detectLocale`）を作り、単体テストを書く
