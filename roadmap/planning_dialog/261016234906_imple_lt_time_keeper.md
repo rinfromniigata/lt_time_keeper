@@ -1,7 +1,7 @@
 # lt_time_keeper 実装設計（imple）
 
 - 対象スペック: `roadmap/specs/lt_time_keeper_SPEC_v3.md`（プランアセット v3、アプリ v0.2.0）
-- 対応する tasks・walk: `261016200839_tasks_lt_time_keeper.md`・`261016200839_walk_lt_time_keeper.md`
+- 対応する tasks・walk: `261016234906_tasks_lt_time_keeper.md`・`261016234906_walk_lt_time_keeper.md`
 - 仕様変更サマリー: `roadmap/development/261016195942_change_v0_2_0_update.md`
 - 前版: `roadmap/archived/261011225751_imple_lt_time_keeper.md`（v0.1.0）。この版は前版を引き継ぎ、v0.2.0 で変わる部分を書き換えた。変わった節には【v0.2.0】を付けた
 

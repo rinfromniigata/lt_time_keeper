@@ -1,10 +1,11 @@
 # lt_time_keeper 実装項目（tasks）
 
-- 設計: `261016200839_imple_lt_time_keeper.md`
-- 検証: `261016200839_walk_lt_time_keeper.md`（同じ Phase 番号の W 項目）
+- 設計: `261016234906_imple_lt_time_keeper.md`
+- 検証: `261016234906_walk_lt_time_keeper.md`（同じ Phase 番号の W 項目）
 - 進め方: Tn をすべて終えたら Wn を行い、Wn がすべて通過してから Phase n+1 に進む
 - 版の経緯: Phase 1〜6 は v0.1.0（前版 `archived/261011225751_tasks_lt_time_keeper.md`）の項目で、ID・チェック・実施メモをそのまま引き継いだ。Phase 7〜11 は v0.2.0（仕様変更 `development/261016195942_change_v0_2_0_update.md`）の項目
   - Phase 1〜6 の実施メモにある `_v2` のファイル名は、当時の版を指す
+- 計画の版：`261016200839` 版から、W8-8 を W9-10 に統合した（仕様変更 `development/261016234757_change_merge_w8_8_into_w9_10.md`）。tasks と imple は内容を変えていない
 
 ---
 
