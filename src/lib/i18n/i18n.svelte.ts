@@ -17,6 +17,9 @@ export const LOCALE_NAMES: Readonly<Record<Locale, string>> = {
 	'zh-Hans': '简体中文'
 };
 
+/** 疑似ロケールを使えるか。ビルド時に決まり、公開版では false になって pseudo.ts は含まれない */
+const PSEUDO_AVAILABLE = import.meta.env.DEV || import.meta.env.VITE_PSEUDO_LOCALE === '1';
+
 /** 現在の言語。疑似ロケール（T8-6）は開発時だけ加わる */
 export type ActiveLocale = Locale | 'pseudo';
 
@@ -25,6 +28,17 @@ class I18n {
 
 	/** 辞書は、疑似ロケール（T8-6）が加わっても同じ形で引けるよう、レコードとして持つ */
 	dictionaries: Record<string, Dictionary> = { ...dictionaries };
+
+	/**
+	 * 疑似ロケール（T8-6）を、URL に `?pseudo` が付いているときだけ有効にする。
+	 * 開発サーバー、または `VITE_PSEUDO_LOCALE=1` を付けたビルドだけで動き、公開版には含めない。保存もしない
+	 */
+	async usePseudoIfRequested(search: string): Promise<void> {
+		if (!PSEUDO_AVAILABLE || !new URLSearchParams(search).has('pseudo')) return;
+		const { pseudoDictionary } = await import('./pseudo.ts');
+		this.dictionaries.pseudo = pseudoDictionary(ja);
+		this.locale = 'pseudo';
+	}
 
 	/** 言語を変える。ストアの値（持ち時間・ベル・表示名）には触れない */
 	setLocale(locale: ActiveLocale): void {

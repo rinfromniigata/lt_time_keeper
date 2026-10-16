@@ -66,6 +66,8 @@
 	onMount(() => {
 		// 言語は起動時にブラウザの言語から決める（書き出した HTML は1言語でしか描けないため、S00 を消す前に切り替える）
 		i18n.setLocale(detectLocale(navigator.languages));
+		// 開発用：?pseudo を付けて開いたときだけ疑似ロケール（公開版では何もしない）
+		void i18n.usePseudoIfRequested(location.search);
 		document.getElementById('splash')?.remove();
 		void update.start();
 		return () => update.stop();
