@@ -235,7 +235,8 @@
 		justify-content: center;
 		align-items: center;
 		gap: var(--space-3);
-		flex-wrap: nowrap;
+		/* 文言が長い言語でも、ボタンが画面からはみ出さないよう折り返す */
+		flex-wrap: wrap;
 	}
 
 	/* 全画面ボタンは広い画面でだけ出す（値は .screen が渡す） */

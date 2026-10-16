@@ -93,9 +93,8 @@
 	.note {
 		font-size: var(--font-size-xs);
 		color: var(--color-text-muted);
-		white-space: nowrap;
-		overflow: hidden;
-		text-overflow: ellipsis;
+		/* 長い補足文は、省略せずに折り返す */
+		overflow-wrap: anywhere;
 	}
 	.warn {
 		color: var(--color-state-warn-text);

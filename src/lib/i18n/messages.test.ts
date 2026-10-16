@@ -82,3 +82,41 @@ describe('detectLocale', () => {
 		expect(detectLocale(['jv'])).toBe('en');
 	});
 });
+
+describe('W8-1 追加の確認', () => {
+	it('英語の複数形は 1件・2件で形が変わる', () => {
+		expect(format(dicts, 'en', msg('settings.bells.count', { n: 1 }))).toBe('1 bell');
+		expect(format(dicts, 'en', msg('settings.bells.count', { n: 2 }))).toBe('2 bells');
+	});
+
+	it('引数に入れた別のメッセージ: 次のベル・Bell 1・第 1 铃', () => {
+		const label = msg('settings.bells.label_ordinal', { n: 1 });
+		const long = msg('timer.next_bell_long', { label, time: '4:00' });
+		expect(format(dicts, 'ja', long)).toBe('次のベル　1鈴まで 4:00');
+		expect(format(dicts, 'en', msg('settings.bells.label_ordinal', { n: 1 }))).toBe('Bell 1');
+		expect(format(dicts, 'zh-Hans', msg('settings.bells.label_ordinal', { n: 1 }))).toBe('第 1 铃');
+		expect(format(dicts, 'en', long)).toContain('Bell 1');
+		expect(format(dicts, 'zh-Hans', long)).toContain('第 1 铃');
+	});
+
+	it('en・zh-Hans で欠けたキーは ja にフォールバックする', () => {
+		const partial = {
+			ja: { 'app.name': '原文', 'app.loading': '読み込み中…' },
+			en: { 'app.name': 'Name' },
+			'zh-Hans': {}
+		} as unknown as Record<string, Dictionary>;
+		expect(format(partial, 'en', msg('app.name'))).toBe('Name');
+		expect(format(partial, 'en', msg('app.loading'))).toBe('読み込み中…');
+		expect(format(partial, 'zh-Hans', msg('app.loading'))).toBe('読み込み中…');
+	});
+
+	it('detectLocale: ja-JP・en-GB・zh-TW・zh-HK・fr-FR・[fr, ja]・空', () => {
+		expect(detectLocale(['ja-JP'])).toBe('ja');
+		expect(detectLocale(['en-GB'])).toBe('en');
+		expect(detectLocale(['zh-TW'])).toBe('zh-Hans');
+		expect(detectLocale(['zh-HK'])).toBe('zh-Hans');
+		expect(detectLocale(['fr-FR'])).toBe('en');
+		expect(detectLocale(['fr', 'ja'])).toBe('ja');
+		expect(detectLocale([])).toBe('en');
+	});
+});

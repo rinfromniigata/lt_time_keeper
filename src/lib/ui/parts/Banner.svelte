@@ -29,6 +29,7 @@
 <style>
 	.banner {
 		display: flex;
+		flex-wrap: wrap;
 		gap: var(--space-3);
 		align-items: flex-start;
 		padding: var(--space-3);
@@ -48,8 +49,9 @@
 	.info > :global(.icon:first-child) {
 		color: var(--color-accent);
 	}
+	/* 文が長い言語では、操作のボタンが文の下へ折り返す */
 	.grow {
-		flex: 1;
+		flex: 1 1 50%;
 		min-width: 0;
 	}
 	p {
