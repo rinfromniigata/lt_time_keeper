@@ -4,6 +4,7 @@
 	import { formatClock } from '../../core/time.ts';
 	import { VibrationRinger } from '../../output/vibration_ringer.ts';
 	import type { Ringer } from '../../output/ringer.ts';
+	import type { PrefsStore } from '../../prefs/store.svelte.ts';
 	import type { UpdateNotifier } from '../../pwa/update.svelte.ts';
 	import type { SettingsStore } from '../../settings/store.svelte.ts';
 	import Banner from '../parts/Banner.svelte';
@@ -25,10 +26,17 @@
 	// previewRinger: 「鳴らしてみる」で使う（計測のセッションとは別）
 	let {
 		settings,
+		prefs,
 		previewRinger,
 		update,
 		onstart
-	}: { settings: SettingsStore; previewRinger: Ringer; update: UpdateNotifier; onstart: () => void } = $props();
+	}: {
+		settings: SettingsStore;
+		prefs: PrefsStore;
+		previewRinger: Ringer;
+		update: UpdateNotifier;
+		onstart: () => void;
+	} = $props();
 
 	const durationZero = $derived(settings.issues.durationZero);
 
@@ -87,7 +95,7 @@
 
 	async function tryRing() {
 		await previewRinger.unlock();
-		previewRinger.setVolume(settings.volume);
+		previewRinger.setVolume(prefs.volume);
 		previewRinger.ring(1);
 	}
 
@@ -105,7 +113,7 @@
 			<span>{i18n.t('app.name')}</span>
 		</div>
 		<div class="header-actions">
-			<ThemeMenu />
+			<ThemeMenu {prefs} />
 		</div>
 	</header>
 
@@ -173,14 +181,14 @@
 					<div class="row">
 						<span class="label" id="volume-label">{i18n.t('prefs.sound.volume')}</span>
 						<div class="grow">
-							<VolumeSlider label={i18n.t('prefs.sound.volume')} bind:value={() => settings.volume, (v) => settings.setVolume(v)} />
+							<VolumeSlider label={i18n.t('prefs.sound.volume')} bind:value={() => prefs.volume, (v) => prefs.setVolume(v)} />
 						</div>
 						<Button onclick={tryRing} style="flex: var(--sound-test-flex)"><Icon name="bell" />{i18n.t('prefs.sound.test')}</Button>
 					</div>
 					{#if vibrationSupported}
 						<div class="row">
 							<span class="label grow" id="vibrate-label">{i18n.t('prefs.sound.vibrate')}</span>
-							<Switch aria-labelledby="vibrate-label" bind:checked={() => settings.vibrate, (v) => settings.setVibrate(v)} />
+							<Switch aria-labelledby="vibrate-label" bind:checked={() => prefs.vibrate, (v) => prefs.setVibrate(v)} />
 						</div>
 					{/if}
 				</Panel>

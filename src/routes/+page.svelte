@@ -2,6 +2,9 @@
 	import { onMount } from 'svelte';
 	import { detectLocale } from '#lib/i18n/detect.ts';
 	import { i18n } from '#lib/i18n/i18n.svelte.ts';
+	import { PrefsStore } from '#lib/prefs/store.svelte.ts';
+	import { LocalStorageKV } from '#lib/storage/storage.ts';
+	import { applyTheme } from '#lib/theme/theme.ts';
 	import { SettingsStore } from '#lib/settings/store.svelte.ts';
 	import { Session } from '#lib/session/session.svelte.ts';
 	import { BrowserFullscreen } from '#lib/device/fullscreen.ts';
@@ -18,8 +21,11 @@
 	// 画面の切り替えは URL を使わず、この状態だけで行う
 	let screen = $state<Screen>('settings');
 
-	// 設定はページを開いてから閉じるまで残る（計測から S01 に戻っても値が残る）
+	// 設定はページを開いてから閉じるまで残る（計測から S01 に戻っても値が残る）。保存はしない
 	const settings = new SettingsStore();
+
+	// 環境設定（言語・テーマ・音量・振動・終了の確認）は端末に保存し、開き直しても残る
+	const prefs = new PrefsStore(new LocalStorageKV());
 
 	// 音は「鳴らしてみる」と計測で1つを使い回す（AudioContext は、最初に鳴らす操作のときに作られる）
 	const audioRinger = new AudioRinger();
@@ -37,7 +43,7 @@
 		// 振動は、設定がオンで、対応した端末のときだけ音に添える
 		const ringer = new CompositeRinger([
 			audioRinger,
-			...(snapshot.vibrate && VibrationRinger.isSupported() ? [new VibrationRinger()] : [])
+			...(prefs.vibrate && VibrationRinger.isSupported() ? [new VibrationRinger()] : [])
 		]);
 		session = new Session(snapshot, {
 			now: () => performance.now(),
@@ -62,10 +68,18 @@
 		i18n.apply();
 	});
 
+	// テーマは <html data-theme>、音量は音に反映する（計測中も、設定画面の「鳴らしてみる」も同じ値）
+	$effect(() => {
+		applyTheme(prefs.theme);
+	});
+	$effect(() => {
+		audioRinger.setVolume(prefs.volume);
+	});
+
 	// 起動画面（S00）は app.html の静的マークアップ。表示できる状態になったら取り除く
 	onMount(() => {
-		// 言語は起動時にブラウザの言語から決める（書き出した HTML は1言語でしか描けないため、S00 を消す前に切り替える）
-		i18n.setLocale(detectLocale(navigator.languages));
+		// 言語は起動時に、保存した言語 → ブラウザの言語の順で決める（書き出した HTML は1言語でしか描けないため、S00 を消す前に切り替える）
+		i18n.setLocale(prefs.locale ?? detectLocale(navigator.languages));
 		// 開発用：?pseudo を付けて開いたときだけ疑似ロケール（公開版では何もしない）
 		void i18n.usePseudoIfRequested(location.search);
 		document.getElementById('splash')?.remove();
@@ -76,7 +90,7 @@
 
 <main class="app" data-screen={screen}>
 	{#if screen === 'settings'}
-		<SettingsScreen {settings} previewRinger={audioRinger} {update} onstart={start} />
+		<SettingsScreen {settings} {prefs} previewRinger={audioRinger} {update} onstart={start} />
 	{:else if session}
 		<TimerScreen {session} title={settings.title} {fullscreen} />
 	{/if}

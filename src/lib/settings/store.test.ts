@@ -14,8 +14,6 @@ describe('DEFAULT_SETTINGS', () => {
 		]);
 		expect(new Set(DEFAULT_SETTINGS.bells.map((b) => b.id)).size).toBe(3);
 		expect(DEFAULT_SETTINGS.title).toBe('');
-		expect(DEFAULT_SETTINGS.volume).toBe(0.7);
-		expect(DEFAULT_SETTINGS.vibrate).toBe(true);
 	});
 });
 
@@ -139,12 +137,6 @@ describe('SettingsStore', () => {
 		expect(store.durationMs).toBe(0);
 		expect(store.canStart).toBe(false);
 		expect(store.issues.durationZero).toBe(true);
-		store.setVolume(2);
-		expect(store.volume).toBe(1);
-		store.setVolume(-1);
-		expect(store.volume).toBe(0);
-		store.setVibrate(false);
-		expect(store.vibrate).toBe(false);
 	});
 	it('変更のたびに save を呼び、複製を渡す', () => {
 		const saved: Settings[] = [];

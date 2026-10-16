@@ -164,7 +164,7 @@ test.describe('W4-3 全画面', () => {
 });
 
 test.describe('W4-4 テーマ', () => {
-	test('メニューで data-theme が付け外しされ、再読み込みで OS に合わせるに戻る', async ({ page }) => {
+	test('メニューで data-theme が付け外しされ、再読み込みしても保存した選択が残る', async ({ page }) => {
 		await page.emulateMedia({ colorScheme: 'light' });
 		await open(page);
 		const attr = () => page.evaluate(() => document.documentElement.getAttribute('data-theme'));
@@ -195,7 +195,7 @@ test.describe('W4-4 テーマ', () => {
 		await page.getByRole('menuitemradio', { name: 'ダーク' }).click();
 		await page.reload();
 		await expect(page.locator('#splash')).toHaveCount(0);
-		expect(await attr()).toBeNull();
+		await expect.poll(attr).toBe('dark');
 	});
 
 	test('キーボード：↑↓で移動、Esc で閉じてボタンに戻る、外側のクリックで閉じる', async ({ page }) => {

@@ -159,7 +159,6 @@ export class Session {
 		this.#durationMs = settings.durationMs;
 		this.#bells = settings.bells.map((b) => ({ ...b }));
 		this.#ringer = deps.ringer;
-		this.#ringer.setVolume(settings.volume);
 		this.#wakeLock = deps.wakeLock;
 		this.#timeouts = deps.timeouts ?? browserTimeouts;
 		this.#readHideDelay = deps.controlsHideDelayMs ?? readControlsHideDelayMs;

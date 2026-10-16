@@ -337,10 +337,10 @@ function bell(id: string, base: Bell['base'], offsetMs: number, strikes: Strikes
 }
 
 describe('ベル', () => {
-	it('開始ボタンの操作の中で unlock を呼び、音量を渡す。計測は音の準備を待たずに始まる', () => {
-		const { session, rung, holdUnlock, advance } = setup(300000, { volume: 0.3 });
+	it('開始ボタンの操作の中で unlock を呼ぶ（音量は環境設定の側が渡す）。計測は音の準備を待たずに始まる', () => {
+		const { session, rung, holdUnlock, advance } = setup(300000);
 		holdUnlock();
-		expect(rung.volumes).toEqual([0.3]);
+		expect(rung.volumes).toEqual([]);
 		void session.start(); // await しない＝同じ呼び出しの中で unlock まで進む
 		expect(rung.unlock).toBe(1);
 		advance(1000);

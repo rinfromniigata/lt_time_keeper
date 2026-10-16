@@ -23,12 +23,6 @@ export class SettingsStore {
 	get title(): string {
 		return this.#state.title;
 	}
-	get volume(): number {
-		return this.#state.volume;
-	}
-	get vibrate(): boolean {
-		return this.#state.vibrate;
-	}
 	get bells(): Settings['bells'] {
 		return this.#state.bells;
 	}
@@ -50,14 +44,6 @@ export class SettingsStore {
 	}
 	setTitle(title: string): void {
 		this.#state.title = title;
-		this.#persist();
-	}
-	setVolume(volume: number): void {
-		this.#state.volume = Math.min(1, Math.max(0, volume));
-		this.#persist();
-	}
-	setVibrate(vibrate: boolean): void {
-		this.#state.vibrate = vibrate;
 		this.#persist();
 	}
 

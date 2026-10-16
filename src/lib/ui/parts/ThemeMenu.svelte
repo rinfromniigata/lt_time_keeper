@@ -1,12 +1,15 @@
 <script lang="ts">
 	import { tick } from 'svelte';
-	import { theme, type ThemeChoice } from '../../theme/theme.svelte.ts';
+	import type { ThemeChoice } from '../../prefs/prefs.ts';
+	import type { PrefsStore } from '../../prefs/store.svelte.ts';
 	import { i18n } from '#lib/i18n/i18n.svelte.ts';
 	import type { MessageKey } from '#lib/i18n/messages.ts';
 	import Button from './Button.svelte';
 	import Icon from './Icon.svelte';
 
-	// ヘッダーの月のボタンで開く、テーマのメニュー。選んだテーマは保存しない。
+	let { prefs }: { prefs: PrefsStore } = $props();
+
+	// ヘッダーの月のボタンで開く、テーマのメニュー。選んだテーマは環境設定に保存される（T9-6 で環境設定へ移す）。
 	// メニューは最も近い position: relative の祖先（.app）を基準に、ヘッダーの下へ置く
 	const OPTIONS: { value: ThemeChoice; label: MessageKey }[] = [
 		{ value: 'system', label: 'prefs.theme.system' },
@@ -35,7 +38,7 @@
 	}
 
 	function choose(value: ThemeChoice) {
-		theme.set(value);
+		prefs.setTheme(value);
 		close(true);
 	}
 
@@ -98,9 +101,9 @@
 				<button
 					type="button"
 					class="menu-item"
-					class:selected={theme.choice === o.value}
+					class:selected={prefs.theme === o.value}
 					role="menuitemradio"
-					aria-checked={theme.choice === o.value}
+					aria-checked={prefs.theme === o.value}
 					onclick={() => choose(o.value)}
 				>
 					{i18n.t(o.label)}
