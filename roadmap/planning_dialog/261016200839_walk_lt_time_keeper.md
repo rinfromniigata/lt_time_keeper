@@ -181,8 +181,9 @@
 - [x] W7-5 【エージェント】`CONTRIBUTING.md` の手順どおりに、セットアップ・確認・テスト・ビルドのコマンドが動く。README に開発・ビルド・リリースの情報が残っていない
   - 依存: T7-4
   - 実施メモ: `bun install --frozen-lockfile`（差分なし）、`bun run dev`（localhost:5173 が 200）、`check:tokens`・`check`・`test:unit --run`（161件）・`test`（W7-4 で通過）・`build`・`preview`（localhost:4173 が 200）・`gen:icons`（マスターは v3）が、すべて記載どおりに動いた。`gen:icons` 後のアイコン一式に差分なし（manifest は改行コードの警告のみで、元に戻した）。CONTRIBUTING が参照するファイル（LICENSE・CHANGELOG.md・release.yml・scripts・e2e・static/icons・docs/brand・roadmap）はすべて存在し、release.yml の Bun は 1.4.3 で記載と一致。README に bun・build・release・test を含む行はなく、開発・ビルド・リリースの情報は残っていない（`CONTRIBUTING.md` へのリンクのみ）
-- [ ] W7-6 【ユーザー】ライト・ダークで、モックと実物を並べて既存画面の色を確認する（ヘッダー・音のパネル・文言の言語は Phase 8・9 で変わるため、色だけを見る）
+- [x] W7-6 【ユーザー】ライト・ダークで、モックと実物を並べて既存画面の色を確認する（ヘッダー・音のパネル・文言の言語は Phase 8・9 で変わるため、色だけを見る）
   - 依存: T7-3
+  - 実施メモ: ユーザーが、ライト・ダークでモックと実物の色を見比べて確認し、問題なしと報告
   - 画面: S01, S01a, S01d, S03, S03a, S03b, S03c, S90
 
 ## Phase 8: i18n の基盤と既存画面の多言語化
