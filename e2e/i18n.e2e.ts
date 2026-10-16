@@ -53,3 +53,52 @@ for (const { browser, lang, dict } of CASES) {
 		});
 	});
 }
+
+// 保存した言語・テーマは、アプリの JS が動く前（インラインスクリプト）の時点で反映される
+test.describe('保存した環境設定の反映（描画前）', () => {
+	test.use({ locale: 'ja-JP' });
+
+	async function openHeld(page: import('@playwright/test').Page, saved: string | null) {
+		if (saved !== null) {
+			await page.addInitScript((value) => localStorage.setItem('lt_time_keeper.prefs', value), saved);
+		}
+		let release!: () => void;
+		const gate = new Promise<void>((resolve) => (release = resolve));
+		await page.route('**/_app/**/*.js', async (route) => {
+			await gate;
+			await route.continue();
+		});
+		await page.goto('http://localhost:4173/', { waitUntil: 'commit' });
+		return release;
+	}
+
+	test('保存した言語とテーマが、JS の前から lang・題名・data-theme になる', async ({ page }) => {
+		const release = await openHeld(page, '{"v":1,"locale":"zh-Hans","theme":"dark","volume":0.5}');
+		await expect(page.locator('html')).toHaveAttribute('lang', 'zh-Hans');
+		await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
+		await expect(page).toHaveTitle(zhHans['app.name']);
+		release();
+		await expect(page.locator('#splash')).toHaveCount(0);
+		await expect(page.locator('html')).toHaveAttribute('lang', 'zh-Hans');
+		await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
+		await expect(page).toHaveTitle(zhHans['app.name']);
+	});
+
+	test('言語を選んでいなければブラウザの言語、テーマが system なら data-theme なし', async ({ page }) => {
+		const release = await openHeld(page, '{"v":1,"locale":null,"theme":"system"}');
+		await expect(page.locator('html')).toHaveAttribute('lang', 'ja');
+		await expect(page.locator('html')).not.toHaveAttribute('data-theme', /.*/);
+		release();
+	});
+
+	test('壊れた値・版の違う値・不正な項目は無視する', async ({ page }) => {
+		for (const bad of ['{broken', '{"v":2,"locale":"en","theme":"dark"}', '{"v":1,"locale":"fr","theme":"blue"}']) {
+			const p = await page.context().newPage();
+			const release = await openHeld(p, bad);
+			await expect(p.locator('html')).toHaveAttribute('lang', 'ja');
+			await expect(p.locator('html')).not.toHaveAttribute('data-theme', /.*/);
+			release();
+			await p.close();
+		}
+	});
+});

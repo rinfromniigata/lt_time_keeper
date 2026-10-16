@@ -5,23 +5,37 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<meta name="text-scale" content="scale" />
 		<title>%i18n.title%</title>
-		<!-- 描画前に、ブラウザの言語から <html lang> と題名を決める（書き出した HTML は1言語でしか描けないため）。
-		     規則は src/lib/i18n/detect.ts と同じ（ja* → ja、en* → en、zh* → zh-Hans、どれもなければ en）。e2e で一致を確かめる -->
+		<!-- 描画前に、保存した言語・テーマ、なければブラウザの言語から <html lang>・題名・data-theme を決める
+		     （書き出した HTML は1言語でしか描けないため）。保存のキー名と形は storage/prefs_codec.ts のもので、
+		     ここへは %i18n.prefs% で渡される。ブラウザの言語の規則は src/lib/i18n/detect.ts と同じ
+		     （ja* → ja、en* → en、zh* → zh-Hans、どれもなければ en）。e2e で一致を確かめる -->
 		<script>
 			(function () {
 				var names = %i18n.names%;
-				var languages = navigator.languages || [];
-				var locale = 'en';
-				for (var i = 0; i < languages.length; i++) {
-					var primary = String(languages[i]).toLowerCase().split(/[-_]/)[0];
-					if (primary === 'ja') locale = 'ja';
-					else if (primary === 'en') locale = 'en';
-					else if (primary === 'zh') locale = 'zh-Hans';
-					else continue;
-					break;
+				var prefs = %i18n.prefs%;
+				var saved = {};
+				try {
+					var parsed = JSON.parse(localStorage.getItem(prefs.key));
+					if (parsed && typeof parsed === 'object' && parsed.v === prefs.version) saved = parsed;
+				} catch (e) {}
+				var locale = prefs.locales.indexOf(saved.locale) >= 0 ? saved.locale : null;
+				if (!locale) {
+					locale = 'en';
+					var languages = navigator.languages || [];
+					for (var i = 0; i < languages.length; i++) {
+						var primary = String(languages[i]).toLowerCase().split(/[-_]/)[0];
+						if (primary === 'ja') locale = 'ja';
+						else if (primary === 'en') locale = 'en';
+						else if (primary === 'zh') locale = 'zh-Hans';
+						else continue;
+						break;
+					}
 				}
 				document.documentElement.lang = locale;
 				document.title = names[locale];
+				if (saved.theme === 'light' || saved.theme === 'dark') {
+					document.documentElement.setAttribute('data-theme', saved.theme);
+				}
 			})();
 		</script>
 		<meta name="description" content="%i18n.description%" />

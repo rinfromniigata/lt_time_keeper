@@ -1,6 +1,7 @@
 import ja from './locales/ja.json';
 import en from './locales/en.json';
 import zhHans from './locales/zh-Hans.json';
+import { PREFS_KEY, PREFS_VERSION } from '../storage/prefs_codec.ts';
 import { format, LOCALES, msg, type Dictionary, type Locale, type MessageKey } from './messages.ts';
 
 // app.html の %i18n.…% を、書き出し時に辞書から差し込む（純粋なTS。hooks.server.ts が呼ぶ）
@@ -28,6 +29,7 @@ function scriptJson(value: unknown): string {
 /**
  * 差し込む値。
  * - %i18n.names%: 言語ごとのアプリ名（インラインスクリプトが `document.title` に使う）
+ * - %i18n.prefs%: 保存のキー名・版番号・言語の一覧（インラインスクリプトが保存値を読むため。キー名を2か所に書かない）
  * - %i18n.splash%: S00 の「読み込み中…」。3言語を `lang` つきで持ち、CSS が `<html lang>` に合うものだけを出す
  * - %i18n.title%・%i18n.description%: 原文（日本語）の題名と説明。OGP と description は
  *   JS を動かさないクローラー向けで1言語しか出せないため
@@ -37,6 +39,7 @@ export function shellValues(): Record<string, string> {
 	const splash = LOCALES.map((l) => `<span lang="${l}">${escapeHtml(text(l, 'app.loading'))}</span>`).join('');
 	return {
 		'%i18n.names%': scriptJson(names),
+		'%i18n.prefs%': scriptJson({ key: PREFS_KEY, version: PREFS_VERSION, locales: LOCALES }),
 		'%i18n.splash%': splash,
 		'%i18n.title%': escapeHtml(text('ja', 'app.name')),
 		'%i18n.description%': escapeHtml(text('ja', 'prefs.about.tagline'))
