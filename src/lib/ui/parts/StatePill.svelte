@@ -1,10 +1,11 @@
 <script lang="ts">
-	import { STATE_LABELS, type DisplayState } from './state.ts';
+	import { i18n } from '#lib/i18n/i18n.svelte.ts';
+	import { STATE_LABEL_KEYS, type DisplayState } from './state.ts';
 
-	let { state }: { state: DisplayState } = $props();
+	let { state }: { state: Exclude<DisplayState, 'ok'> } = $props();
 </script>
 
-<span class="state-pill {state}">{STATE_LABELS[state]}</span>
+<span class="state-pill {state}">{i18n.t(STATE_LABEL_KEYS[state])}</span>
 
 <style>
 	.state-pill {

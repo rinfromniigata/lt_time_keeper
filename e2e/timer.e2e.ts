@@ -180,15 +180,15 @@ test('次のベルが上部に出て、秒が数字とそろって減り、鳴�
 	const next = page.locator('.next-bell');
 	await page.getByRole('button', { name: '開始' }).click();
 	await expect(next).toContainText('1鈴まで');
-	await expect(next.locator('strong')).toHaveText('4:00');
+	await expect(next.locator('strong:visible')).toHaveText('4:00');
 
 	await advance(page, 108_000); // 残り 3:12 のとき、1鈴（残り 1:00）まで 2:12
 	await expect(digits(page)).toHaveText('3:12');
-	await expect(next.locator('strong')).toHaveText('2:12');
+	await expect(next.locator('strong:visible')).toHaveText('2:12');
 
 	await advance(page, 132_000); // 1鈴の時点（経過 4:00）→ 次は 2鈴
 	await expect(next).toContainText('2鈴まで');
-	await expect(next.locator('strong')).toHaveText('1:00');
+	await expect(next.locator('strong:visible')).toHaveText('1:00');
 	await advance(page, 60_000);
 	await expect(next).toContainText('3鈴まで');
 	await advance(page, 60_000);
@@ -209,7 +209,7 @@ test('1鈴で予鈴（黄）になり、状態ラベルが「予鈴」に変わ�
 
 test('ベルが0件なら次のベルは出ず、予鈴にならずに超過へ進む', async ({ page }) => {
 	await open(page);
-	for (let i = 0; i < 3; i++) await page.getByRole('button', { name: /を削除/ }).first().click();
+	for (let i = 0; i < 3; i++) await page.getByRole('button', { name: '削除', exact: true }).first().click();
 	await page.getByRole('button', { name: '開始' }).click();
 	await expect(page.locator('.next-bell')).toHaveCount(0);
 	await advance(page, 299_000);
@@ -231,7 +231,7 @@ test('長い表示名は省略され、次のベルは隠れない。見出し�
 		expect(box.x).toBeGreaterThanOrEqual(title.right - 1);
 		expect(box.x + box.width).toBeLessThanOrEqual(width);
 		expect(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth)).toBe(false);
-		await expect(page.locator('.next-bell .prefix')).toBeVisible({ visible: width === 1280 });
+		await expect(page.locator('.next-bell .long')).toBeVisible({ visible: width === 1280 });
 	}
 });
 

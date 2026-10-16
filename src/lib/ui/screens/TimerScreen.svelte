@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { formatClock } from '../../core/time.ts';
+	import { msg, type MessageKey } from '#lib/i18n/messages.ts';
 	import type { FullscreenControl } from '../../device/fullscreen.ts';
 	import type { Session, Warning } from '../../session/session.svelte.ts';
 	import Banner from '../parts/Banner.svelte';
@@ -20,16 +21,22 @@
 	const display = $derived(session.display);
 	const paused = $derived(display.state === 'paused');
 
-	const WARNING_TEXT: Record<Warning, { message: string; detail: string }> = {
-		audio: {
-			message: 'ベルの音を出せません。',
-			detail: '端末の消音を解除するか、音量を上げてから画面を一度タップしてください。'
-		},
-		wakeLock: {
-			message: '画面のスリープを防げませんでした。',
-			detail: '端末の自動ロックを長めにしておくと安心です。'
-		}
+	const WARNING_KEYS: Record<Warning, { message: MessageKey; detail: MessageKey }> = {
+		audio: { message: 'warning.sound_title', detail: 'warning.sound_note' },
+		wakeLock: { message: 'warning.wake_title', detail: 'warning.wake_note' }
 	};
+
+	// 「次のベル」は、時刻の部分だけを太く出す。文の語順は言語で変わるため、時刻の位置に目印を入れて辞書の文を組み、
+	// 目印の前後で分ける（文字列をつなげて文を作らない）
+	const TIME_MARK = '\u0001';
+	function nextParts(key: 'timer.next_bell_long' | 'timer.next_bell_short') {
+		const next = display.next;
+		if (next === null) return null;
+		const [before, after = ''] = i18n.tm(msg(key, { label: next.name, time: TIME_MARK })).split(TIME_MARK);
+		return { before, after, time: next.in };
+	}
+	const nextLong = $derived(nextParts('timer.next_bell_long'));
+	const nextShort = $derived(nextParts('timer.next_bell_short'));
 
 	function onkeydown(e: KeyboardEvent) {
 		session.handleKey(e);
@@ -50,17 +57,18 @@
 <div class="screen timer {display.state}" class:hidden-controls={session.controlsHidden}>
 	{#each session.warnings as w (w)}
 		<Banner
-			message={WARNING_TEXT[w].message}
-			detail={WARNING_TEXT[w].detail}
+			message={i18n.t(WARNING_KEYS[w].message)}
+			detail={i18n.t(WARNING_KEYS[w].detail)}
 			onclose={() => session.dismissWarning(w)}
 		/>
 	{/each}
 
 	<div class="top">
 		<p class="talk-title">{title}</p>
-		{#if display.next}
+		{#if nextLong && nextShort}
 			<span class="next-bell">
-				<span class="prefix">次のベル　</span>{i18n.tm(display.next.name)}まで <strong>{display.next.in}</strong>
+				<span class="long">{nextLong.before}<strong>{nextLong.time}</strong>{nextLong.after}</span>
+				<span class="short">{nextShort.before}<strong>{nextShort.time}</strong>{nextShort.after}</span>
 			</span>
 		{/if}
 	</div>
@@ -70,7 +78,7 @@
 			<span class="digits" role="timer">{display.digits}</span>
 			{#if display.sub !== null}
 				<span class="sub-time">{i18n.tm(display.sub)}</span>
-			{:else}
+			{:else if display.state !== 'ok'}
 				<StatePill state={display.state} />
 			{/if}
 		</Ring>
@@ -84,18 +92,18 @@
 			onclick={() => session.togglePause()}
 			style="flex: var(--controls-flex); padding-inline: var(--controls-padding)"
 		>
-			<Icon name={paused ? 'play' : 'pause'} filled />{paused ? '再開' : '一時停止'}
+			<Icon name={paused ? 'play' : 'pause'} filled />{i18n.t(paused ? 'timer.resume' : 'timer.pause')}
 		</Button>
 		<Button
 			size="lg"
 			onclick={() => session.requestFinish()}
 			style="flex: var(--controls-flex); padding-inline: var(--controls-padding)"
 		>
-			<Icon name="stop" filled />終了
+			<Icon name="stop" filled />{i18n.t('timer.end')}
 		</Button>
 		{#if fullscreen.supported}
 			<span class="fullscreen">
-				<Button size="lg" variant="ghost" iconOnly aria-label="全画面" onclick={() => fullscreen.toggle()}>
+				<Button size="lg" variant="ghost" iconOnly aria-label={i18n.t('timer.fullscreen')} onclick={() => fullscreen.toggle()}>
 					<Icon name="full" />
 				</Button>
 			</span>
@@ -103,24 +111,27 @@
 	</div>
 
 	<div class="kbd-hints">
-		<span><Kbd>Space</Kbd>一時停止・再開</span>
-		{#if fullscreen.supported}<span><Kbd>F</Kbd>全画面</span>{/if}
-		<span><Kbd>Esc</Kbd>終了</span>
+		<span><Kbd>Space</Kbd>{i18n.t('timer.kbd.pause')}</span>
+		{#if fullscreen.supported}<span><Kbd>F</Kbd>{i18n.t('timer.kbd.fullscreen')}</span>{/if}
+		<span><Kbd>Esc</Kbd>{i18n.t('timer.kbd.end')}</span>
 	</div>
 
 	{#if session.confirming}
 		<ConfirmDialog
-			title="計測を終了しますか？"
-			confirmLabel="終了する"
-			cancelLabel="続ける"
+			title={i18n.t('end_confirm.title')}
+			confirmLabel={i18n.t('end_confirm.end')}
+			cancelLabel={i18n.t('end_confirm.continue')}
 			onconfirm={() => session.confirmFinish()}
 			oncancel={() => session.cancelFinish()}
 			initialFocus="confirm"
 		>
-			経過 {formatClock(session.snapshot.elapsedMs)} ／ {formatClock(session.durationMs)}。終了すると設定画面に戻ります。計測はこのあいだも続いています。
+			{i18n.t('end_confirm.body', {
+				elapsed: formatClock(session.snapshot.elapsedMs),
+				total: formatClock(session.durationMs)
+			})}
 			{#snippet hints()}
-				<span><Kbd>Enter</Kbd>終了する</span>
-				<span><Kbd>Esc</Kbd>続ける</span>
+				<span><Kbd>Enter</Kbd>{i18n.t('end_confirm.key_end')}</span>
+				<span><Kbd>Esc</Kbd>{i18n.t('end_confirm.key_continue')}</span>
 			{/snippet}
 		</ConfirmDialog>
 	{/if}
@@ -164,8 +175,11 @@
 		color: var(--color-text);
 		font-family: var(--font-digits);
 	}
-	.prefix {
-		display: var(--next-bell-prefix-display);
+	.long {
+		display: var(--next-bell-long-display);
+	}
+	.short {
+		display: var(--next-bell-short-display);
 	}
 
 	.main {

@@ -1,15 +1,17 @@
 <script lang="ts">
 	import { tick } from 'svelte';
 	import { theme, type ThemeChoice } from '../../theme/theme.svelte.ts';
+	import { i18n } from '#lib/i18n/i18n.svelte.ts';
+	import type { MessageKey } from '#lib/i18n/messages.ts';
 	import Button from './Button.svelte';
 	import Icon from './Icon.svelte';
 
 	// ヘッダーの月のボタンで開く、テーマのメニュー。選んだテーマは保存しない。
 	// メニューは最も近い position: relative の祖先（.app）を基準に、ヘッダーの下へ置く
-	const OPTIONS: { value: ThemeChoice; label: string }[] = [
-		{ value: 'system', label: 'OSに合わせる' },
-		{ value: 'light', label: 'ライト' },
-		{ value: 'dark', label: 'ダーク' }
+	const OPTIONS: { value: ThemeChoice; label: MessageKey }[] = [
+		{ value: 'system', label: 'prefs.theme.system' },
+		{ value: 'light', label: 'prefs.theme.light' },
+		{ value: 'dark', label: 'prefs.theme.dark' }
 	];
 
 	let open = $state(false);
@@ -79,7 +81,7 @@
 		<Button
 			variant="ghost"
 			iconOnly
-			aria-label="テーマを切り替える"
+			aria-label={i18n.t('prefs.theme.title')}
 			aria-haspopup="menu"
 			aria-expanded={open}
 			aria-controls={open ? menuId : undefined}
@@ -91,7 +93,7 @@
 
 	{#if open}
 		<!-- svelte-ignore a11y_interactive_supports_focus -->
-		<div id={menuId} class="menu" role="menu" aria-label="テーマ" onkeydown={onmenukeydown}>
+		<div id={menuId} class="menu" role="menu" aria-label={i18n.t('prefs.theme.title')} onkeydown={onmenukeydown}>
 			{#each OPTIONS as o (o.value)}
 				<button
 					type="button"
@@ -101,7 +103,7 @@
 					aria-checked={theme.choice === o.value}
 					onclick={() => choose(o.value)}
 				>
-					{o.label}
+					{i18n.t(o.label)}
 				</button>
 			{/each}
 		</div>

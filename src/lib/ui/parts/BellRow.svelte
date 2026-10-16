@@ -1,5 +1,7 @@
 <script lang="ts">
 	import type { Strikes } from '../../core/bells.ts';
+	import { i18n } from '#lib/i18n/i18n.svelte.ts';
+	import type { MessageKey } from '#lib/i18n/messages.ts';
 	import Button from './Button.svelte';
 	import Icon from './Icon.svelte';
 
@@ -16,11 +18,11 @@
 
 	let { badge, when, strikes, note, onopen, ondelete }: Props = $props();
 
-	const NOTE_TEXT = {
-		warn: 'ここで黄（予鈴）に',
-		over: 'ここで赤（超過）に',
-		silent: '持ち時間より長いため鳴りません'
-	} as const;
+	const NOTE_KEYS: Record<'warn' | 'over' | 'silent', MessageKey> = {
+		warn: 'settings.bells.note_warn',
+		over: 'settings.bells.note_over',
+		silent: 'settings.bells.note_never'
+	};
 </script>
 
 <div class="bell-row" class:error={note === 'silent'}>
@@ -29,14 +31,14 @@
 		<span class="when">
 			<strong>{when}</strong>
 			<span class="note" class:warn={note === 'warn'} class:over={note === 'over'}>
-				{note ? NOTE_TEXT[note] : '—'}
+				{i18n.t(note ? NOTE_KEYS[note] : 'settings.bells.note_none')}
 			</span>
 		</span>
-		<span class="strikes" role="img" aria-label="{strikes}回">
+		<span class="strikes" role="img" aria-label={i18n.t('settings.bells.strikes', { n: strikes })}>
 			{#each { length: strikes } as _, i (i)}<i></i>{/each}
 		</span>
 	</button>
-	<Button variant="ghost" iconOnly aria-label="{badge}を削除" onclick={ondelete}>
+	<Button variant="ghost" iconOnly aria-label={i18n.t('settings.bells.delete')} onclick={ondelete}>
 		<Icon name="x" />
 	</Button>
 </div>

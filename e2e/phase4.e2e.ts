@@ -154,13 +154,13 @@ test.describe('W4-4 テーマ', () => {
 		await page.emulateMedia({ colorScheme: 'light' });
 		await open(page);
 		const attr = () => page.evaluate(() => document.documentElement.getAttribute('data-theme'));
-		const trigger = page.getByRole('button', { name: 'テーマを切り替える' });
+		const trigger = page.getByRole('button', { name: '表示テーマ' });
 		expect(await attr()).toBeNull();
 
 		await trigger.click();
-		await expect(page.getByRole('menu', { name: 'テーマ' })).toBeVisible();
-		await expect(page.getByRole('menuitemradio', { name: 'OSに合わせる' })).toHaveAttribute('aria-checked', 'true');
-		await expect(page.getByRole('menuitemradio', { name: 'OSに合わせる' })).toBeFocused();
+		await expect(page.getByRole('menu', { name: '表示テーマ' })).toBeVisible();
+		await expect(page.getByRole('menuitemradio', { name: 'システム' })).toHaveAttribute('aria-checked', 'true');
+		await expect(page.getByRole('menuitemradio', { name: 'システム' })).toBeFocused();
 
 		await page.getByRole('menuitemradio', { name: 'ダーク' }).click();
 		await expect(page.getByRole('menu')).toHaveCount(0);
@@ -174,7 +174,7 @@ test.describe('W4-4 テーマ', () => {
 		expect(await page.evaluate(() => getComputedStyle(document.body).backgroundColor)).not.toBe(darkBg);
 
 		await trigger.click();
-		await page.getByRole('menuitemradio', { name: 'OSに合わせる' }).click();
+		await page.getByRole('menuitemradio', { name: 'システム' }).click();
 		expect(await attr()).toBeNull();
 
 		await trigger.click();
@@ -186,14 +186,14 @@ test.describe('W4-4 テーマ', () => {
 
 	test('キーボード：↑↓で移動、Esc で閉じてボタンに戻る、外側のクリックで閉じる', async ({ page }) => {
 		await open(page);
-		const trigger = page.getByRole('button', { name: 'テーマを切り替える' });
+		const trigger = page.getByRole('button', { name: '表示テーマ' });
 		await trigger.focus();
 		await page.keyboard.press('Enter');
 		await page.keyboard.press('ArrowDown');
 		await expect(page.getByRole('menuitemradio', { name: 'ライト' })).toBeFocused();
 		await page.keyboard.press('ArrowDown');
 		await page.keyboard.press('ArrowDown');
-		await expect(page.getByRole('menuitemradio', { name: 'OSに合わせる' })).toBeFocused();
+		await expect(page.getByRole('menuitemradio', { name: 'システム' })).toBeFocused();
 		await page.keyboard.press('ArrowUp');
 		await expect(page.getByRole('menuitemradio', { name: 'ダーク' })).toBeFocused();
 		await page.keyboard.press('Escape');
@@ -270,7 +270,7 @@ test.describe('W4-5 キーボードだけの操作とフォーカス', () => {
 
 	test('テーマのメニューのフォーカスも見える', async ({ page }) => {
 		await open(page);
-		const trigger = page.getByRole('button', { name: 'テーマを切り替える' });
+		const trigger = page.getByRole('button', { name: '表示テーマ' });
 		await trigger.focus();
 		expect((await focusRing(page))!.visible).toBe(true);
 		await page.keyboard.press('Enter');

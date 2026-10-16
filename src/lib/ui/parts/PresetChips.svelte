@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { SECOND } from '../../core/time.ts';
+	import { i18n } from '#lib/i18n/i18n.svelte.ts';
 
 	// 持ち時間のプリセット（分）。選択中は value（ミリ秒）と一致するもの
 	interface Props {
@@ -15,7 +16,7 @@
 	{#each minutes as m (m)}
 		{@const ms = m * 60 * SECOND}
 		<button type="button" class="chip" class:selected={value === ms} aria-pressed={value === ms} onclick={() => onselect(ms)}>
-			{m}分
+			{i18n.t('settings.duration.preset', { n: m })}
 		</button>
 	{/each}
 </div>

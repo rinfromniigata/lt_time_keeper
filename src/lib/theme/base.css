@@ -100,7 +100,8 @@ svg {
   --timer-padding: var(--space-4);
   --talk-title-size: var(--font-size-lg);
   --next-bell-size: var(--font-size-sm);
-  --next-bell-prefix-display: none;
+  --next-bell-long-display: none;
+  --next-bell-short-display: inline;
   --controls-flex: 1 1 0;
   --controls-padding: var(--space-4);
   --kbd-hints-display: none;
@@ -126,7 +127,8 @@ svg {
     --timer-padding: var(--space-5) var(--space-6);
     --talk-title-size: var(--font-size-xl);
     --next-bell-size: var(--font-size-md);
-    --next-bell-prefix-display: inline;
+    --next-bell-long-display: inline;
+    --next-bell-short-display: none;
     --controls-flex: none;
     --controls-padding: var(--space-7);
     --kbd-hints-display: flex;

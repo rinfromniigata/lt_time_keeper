@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
+	import { i18n } from '#lib/i18n/i18n.svelte.ts';
 	import Button from './Button.svelte';
 	import Icon from './Icon.svelte';
 
@@ -22,7 +23,7 @@
 		{#if detail}<p class="detail">{detail}</p>{/if}
 	</div>
 	{@render actions?.()}
-	<Button variant="ghost" iconOnly aria-label="閉じる" onclick={onclose}><Icon name="x" /></Button>
+	<Button variant="ghost" iconOnly aria-label={i18n.t('common.close')} onclick={onclose}><Icon name="x" /></Button>
 </div>
 
 <style>

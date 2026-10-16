@@ -10,6 +10,7 @@
 
 <script lang="ts">
 	import { onMount, untrack } from 'svelte';
+	import { i18n } from '#lib/i18n/i18n.svelte.ts';
 	import Button from './Button.svelte';
 	import DurationInput from './DurationInput.svelte';
 	import Segmented from './Segmented.svelte';
@@ -79,36 +80,36 @@
 		<div class="grabber"></div>
 		<h3 id={titleId}>{title}</h3>
 		<div class="group">
-			<span class="label">鳴らす時点</span>
+			<span class="label">{i18n.t('bell_editor.when')}</span>
 			<Segmented
-				label="鳴らす時点の基準"
+				label={i18n.t('bell_editor.when')}
 				options={[
-					{ value: 'remaining', label: '残り' },
-					{ value: 'over', label: '超過後' }
+					{ value: 'remaining', label: i18n.t('bell_editor.basis_remaining') },
+					{ value: 'over', label: i18n.t('bell_editor.basis_overtime') }
 				]}
 				bind:value={base}
 			/>
 			<DurationInput idPrefix="bell" steppers={false} bind:value={offsetMs} />
 		</div>
 		<div class="group">
-			<span class="label">鳴らす回数</span>
+			<span class="label">{i18n.t('bell_editor.count')}</span>
 			<Segmented
-				label="鳴らす回数"
+				label={i18n.t('bell_editor.count')}
 				options={[
-					{ value: 1, label: '1回' },
-					{ value: 2, label: '2回' },
-					{ value: 3, label: '3回' }
+					{ value: 1, label: i18n.t('bell_editor.count_option', { n: 1 }) },
+					{ value: 2, label: i18n.t('bell_editor.count_option', { n: 2 }) },
+					{ value: 3, label: i18n.t('bell_editor.count_option', { n: 3 }) }
 				]}
 				bind:value={strikes}
 			/>
 		</div>
 		<div class="actions">
 			{#if mode === 'edit'}
-				<Button variant="danger" onclick={() => ondelete?.()}>削除</Button>
+				<Button variant="danger" onclick={() => ondelete?.()}>{i18n.t('bell_editor.delete')}</Button>
 			{:else}
-				<Button onclick={oncancel}>キャンセル</Button>
+				<Button onclick={oncancel}>{i18n.t('bell_editor.cancel')}</Button>
 			{/if}
-			<Button variant="primary" onclick={() => onsubmit({ base, offsetMs, strikes })}>決定</Button>
+			<Button variant="primary" onclick={() => onsubmit({ base, offsetMs, strikes })}>{i18n.t('bell_editor.confirm')}</Button>
 		</div>
 	</div>
 </div>

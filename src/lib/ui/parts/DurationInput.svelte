@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { MAX_INPUT_MS, SECOND } from '../../core/time.ts';
+	import { i18n } from '#lib/i18n/i18n.svelte.ts';
 	import Button from './Button.svelte';
 	import Icon from './Icon.svelte';
 	import NumberField from './NumberField.svelte';
@@ -33,16 +34,16 @@
 
 <div class="duration">
 	<div class="num-box">
-		<NumberField id="{idPrefix}-min" label="分" max={99} {error} bind:value={() => minutes, setMinutes} />
-		<span class="unit">分</span>
+		<NumberField id="{idPrefix}-min" label={i18n.t('settings.duration.minutes_field')} max={99} {error} bind:value={() => minutes, setMinutes} />
+		<span class="unit">{i18n.t('settings.duration.minutes_unit')}</span>
 		{#if steppers}
 			<div class="steppers">
-				<Button iconOnly aria-label="1分減らす" disabled={value < MINUTE} onclick={() => add(-MINUTE)}>
+				<Button iconOnly aria-label={i18n.t('settings.duration.decrease_minute')} disabled={value < MINUTE} onclick={() => add(-MINUTE)}>
 					<Icon name="minus" />
 				</Button>
 				<Button
 					iconOnly
-					aria-label="1分増やす"
+					aria-label={i18n.t('settings.duration.increase_minute')}
 					disabled={value + MINUTE > MAX_INPUT_MS}
 					onclick={() => add(MINUTE)}
 				>
@@ -53,16 +54,16 @@
 	</div>
 	<div class="colon" aria-hidden="true">:</div>
 	<div class="num-box">
-		<NumberField id="{idPrefix}-sec" label="秒" max={59} {error} bind:value={() => seconds, setSeconds} />
-		<span class="unit">秒</span>
+		<NumberField id="{idPrefix}-sec" label={i18n.t('settings.duration.seconds_field')} max={59} {error} bind:value={() => seconds, setSeconds} />
+		<span class="unit">{i18n.t('settings.duration.seconds_unit')}</span>
 		{#if steppers}
 			<div class="steppers">
-				<Button iconOnly aria-label="10秒減らす" disabled={value < TEN_SECONDS} onclick={() => add(-TEN_SECONDS)}>
+				<Button iconOnly aria-label={i18n.t('settings.duration.decrease_seconds')} disabled={value < TEN_SECONDS} onclick={() => add(-TEN_SECONDS)}>
 					<Icon name="minus" />
 				</Button>
 				<Button
 					iconOnly
-					aria-label="10秒増やす"
+					aria-label={i18n.t('settings.duration.increase_seconds')}
 					disabled={value + TEN_SECONDS > MAX_INPUT_MS}
 					onclick={() => add(TEN_SECONDS)}
 				>

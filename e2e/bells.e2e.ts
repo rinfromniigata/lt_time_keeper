@@ -101,9 +101,9 @@ test('削除：シートの削除と行の × で消え、番号が1鈴〜に戻
 	await expect(rows(page).nth(0).locator('.badge')).toHaveText('1鈴');
 
 	// 行の ×
-	await rows(page).nth(0).getByRole('button', { name: /を削除/ }).click();
-	await rows(page).nth(0).getByRole('button', { name: /を削除/ }).click();
-	await rows(page).nth(0).getByRole('button', { name: /を削除/ }).click();
+	await rows(page).nth(0).getByRole('button', { name: '削除', exact: true }).click();
+	await rows(page).nth(0).getByRole('button', { name: '削除', exact: true }).click();
+	await rows(page).nth(0).getByRole('button', { name: '削除', exact: true }).click();
 	await expect(rows(page)).toHaveCount(0);
 	await expect(page.getByText('ベルがありません。音は鳴らさず、時間と色だけで知らせます。')).toBeVisible();
 	await expect(page.getByText('0件', { exact: true })).toBeVisible();
@@ -350,7 +350,7 @@ test.describe('計測中のベル', () => {
 
 	test('ベルを全部消して開始すると、何も鳴らさず計測は続く', async ({ page }) => {
 		await openWithFakeAudio(page);
-		for (let i = 0; i < 3; i++) await page.getByRole('button', { name: /を削除/ }).first().click();
+		for (let i = 0; i < 3; i++) await page.getByRole('button', { name: '削除', exact: true }).first().click();
 		await page.getByRole('button', { name: '開始' }).click();
 		await advance(page, 400_000);
 		expect(await strikes(page)).toBe(0);

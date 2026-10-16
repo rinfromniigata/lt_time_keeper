@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { bellBadge, bellNote, sortBells, type Bell } from '../../core/bells.ts';
+	import { bellBadge, bellNote, nextBellName, sortBells, type Bell } from '../../core/bells.ts';
 	import { formatClock } from '../../core/time.ts';
 	import { VibrationRinger } from '../../output/vibration_ringer.ts';
 	import type { Ringer } from '../../output/ringer.ts';
@@ -37,13 +37,21 @@
 		sortBells(settings.bells, settings.durationMs).map((bell, index, all) => ({
 			bell,
 			badge: i18n.tm(bellBadge(index, all.length)),
-			// 4件以上では、編集シートの見出しを「4番目のベルを編集」にする
-			editTitle: all.length <= 3 ? `${i18n.tm(bellBadge(index, all.length))}を編集` : `${index + 1}番目のベルを編集`,
-			when: bell.base === 'remaining' ? `残り ${formatClock(bell.offsetMs)}` : `超過 +${formatClock(bell.offsetMs)}`,
+			// 3件以下は「1鈴を編集」、4件以上は「4番目のベルを編集」
+			editTitle: i18n.t('bell_editor.title_edit', { label: nextBellName(index, all.length) }),
+			when: i18n.t(bell.base === 'remaining' ? 'settings.bells.remaining' : 'settings.bells.overtime', {
+				time: formatClock(bell.offsetMs)
+			}),
 			note: bellNote(bell, settings.bells, settings.durationMs)
 		}))
 	);
-	const bellSummary = $derived(settings.bells.length === 0 ? 'ベルなし' : `ベル ${settings.bells.length}件`);
+	const summary = $derived.by(() => {
+		if (durationZero) return i18n.t('settings.start_bar.summary_invalid');
+		const time = formatClock(settings.durationMs);
+		return settings.bells.length === 0
+			? i18n.t('settings.start_bar.summary_no_bells', { time })
+			: i18n.t('settings.start_bar.summary', { time, n: settings.bells.length });
+	});
 
 	// ベルの編集シート。edit は開いた行の id を持つ
 	type Editing = { mode: 'add' } | { mode: 'edit'; id: string; title: string; initial: BellValues };
@@ -94,18 +102,9 @@
 	<header class="app-header">
 		<div class="brand">
 			<svg class="brand-icon" aria-hidden="true"><use href="#ic-brand" /></svg>
-			<span>LTタイムキーパー</span>
+			<span>{i18n.t('app.name')}</span>
 		</div>
 		<div class="header-actions">
-			<a
-				class="repo-link"
-				href="https://github.com/rinfromniigata/lt_time_keeper"
-				target="_blank"
-				rel="noopener noreferrer"
-				aria-label="GitHub リポジトリを開く"
-			>
-				<Icon name="github" filled />
-			</a>
 			<ThemeMenu />
 		</div>
 	</header>
@@ -116,40 +115,40 @@
 				<div class="update">
 					<Banner
 						tone="info"
-						message="新しいバージョンがあります。"
-						detail="再読み込みすると、入力中の値は初期値に戻ります。"
+						message={i18n.t('update.title')}
+						detail={i18n.t('update.note')}
 						onclose={() => update.dismiss()}
 					>
 						{#snippet actions()}
-							<Button variant="primary" onclick={() => update.reload()}>再読み込み</Button>
+							<Button variant="primary" onclick={() => update.reload()}>{i18n.t('update.reload')}</Button>
 						{/snippet}
 					</Banner>
 				</div>
 			{/if}
 			<div class="col">
-				<Panel title="持ち時間" order={1}>
+				<Panel title={i18n.t('settings.duration.title')} order={1}>
 					<DurationInput bind:value={() => settings.durationMs, (ms) => settings.setDuration(ms)} error={durationZero} />
 					<PresetChips value={settings.durationMs} onselect={(ms) => settings.setDuration(ms)} />
 					{#if durationZero}
-						<FieldError>持ち時間を1秒以上にしてください。</FieldError>
+						<FieldError>{i18n.t('settings.duration.error_zero')}</FieldError>
 					{/if}
 				</Panel>
-				<Panel title="表示名" hint="任意" order={4}>
+				<Panel title={i18n.t('settings.title.title')} hint={i18n.t('settings.title.optional')} order={4}>
 					<TextField
-						aria-label="表示名"
-						placeholder="例：LT「型安全なCSS設計」"
+						aria-label={i18n.t('settings.title.title')}
+						placeholder={i18n.t('settings.title.placeholder')}
 						bind:value={() => settings.title, (t) => settings.setTitle(t)}
 					/>
-					<p class="hint">計測中の画面の上部に表示します。</p>
+					<p class="hint">{i18n.t('settings.title.hint')}</p>
 				</Panel>
 			</div>
 			<div class="col">
-				<Panel title="ベル" hint="{settings.bells.length}件" order={2}>
+				<Panel title={i18n.t('settings.bells.title')} hint={i18n.t('settings.bells.count', { n: settings.bells.length })} order={2}>
 					{#if rows.length === 0}
 						<EmptyState>
-							ベルがありません。音は鳴らさず、時間と色だけで知らせます。
+							{i18n.t('settings.bells.empty')}
 							{#snippet action()}
-								<Button onclick={openAdd}><Icon name="plus" />ベルを追加</Button>
+								<Button onclick={openAdd}><Icon name="plus" />{i18n.t('settings.bells.add')}</Button>
 							{/snippet}
 						</EmptyState>
 					{:else}
@@ -167,20 +166,20 @@
 								</li>
 							{/each}
 						</ul>
-						<Button variant="ghost" onclick={openAdd}><Icon name="plus" />ベルを追加</Button>
+						<Button variant="ghost" onclick={openAdd}><Icon name="plus" />{i18n.t('settings.bells.add')}</Button>
 					{/if}
 				</Panel>
-				<Panel title="音" order={3}>
+				<Panel title={i18n.t('prefs.tab.sound')} order={3}>
 					<div class="row">
-						<span class="label" id="volume-label">音量</span>
+						<span class="label" id="volume-label">{i18n.t('prefs.sound.volume')}</span>
 						<div class="grow">
-							<VolumeSlider label="音量" bind:value={() => settings.volume, (v) => settings.setVolume(v)} />
+							<VolumeSlider label={i18n.t('prefs.sound.volume')} bind:value={() => settings.volume, (v) => settings.setVolume(v)} />
 						</div>
-						<Button onclick={tryRing} style="flex: var(--sound-test-flex)"><Icon name="bell" />鳴らしてみる</Button>
+						<Button onclick={tryRing} style="flex: var(--sound-test-flex)"><Icon name="bell" />{i18n.t('prefs.sound.test')}</Button>
 					</div>
 					{#if vibrationSupported}
 						<div class="row">
-							<span class="label grow" id="vibrate-label">ベルと同時に振動する</span>
+							<span class="label grow" id="vibrate-label">{i18n.t('prefs.sound.vibrate')}</span>
 							<Switch aria-labelledby="vibrate-label" bind:checked={() => settings.vibrate, (v) => settings.setVibrate(v)} />
 						</div>
 					{/if}
@@ -191,7 +190,7 @@
 
 	<div class="start-bar">
 		<span class="summary">
-			{durationZero ? '持ち時間を入力すると開始できます' : `持ち時間 ${formatClock(settings.durationMs)} ／ ${bellSummary}`}
+			{summary}
 		</span>
 		<Button
 			variant="primary"
@@ -200,14 +199,14 @@
 			onclick={onstart}
 			style="width: var(--start-width); min-width: var(--start-min-width)"
 		>
-			<Icon name="play" filled />開始
+			<Icon name="play" filled />{i18n.t('settings.start')}
 		</Button>
 	</div>
 
 	{#if editing}
 		<BellEditor
 			mode={editing.mode}
-			title={editing.mode === 'edit' ? editing.title : 'ベルを追加'}
+			title={editing.mode === 'edit' ? editing.title : i18n.t('bell_editor.title_add')}
 			initial={editing.mode === 'edit' ? editing.initial : addInitial}
 			onsubmit={submit}
 			ondelete={removeEditing}
@@ -246,18 +245,6 @@
 		display: flex;
 		align-items: center;
 		gap: var(--space-1);
-	}
-	.repo-link {
-		display: inline-flex;
-		align-items: center;
-		justify-content: center;
-		width: var(--tap-target-min);
-		min-height: var(--tap-target-min);
-		border-radius: var(--radius-md);
-		color: var(--color-text);
-	}
-	.repo-link:hover {
-		background: var(--color-surface-raised);
 	}
 	.brand-icon {
 		width: calc(var(--icon-size) * 1.2);
