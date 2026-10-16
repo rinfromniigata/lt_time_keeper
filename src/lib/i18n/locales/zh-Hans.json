@@ -80,5 +80,6 @@
 	"prefs.theme.dark": "深色",
 	"prefs.sound.volume": "音量",
 	"prefs.sound.test": "试听",
-	"prefs.sound.vibrate": "响铃时同时振动"
+	"prefs.sound.vibrate": "响铃时同时振动",
+	"prefs.about.tagline": "用于闪电演讲和演示的计时工具"
 }

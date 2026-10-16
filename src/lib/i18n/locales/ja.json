@@ -80,5 +80,6 @@
 	"prefs.theme.dark": "ダーク",
 	"prefs.sound.volume": "音量",
 	"prefs.sound.test": "鳴らしてみる",
-	"prefs.sound.vibrate": "ベルと同時に振動する"
+	"prefs.sound.vibrate": "ベルと同時に振動する",
+	"prefs.about.tagline": "LTやプレゼンの持ち時間を計るタイムキーパー"
 }

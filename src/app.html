@@ -4,8 +4,27 @@
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<meta name="text-scale" content="scale" />
-		<title>LTタイムキーパー</title>
-		<meta name="description" content="LTやプレゼンテーションの持ち時間を計り、ベルで知らせるタイムキーパー" />
+		<title>%i18n.title%</title>
+		<!-- 描画前に、ブラウザの言語から <html lang> と題名を決める（書き出した HTML は1言語でしか描けないため）。
+		     規則は src/lib/i18n/detect.ts と同じ（ja* → ja、en* → en、zh* → zh-Hans、どれもなければ en）。e2e で一致を確かめる -->
+		<script>
+			(function () {
+				var names = %i18n.names%;
+				var languages = navigator.languages || [];
+				var locale = 'en';
+				for (var i = 0; i < languages.length; i++) {
+					var primary = String(languages[i]).toLowerCase().split(/[-_]/)[0];
+					if (primary === 'ja') locale = 'ja';
+					else if (primary === 'en') locale = 'en';
+					else if (primary === 'zh') locale = 'zh-Hans';
+					else continue;
+					break;
+				}
+				document.documentElement.lang = locale;
+				document.title = names[locale];
+			})();
+		</script>
+		<meta name="description" content="%i18n.description%" />
 		<!-- manifest.webmanifest の theme_color と同じ値（gen_icons.ts が tokens のダーク側の --color-bg から作る） -->
 		<meta name="theme-color" content="#121316" />
 		<link rel="manifest" href="/manifest.webmanifest" />
@@ -13,8 +32,8 @@
 		<link rel="icon" href="/icons/favicon-32.png" type="image/png" sizes="32x32" />
 		<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
 		<meta property="og:type" content="website" />
-		<meta property="og:title" content="LTタイムキーパー" />
-		<meta property="og:description" content="LTやプレゼンテーションの持ち時間を計り、ベルで知らせるタイムキーパー" />
+		<meta property="og:title" content="%i18n.title%" />
+		<meta property="og:description" content="%i18n.description%" />
 		<meta property="og:url" content="https://lt.rinontech.com/" />
 		<meta property="og:image" content="https://lt.rinontech.com/icons/og.png" />
 		<meta property="og:image:width" content="1200" />
@@ -44,7 +63,7 @@
 		<!-- S00 起動中。アプリが表示できる状態になったら +page.svelte が取り除く -->
 		<div id="splash" class="splash" role="status">
 			<svg class="mark" aria-hidden="true"><use href="#ic-brand" /></svg>
-			<div class="row"><span class="spinner" aria-hidden="true"></span><span>読み込み中…</span></div>
+			<div class="row"><span class="spinner" aria-hidden="true"></span><span class="loading">%i18n.splash%</span></div>
 		</div>
 
 		<div style="display: contents">%sveltekit.body%</div>

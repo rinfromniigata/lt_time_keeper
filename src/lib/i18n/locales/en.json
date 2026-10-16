@@ -89,5 +89,6 @@
 	"prefs.theme.dark": "Dark",
 	"prefs.sound.volume": "Volume",
 	"prefs.sound.test": "Play test sound",
-	"prefs.sound.vibrate": "Vibrate with bells"
+	"prefs.sound.vibrate": "Vibrate with bells",
+	"prefs.about.tagline": "A timekeeper for lightning talks and presentations"
 }

@@ -40,3 +40,14 @@
     transform: rotate(360deg);
   }
 }
+
+/* 「読み込み中…」は3言語を lang つきで持ち、<html lang> に合うものだけを出す（lang は app.html のインラインスクリプトが決める） */
+.splash .loading > [lang] {
+  display: none;
+}
+
+:root:lang(ja) .splash .loading > [lang='ja'],
+:root:lang(en) .splash .loading > [lang='en'],
+:root:lang(zh-Hans) .splash .loading > [lang='zh-Hans'] {
+  display: inline;
+}
