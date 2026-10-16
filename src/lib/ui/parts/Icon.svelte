@@ -11,6 +11,7 @@
 		| 'alert'
 		| 'back'
 		| 'check'
+		| 'gear'
 		| 'moon'
 		| 'github';
 </script>

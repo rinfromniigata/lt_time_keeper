@@ -1,6 +1,7 @@
 {
 	"app.name": "LT Timekeeper",
 	"app.loading": "Loading…",
+	"header.open_prefs": "Open preferences",
 	"settings.duration.title": "Talk time",
 	"settings.duration.minutes_unit": "min",
 	"settings.duration.seconds_unit": "sec",

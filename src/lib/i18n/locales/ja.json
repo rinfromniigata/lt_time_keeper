@@ -1,6 +1,7 @@
 {
 	"app.name": "LTタイムキーパー",
 	"app.loading": "読み込み中…",
+	"header.open_prefs": "環境設定を開く",
 	"settings.duration.title": "持ち時間",
 	"settings.duration.minutes_unit": "分",
 	"settings.duration.seconds_unit": "秒",

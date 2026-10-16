@@ -107,7 +107,6 @@ svg {
   --kbd-hints-display: none;
   --fullscreen-display: none;
   --settings-col-display: contents;
-  --sound-test-flex: 1 1 100%;
   --sheet-align: end;
   --sheet-layer-padding: 0;
   --sheet-radius: var(--radius-lg) var(--radius-lg) 0 0;
@@ -146,7 +145,6 @@ svg {
     --kbd-hints-display: flex;
     --fullscreen-display: inline-flex;
     --settings-col-display: flex;
-    --sound-test-flex: none;
     --sheet-align: center;
     --sheet-layer-padding: var(--space-4);
     --sheet-radius: var(--radius-lg);

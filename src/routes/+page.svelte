@@ -13,6 +13,7 @@
 	import { CompositeRinger } from '#lib/output/composite_ringer.ts';
 	import { VibrationRinger } from '#lib/output/vibration_ringer.ts';
 	import { UpdateNotifier } from '#lib/pwa/update.svelte.ts';
+	import PrefsScreen from '#lib/ui/screens/PrefsScreen.svelte';
 	import SettingsScreen from '#lib/ui/screens/SettingsScreen.svelte';
 	import TimerScreen from '#lib/ui/screens/TimerScreen.svelte';
 
@@ -20,6 +21,9 @@
 
 	// 画面の切り替えは URL を使わず、この状態だけで行う
 	let screen = $state<Screen>('settings');
+
+	// 環境設定（S05）は S01 の上に重ねて出す。計測中は S01 がないので開けない
+	let prefsOpen = $state(false);
 
 	// 設定はページを開いてから閉じるまで残る（計測から S01 に戻っても値が残る）。保存はしない
 	const settings = new SettingsStore();
@@ -38,7 +42,7 @@
 
 	function start() {
 		// 開始を続けて押しても、2回目は何もしない
-		if (session || !settings.canStart) return;
+		if (session || prefsOpen || !settings.canStart) return;
 		const snapshot = settings.snapshot();
 		// 振動は、設定がオンで、対応した端末のときだけ音に添える
 		const ringer = new CompositeRinger([
@@ -90,7 +94,10 @@
 
 <main class="app" data-screen={screen}>
 	{#if screen === 'settings'}
-		<SettingsScreen {settings} {prefs} previewRinger={audioRinger} {update} onstart={start} />
+		<SettingsScreen {settings} {update} onstart={start} onopenprefs={() => (prefsOpen = true)} />
+		{#if prefsOpen}
+			<PrefsScreen {prefs} previewRinger={audioRinger} onclose={() => (prefsOpen = false)} />
+		{/if}
 	{:else if session}
 		<TimerScreen {session} title={settings.title} {fullscreen} />
 	{/if}

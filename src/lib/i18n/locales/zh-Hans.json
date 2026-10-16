@@ -1,6 +1,7 @@
 {
 	"app.name": "LT 计时器",
 	"app.loading": "正在加载…",
+	"header.open_prefs": "打开偏好设置",
 	"settings.duration.title": "演讲时长",
 	"settings.duration.minutes_unit": "分",
 	"settings.duration.seconds_unit": "秒",

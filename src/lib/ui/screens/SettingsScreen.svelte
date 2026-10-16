@@ -1,16 +1,11 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
 	import { bellBadge, bellNote, nextBellName, sortBells, type Bell } from '../../core/bells.ts';
 	import { formatClock } from '../../core/time.ts';
-	import { VibrationRinger } from '../../output/vibration_ringer.ts';
-	import type { Ringer } from '../../output/ringer.ts';
-	import type { PrefsStore } from '../../prefs/store.svelte.ts';
 	import type { UpdateNotifier } from '../../pwa/update.svelte.ts';
 	import type { SettingsStore } from '../../settings/store.svelte.ts';
 	import Banner from '../parts/Banner.svelte';
 	import BellEditor, { type BellValues } from '../parts/BellEditor.svelte';
 	import BellRow from '../parts/BellRow.svelte';
-	import ThemeMenu from '../parts/ThemeMenu.svelte';
 	import Button from '../parts/Button.svelte';
 	import DurationInput from '../parts/DurationInput.svelte';
 	import EmptyState from '../parts/EmptyState.svelte';
@@ -18,24 +13,20 @@
 	import Icon from '../parts/Icon.svelte';
 	import Panel from '../parts/Panel.svelte';
 	import PresetChips from '../parts/PresetChips.svelte';
-	import Switch from '../parts/Switch.svelte';
 	import { i18n } from '#lib/i18n/i18n.svelte.ts';
 	import TextField from '../parts/TextField.svelte';
-	import VolumeSlider from '../parts/VolumeSlider.svelte';
 
-	// previewRinger: 「鳴らしてみる」で使う（計測のセッションとは別）
+	// onopenprefs: ヘッダーの歯車から環境設定を開く
 	let {
 		settings,
-		prefs,
-		previewRinger,
 		update,
-		onstart
+		onstart,
+		onopenprefs
 	}: {
 		settings: SettingsStore;
-		prefs: PrefsStore;
-		previewRinger: Ringer;
 		update: UpdateNotifier;
 		onstart: () => void;
+		onopenprefs: () => void;
 	} = $props();
 
 	const durationZero = $derived(settings.issues.durationZero);
@@ -92,18 +83,6 @@
 		offsetMs: Math.min(60000, settings.durationMs),
 		strikes: 1
 	});
-
-	async function tryRing() {
-		await previewRinger.unlock();
-		previewRinger.setVolume(prefs.volume);
-		previewRinger.ring(1);
-	}
-
-	// 振動のスイッチは、対応端末でだけ出す（ビルド時には判定できないので、表示後に決める）
-	let vibrationSupported = $state(false);
-	onMount(() => {
-		vibrationSupported = VibrationRinger.isSupported();
-	});
 </script>
 
 <div class="screen">
@@ -113,7 +92,7 @@
 			<span>{i18n.t('app.name')}</span>
 		</div>
 		<div class="header-actions">
-			<ThemeMenu {prefs} />
+			<Button variant="ghost" iconOnly aria-label={i18n.t('header.open_prefs')} onclick={onopenprefs}><Icon name="gear" /></Button>
 		</div>
 	</header>
 
@@ -141,7 +120,7 @@
 						<FieldError>{i18n.t('settings.duration.error_zero')}</FieldError>
 					{/if}
 				</Panel>
-				<Panel title={i18n.t('settings.title.title')} hint={i18n.t('settings.title.optional')} order={4}>
+				<Panel title={i18n.t('settings.title.title')} hint={i18n.t('settings.title.optional')} order={3}>
 					<TextField
 						aria-label={i18n.t('settings.title.title')}
 						placeholder={i18n.t('settings.title.placeholder')}
@@ -175,21 +154,6 @@
 							{/each}
 						</ul>
 						<Button variant="ghost" onclick={openAdd}><Icon name="plus" />{i18n.t('settings.bells.add')}</Button>
-					{/if}
-				</Panel>
-				<Panel title={i18n.t('prefs.tab.sound')} order={3}>
-					<div class="row">
-						<span class="label" id="volume-label">{i18n.t('prefs.sound.volume')}</span>
-						<div class="grow">
-							<VolumeSlider label={i18n.t('prefs.sound.volume')} bind:value={() => prefs.volume, (v) => prefs.setVolume(v)} />
-						</div>
-						<Button onclick={tryRing} style="flex: var(--sound-test-flex)"><Icon name="bell" />{i18n.t('prefs.sound.test')}</Button>
-					</div>
-					{#if vibrationSupported}
-						<div class="row">
-							<span class="label grow" id="vibrate-label">{i18n.t('prefs.sound.vibrate')}</span>
-							<Switch aria-labelledby="vibrate-label" bind:checked={() => prefs.vibrate, (v) => prefs.setVibrate(v)} />
-						</div>
 					{/if}
 				</Panel>
 			</div>
@@ -292,20 +256,6 @@
 		display: flex;
 		flex-direction: column;
 		gap: var(--space-2);
-	}
-	.row {
-		display: flex;
-		align-items: center;
-		gap: var(--space-3);
-		flex-wrap: wrap;
-	}
-	.grow {
-		flex: 1;
-		min-width: 0;
-	}
-	.label {
-		font-size: var(--font-size-sm);
-		font-weight: var(--font-weight-medium);
 	}
 	.hint {
 		font-size: var(--font-size-sm);
