@@ -182,7 +182,8 @@
   - 実施メモ: `playwright.config.ts` の既定のロケール `ja-JP` は、T8-3 で前倒し済み。`e2e/i18n.e2e.ts` を追加（8件）：ブラウザの言語 `ja-JP`・`en-US`・`zh-TW`・`fr-FR` ごとに、(1) アプリの JS（`_app` の読み込み）を止めた状態で、`<html lang>`（ja・en・zh-Hans・en）、題名、S00 の文言（その言語だけが見える）を確かめ、止めを外すと S00 が消える。(2) S01 の「持ち時間」「表示名」「開始」がその言語の辞書の文言で出て、題名と `lang` が変わらず、ja 以外では日本語の見出しが混ざらない。辞書は Playwright が JSON の import を受け付けないため、ファイルから読む（期待値を辞書から取るので、訳を直しても追従する）。インラインスクリプトの規則と `detect.ts` の一致は、この e2e で確かめている。単体テスト183件、e2e 71件、`check`・`check:tokens`・`check:i18n` 通過。Phase 8 の実装（T8-1〜T8-8）は終わり、次は検証（W8）
 
 ## Phase 9: 保存・環境設定（一般・音）と S01・S03f の改修
-- [ ] T9-1 【エージェント】`storage/storage.ts`（`KeyValueStorage`、`LocalStorageKV`、`MemoryKV`）、`prefs/prefs.ts`（型と初期値）、`storage/prefs_codec.ts`（版番号つきの形の符号化と、項目ごとの検証）を作り、単体テストを書く
+- [x] T9-1 【エージェント】`storage/storage.ts`（`KeyValueStorage`、`LocalStorageKV`、`MemoryKV`）、`prefs/prefs.ts`（型と初期値）、`storage/prefs_codec.ts`（版番号つきの形の符号化と、項目ごとの検証）を作り、単体テストを書く
+  - 実施メモ: imple §3.6 のとおり実装。`LocalStorageKV` は `localStorage` の参照自体が例外・未定義でも止まらない。`decodePrefs` は、未保存・JSON でない・オブジェクトでない・`v` が違う場合に null、項目ごとの不正（未知の言語・テーマ、範囲外や非有限の音量、真偽値でない値）はその項目だけ初期値、知らない項目は捨てる。判断：(1) `ThemeChoice` を `prefs.ts` に定義し、`THEME_CHOICES` も足した（検証用）。`theme.svelte.ts` の同名の型は、T9-2 で `theme.ts` に置き換えるまでそのまま。(2) `Settings` の `volume`・`vibrate` はまだ外していない（T9-2）。単体テスト 17件追加（累計200件）、`check` 0エラー、`check:tokens`・`check:i18n` 通過。「値を変えるたびに保存される」（W9-1）は `PrefsStore` を作る T9-2 でテストする
 - [ ] T9-2 【エージェント】`prefs/store.svelte.ts`（`PrefsStore`。変えるたびに保存）を作る。`Settings` から `volume`・`vibrate` を外して `prefs` に移し、`theme.svelte.ts` を `theme.ts`（`prefs.theme` を `data-theme` に反映）に置き換え、起動時の言語を `prefs.locale ?? detectLocale(...)` にする。単体テストを直す
   - 依存: T9-1, T8-2
 - [ ] T9-3 【エージェント】`app.html` のインラインスクリプトで、保存値の言語・テーマを描画前に反映する（キー名と形は `prefs_codec.ts` の定数を `hooks.server.ts` から渡す）
