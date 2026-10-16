@@ -52,8 +52,6 @@ for (const scheme of ['light', 'dark'] as const) {
 			expect(await css(page.getByLabel('分', { exact: true }), 'border-top-color')).toBe(border);
 			expect(await css(page.getByLabel('表示名'), 'border-top-color')).toBe(border);
 			expect(await css(page.getByRole('button', { name: '10分' }), 'border-top-color')).toBe(border);
-			await page.getByRole('switch').click(); // オフにすると溝が境界色になる（オンはアクセント色）
-			await expect.poll(() => css(page.locator('.switch .track').first(), 'background-color')).toBe(border);
 
 			// パネルの区切りは --color-border のまま
 			expect(await css(page.locator('.bell-row').first(), 'border-top-color')).toBe(
@@ -65,6 +63,29 @@ for (const scheme of ['light', 'dark'] as const) {
 			await expect(seg).toBeVisible();
 			expect(await css(seg, 'border-top-color')).toBe(border);
 			expect(await css(page.locator('.segment').nth(1), 'border-left-color')).toBe(border);
+		});
+
+		test('S05・S03f: セグメント・スイッチ・チェックボックスの境界は --color-border-input', async ({ page }) => {
+			await open(page);
+			const border = await token(page, '--color-border-input');
+			await page.getByRole('button', { name: '環境設定を開く' }).click();
+			const dialog = page.getByRole('dialog', { name: '環境設定' });
+			await expect(dialog).toBeVisible();
+			expect(await css(dialog.locator('.segmented').first(), 'border-top-color')).toBe(border);
+			expect(await css(dialog.locator('.segment').nth(1), 'border-left-color')).toBe(border);
+			// 一度オフにして、オンに戻す（オフのときの溝が境界色。オンはアクセント色）
+			await dialog.getByRole('switch').click();
+			await expect.poll(() => css(dialog.locator('.switch .track'), 'background-color')).toBe(border);
+			await dialog.getByRole('switch').click();
+			await dialog.getByRole('button', { name: '閉じる' }).click();
+
+			await page.getByRole('button', { name: '開始' }).click();
+			await page.keyboard.press('Escape');
+			const box = page.getByRole('alertdialog').locator('.box');
+			expect(await css(box, 'border-top-color')).toBe(border);
+			// チェックを入れるとアクセント色の塗りになる
+			await page.getByRole('alertdialog').getByRole('checkbox').check();
+			expect(await css(box, 'border-top-color')).toBe(await token(page, '--color-accent'));
 		});
 
 		test('S01a・S03: 持ち時間 0 の枠の色は危険色のまま（境界色に上書きされない）', async ({ page }) => {

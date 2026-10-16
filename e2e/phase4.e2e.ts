@@ -163,62 +163,66 @@ test.describe('W4-3 全画面', () => {
 	});
 });
 
-test.describe('W4-4 テーマ', () => {
-	test('メニューで data-theme が付け外しされ、再読み込みしても保存した選択が残る', async ({ page }) => {
+test.describe('W4-4 テーマ（環境設定の「表示テーマ」）', () => {
+	const openPrefs = async (page: Page) => {
+		await page.getByRole('button', { name: '環境設定を開く' }).click();
+		await expect(page.getByRole('dialog', { name: '環境設定' })).toBeVisible();
+	};
+	const radio = (page: Page, name: string) => page.getByRole('radio', { name, exact: true });
+
+	test('選ぶと data-theme が付け外しされ、再読み込みしても保存した選択が残る', async ({ page }) => {
 		await page.emulateMedia({ colorScheme: 'light' });
 		await open(page);
 		const attr = () => page.evaluate(() => document.documentElement.getAttribute('data-theme'));
-		const trigger = page.getByRole('button', { name: '表示テーマ' });
 		expect(await attr()).toBeNull();
 
-		await trigger.click();
-		await expect(page.getByRole('menu', { name: '表示テーマ' })).toBeVisible();
-		await expect(page.getByRole('menuitemradio', { name: 'システム' })).toHaveAttribute('aria-checked', 'true');
-		await expect(page.getByRole('menuitemradio', { name: 'システム' })).toBeFocused();
+		await openPrefs(page);
+		await expect(radio(page, 'システム')).toHaveAttribute('aria-checked', 'true');
 
-		await page.getByRole('menuitemradio', { name: 'ダーク' }).click();
-		await expect(page.getByRole('menu')).toHaveCount(0);
+		await radio(page, 'ダーク').click();
 		expect(await attr()).toBe('dark');
 		const darkBg = await page.evaluate(() => getComputedStyle(document.body).backgroundColor);
 
-		await trigger.click();
-		await expect(page.getByRole('menuitemradio', { name: 'ダーク' })).toHaveAttribute('aria-checked', 'true');
-		await page.getByRole('menuitemradio', { name: 'ライト' }).click();
+		await radio(page, 'ライト').click();
 		expect(await attr()).toBe('light');
-		expect(await page.evaluate(() => getComputedStyle(document.body).backgroundColor)).not.toBe(darkBg);
+		await expect
+			.poll(() => page.evaluate(() => getComputedStyle(document.body).backgroundColor))
+			.not.toBe(darkBg);
 
-		await trigger.click();
-		await page.getByRole('menuitemradio', { name: 'システム' }).click();
+		await radio(page, 'システム').click();
 		expect(await attr()).toBeNull();
 
-		await trigger.click();
-		await page.getByRole('menuitemradio', { name: 'ダーク' }).click();
+		await radio(page, 'ダーク').click();
 		await page.reload();
 		await expect(page.locator('#splash')).toHaveCount(0);
 		await expect.poll(attr).toBe('dark');
+		await openPrefs(page);
+		await expect(radio(page, 'ダーク')).toHaveAttribute('aria-checked', 'true');
 	});
 
-	test('キーボード：↑↓で移動、Esc で閉じてボタンに戻る、外側のクリックで閉じる', async ({ page }) => {
+	test('キーボード：矢印で選択が移り、Esc で閉じて歯車に戻る', async ({ page }) => {
 		await open(page);
-		const trigger = page.getByRole('button', { name: '表示テーマ' });
-		await trigger.focus();
+		const gear = page.getByRole('button', { name: '環境設定を開く' });
+		await gear.focus();
 		await page.keyboard.press('Enter');
-		await page.keyboard.press('ArrowDown');
-		await expect(page.getByRole('menuitemradio', { name: 'ライト' })).toBeFocused();
-		await page.keyboard.press('ArrowDown');
-		await page.keyboard.press('ArrowDown');
-		await expect(page.getByRole('menuitemradio', { name: 'システム' })).toBeFocused();
-		await page.keyboard.press('ArrowUp');
-		await expect(page.getByRole('menuitemradio', { name: 'ダーク' })).toBeFocused();
-		await page.keyboard.press('Escape');
-		await expect(page.getByRole('menu')).toHaveCount(0);
-		await expect(trigger).toBeFocused();
-		expect(await page.evaluate(() => document.documentElement.getAttribute('data-theme'))).toBeNull();
+		await expect(page.getByRole('dialog', { name: '環境設定' })).toBeVisible();
 
-		await trigger.click();
-		await expect(page.getByRole('menu')).toBeVisible();
-		await page.mouse.click(5, 400);
-		await expect(page.getByRole('menu')).toHaveCount(0);
+		await radio(page, 'システム').focus();
+		await page.keyboard.press('ArrowRight');
+		await expect(radio(page, 'ライト')).toBeFocused();
+		await expect(radio(page, 'ライト')).toHaveAttribute('aria-checked', 'true');
+		expect(await page.evaluate(() => document.documentElement.getAttribute('data-theme'))).toBe('light');
+		await page.keyboard.press('ArrowRight');
+		await expect(radio(page, 'ダーク')).toBeFocused();
+		await page.keyboard.press('ArrowRight');
+		await expect(radio(page, 'システム')).toBeFocused();
+		await page.keyboard.press('ArrowLeft');
+		await expect(radio(page, 'ダーク')).toBeFocused();
+
+		await page.keyboard.press('Escape');
+		await expect(page.getByRole('dialog')).toHaveCount(0);
+		await expect(gear).toBeFocused();
+		expect(await page.evaluate(() => document.documentElement.getAttribute('data-theme'))).toBe('dark');
 	});
 });
 
@@ -282,15 +286,26 @@ test.describe('W4-5 キーボードだけの操作とフォーカス', () => {
 		await expect(page.getByRole('button', { name: '開始' })).toBeVisible();
 	});
 
-	test('テーマのメニューのフォーカスも見える', async ({ page }) => {
+	test('環境設定（歯車・タブ・選択肢・スイッチ・スライダー）のフォーカスも見える', async ({ page }) => {
 		await open(page);
-		const trigger = page.getByRole('button', { name: '表示テーマ' });
-		await trigger.focus();
+		const gear = page.getByRole('button', { name: '環境設定を開く' });
+		await gear.focus();
 		expect((await focusRing(page))!.visible).toBe(true);
 		await page.keyboard.press('Enter');
+		// 一般タブ：タブ → 言語 → テーマ → スイッチ → 閉じる
+		for (let i = 0; i < 5; i++) {
+			const ring = await focusRing(page);
+			expect(ring!.visible, `一般タブでフォーカスが見えない: ${ring!.name}`).toBe(true);
+			await page.keyboard.press('Tab');
+		}
+		// 音タブ：キーボードで切り替え（マウスのあとの focus() は :focus-visible にならないため）→ 音量 → 鳴らしてみる
+		await page.getByRole('tab', { name: '一般', exact: true }).focus();
+		await page.keyboard.press('ArrowRight');
+		await page.keyboard.press('Tab');
 		for (let i = 0; i < 3; i++) {
-			expect((await focusRing(page))!.visible).toBe(true);
-			await page.keyboard.press('ArrowDown');
+			const ring = await focusRing(page);
+			expect(ring!.visible, `音タブでフォーカスが見えない: ${ring!.name}`).toBe(true);
+			await page.keyboard.press('Tab');
 		}
 	});
 });

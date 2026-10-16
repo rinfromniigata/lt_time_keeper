@@ -12,6 +12,11 @@ const seconds = (page: Page) => page.getByRole('dialog').getByLabel('秒', { exa
 const mainMinutes = (page: Page) => page.locator('#duration-min');
 const mainSeconds = (page: Page) => page.locator('#duration-sec');
 const button = (page: Page, name: string) => page.getByRole('button', { name, exact: true });
+/** 環境設定を歯車から開き、「音」タブにする */
+async function openSoundTab(page: Page) {
+	await page.getByRole('button', { name: '環境設定を開く' }).click();
+	await page.getByRole('tab', { name: '音', exact: true }).click();
+}
 
 test('初期のベルは1鈴〜3鈴で、補足文・回数・件数・開始バーの件数が出る', async ({ page }) => {
 	await open(page);
@@ -177,6 +182,7 @@ test('「鳴らしてみる」で、音量をかけたベル音が1回鳴る', a
 		w.AudioContext = FakeContext;
 	});
 	await open(page);
+	await openSoundTab(page);
 	const slider = page.getByRole('slider', { name: '音量' });
 	await slider.focus();
 	await page.keyboard.press('Home');
@@ -196,6 +202,7 @@ test('振動のスイッチは、振動に対応した端末でだけ出る', as
 		Object.defineProperty(Navigator.prototype, 'vibrate', { value: () => true, configurable: true, writable: true });
 	});
 	await open(supported);
+	await openSoundTab(supported);
 	const sw = supported.getByRole('switch', { name: 'ベルと同時に振動する' });
 	await expect(sw).toBeVisible();
 	await expect(sw).toHaveAttribute('aria-checked', 'true');
@@ -208,29 +215,30 @@ test('振動のスイッチは、振動に対応した端末でだけ出る', as
 		delete (Navigator.prototype as unknown as Record<string, unknown>).vibrate;
 	});
 	await open(unsupported);
+	await openSoundTab(unsupported);
+	await expect(unsupported.getByRole('slider', { name: '音量' })).toBeVisible();
 	await expect(unsupported.getByText('ベルと同時に振動する')).toHaveCount(0);
 	await unsupported.close();
 });
 
-test('パネルの並びは、狭い画面で 持ち時間・ベル・音・表示名、広い画面で左 持ち時間・表示名／右 ベル・音', async ({ page }) => {
+test('パネルの並びは、狭い画面で 持ち時間・ベル・表示名、広い画面で左 持ち時間・表示名／右 ベル', async ({ page }) => {
 	await open(page);
 	const pos = async (name: string) => {
 		const box = await page.getByRole('heading', { name, exact: true }).boundingBox();
 		return box!;
 	};
 	await page.setViewportSize({ width: 390, height: 800 });
-	const n = { time: await pos('持ち時間'), bell: await pos('ベル'), sound: await pos('音'), title: await pos('表示名') };
+	const n = { time: await pos('持ち時間'), bell: await pos('ベル'), title: await pos('表示名') };
 	expect(n.time.y).toBeLessThan(n.bell.y);
-	expect(n.bell.y).toBeLessThan(n.sound.y);
-	expect(n.sound.y).toBeLessThan(n.title.y);
+	expect(n.bell.y).toBeLessThan(n.title.y);
+	// 音のパネルは S01 になく、環境設定へ移った
+	await expect(page.getByRole('heading', { name: '音', exact: true })).toHaveCount(0);
 
 	await page.setViewportSize({ width: 1280, height: 800 });
-	const w = { time: await pos('持ち時間'), bell: await pos('ベル'), sound: await pos('音'), title: await pos('表示名') };
+	const w = { time: await pos('持ち時間'), bell: await pos('ベル'), title: await pos('表示名') };
 	expect(w.time.x).toBeLessThan(w.bell.x);
 	expect(w.title.x).toBe(w.time.x);
 	expect(w.title.y).toBeGreaterThan(w.time.y);
-	expect(w.sound.x).toBe(w.bell.x);
-	expect(w.sound.y).toBeGreaterThan(w.bell.y);
 });
 
 test('ベルが多くても長い表示名でも、横スクロールは出ない。シートは狭い画面で下端、広い画面で中央', async ({ page }) => {
@@ -341,7 +349,9 @@ test.describe('計測中のベル', () => {
 		// 設定でオフにして、もう一度
 		await page.keyboard.press('Escape');
 		await page.keyboard.press('Enter');
+		await openSoundTab(page);
 		await page.getByRole('switch', { name: 'ベルと同時に振動する' }).click();
+		await page.keyboard.press('Escape');
 		await page.getByRole('button', { name: '開始' }).click();
 		await advance(page, 240_000);
 		await expect.poll(() => strikes(page)).toBe(2);
