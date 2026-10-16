@@ -10,6 +10,7 @@
 		| 'bell'
 		| 'alert'
 		| 'back'
+		| 'check'
 		| 'moon'
 		| 'github';
 </script>

@@ -191,9 +191,10 @@
   - 依存: T9-1, T8-4
   - 実施メモ: `shell.ts` の `shellValues` に `%i18n.prefs%`（`PREFS_KEY`・`PREFS_VERSION`・`LOCALES` の JSON。`hooks.server.ts` の `transformPageChunk` が `fillShell` 経由で差し込む）を足し、`app.html` のインラインスクリプトが、保存値を `try/catch` で読んで、`v` が合うときだけ使う。言語は「保存値が一覧にあればそれ、なければブラウザの言語（従来の規則）」、テーマは `light`・`dark` のときだけ `<html data-theme>` を付ける（system や不正値では付けない）。壊れた値・版の違う値・`localStorage` の例外は、保存なしと同じ扱い。キー名は `app.html` に直書きしていない。単体テスト 1件追加（累計209件）。e2e 3件追加（`e2e/i18n.e2e.ts`。JS を止めた状態で、保存した言語・テーマが `lang`・題名・`data-theme` になる／言語未選択・system はブラウザの言語で `data-theme` なし／壊れた値・版違い・不正項目は無視）で全74件通過。`check` 0エラー、`check:tokens`・`check:i18n` 通過。`DOMContentLoaded` の時点での確認（W9-5）は W9 で行う
   - 画面: S00
-- [ ] T9-4 【エージェント】部品 `Tabs`（WAI-ARIA の tabs）と `Checkbox` を作る。S90 の通常・hover・focus・disabled を持たせ、境界は `--color-border-input`
+- [x] T9-4 【エージェント】部品 `Tabs`（WAI-ARIA の tabs）と `Checkbox` を作る。S90 の通常・hover・focus・disabled を持たせ、境界は `--color-border-input`
   - 依存: T7-3
   - 画面: S90
+  - 実施メモ: `ui/parts/Tabs.svelte`・`Checkbox.svelte` を追加し、スプライトに `i-check`（モックと同じ形）、`IconName` に `check` を足した。(1) `Tabs` は `role="tablist"`／`tab`（`aria-selected`・`aria-controls`、選択中だけ `tabindex=0`）で、←→（端で回る）・Home・End で選択とフォーカスを移す（選ぶとすぐ切り替わる方式）。内容の `role="tabpanel"` は呼び出し側が置き、`tabId(idBase, value)`・`panelId(idBase, value)`（同じファイルから export）で `id`・`aria-labelledby` を合わせる。並びの幅と余白は、モバイルで均等割りにする必要があるため、`--tabs-padding-inline`・`--tabs-tab-flex`・`--tabs-tab-justify`（未指定なら左寄せ）で呼び出し側が決める形にした。値は T9-5 で `base.css` の `.screen` に足す。境界は `--color-border`（区切りの装飾）、選択中の下線は `--color-accent`。(2) `Checkbox` は、本物の `input[type=checkbox]` を全面に重ねて透明にし（キーボード・読み上げ・クリックはブラウザに任せる）、見た目の箱はモックどおり（`--color-border-input`、チェック時は `--color-accent`、disabled は `--color-disabled-*`）。文言は `children`、補足は `hint`（任意）で渡す。hover はスイッチと同じく少し暗くした（モックに hover の指定がなかったための判断）。(3) 確認は、使い捨ての試験ページ（削除済み）を Playwright で操作して行った：タブの ←→・Home・End・端での回り込み・選択中だけが Tab で止まること・内容の切り替え、チェックボックスの Space・クリック・disabled で変わらないこと、ライト・ダークのスクリーンショット。`check` 0エラー、`check:tokens`・`check:i18n` 通過、単体テスト209件・e2e 74件通過。画面に組み込むのは T9-5（`Tabs`）と T9-7（`Checkbox`）で、e2e もそのとき足す
 - [ ] T9-5 【エージェント】`PrefsScreen.svelte` に「一般」「音」の2つのタブを作る（720px 以上はダイアログ、未満は全画面。×・Esc で閉じ、歯車へフォーカスを戻す）。一般は言語・表示テーマ・終了の確認、音は音量・鳴らしてみる・振動（対応端末だけ）。使うキーを辞書に足す
   - 依存: T9-2, T9-4
   - 画面: S05, S05a
