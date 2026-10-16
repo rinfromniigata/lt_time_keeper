@@ -22,6 +22,8 @@ jobs:
 
       - run: bun run check:tokens
 
+      - run: bun run check:i18n
+
       - run: bun run check
 
       - name: Install Playwright system dependencies

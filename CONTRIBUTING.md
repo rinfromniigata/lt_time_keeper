@@ -24,12 +24,14 @@ bun run dev
 
 ```sh
 bun run check:tokens   # トークンの一致と、色・寸法の直書き、文字色の状態色（-text）を検査
+bun run check:i18n     # 辞書のキー・プレースホルダの一致、未使用キー、.svelte の文字の直書きを検査
 bun run check          # 型検査（svelte-check、Service Worker の tsc）
 bun run test:unit      # 単体テスト（Vitest。監視モード。1回だけなら末尾に --run）
 bun run test           # 単体テスト（1回）と e2e（Playwright）
 ```
 
 - `bun run test` の e2e は、実行前に Playwright のブラウザを入れ、ビルドしてプレビューを起動します
+- UI の文字列は、`src/lib/i18n/locales/ja.json`（原文）と `en.json`・`zh-Hans.json` の辞書に置き、コンポーネントから `i18n.t('キー')` で参照します。文字列をつなげて文を作らず、可変部分はプレースホルダ（`{time}` など）にします。キーは `'キー'` の形の文字列リテラルで書いてください（`check:i18n` が静的に拾います。組み立てたキーは未使用と判定されます）。複数形は、辞書の値を `one`・`other` などの形を持つオブジェクトにします（`other` は必須）。キーボードの名前（`Space`・`Esc`・`Enter`・`F`）だけは、直書きが許されます
 - 値（色・サイズ・形）の正本は `src/lib/theme/tokens.css` です。コードに値を直書きせず、トークンを参照してください。`tokens.css` は `roadmap/specs/` の最新版と一致させます（`check:tokens` が検査します）
 
 ## ビルド
@@ -53,7 +55,7 @@ bun run gen:icons
 
 1. `CHANGELOG.md`（[Keep a Changelog](https://keepachangelog.com/ja/1.1.0/) 形式）に変更を書き、`package.json` の `version` を上げます（バージョンの表記は `package.json` だけです）
 2. `main` にコミットして push し、`v*` タグを push します
-3. GitHub Actions（`.github/workflows/release.yml`）が `check:tokens`・`check`・`test`・`build` を通し、`build/` の zip を添付したドラフトリリースを作ります
+3. GitHub Actions（`.github/workflows/release.yml`）が `check:tokens`・`check:i18n`・`check`・`test`・`build` を通し、`build/` の zip を添付したドラフトリリースを作ります
 4. ドラフトリリースの内容を確認して公開します
 
 公開先（https://lt.rinontech.com/）へのデプロイは、Cloudflare Pages の GitHub 連携で行います（ビルドコマンド `bun run build`、出力 `build`、`BUN_VERSION=1.4.3`）。
@@ -74,7 +76,7 @@ src/
    ├─ pwa/             更新のお知らせ
    ├─ theme/           tokens.css・base.css
    └─ ui/              部品（parts）と画面（screens）
-scripts/               check_tokens.ts・gen_icons.ts
+scripts/               check_tokens.ts・check_i18n.ts・gen_icons.ts
 e2e/                   Playwright のテスト
 static/                アイコン一式・manifest
 docs/brand/            ブランド資料とマスターSVGの写し

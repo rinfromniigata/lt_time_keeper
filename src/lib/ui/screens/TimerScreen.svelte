@@ -55,6 +55,11 @@
 <svelte:window {onkeydown} onpointermove={() => session.poke()} onpointerdown={() => session.poke()} />
 
 <div class="screen timer {display.state}" class:hidden-controls={session.controlsHidden}>
+	{#if session.controlsHidden}
+		<!-- スクリーンリーダー向け。操作ボタンを隠しているあいだだけ現れ、押すと表示を戻す（見える人は画面のどこを触れても戻るので、
+		     ポインターの操作は受けない） -->
+		<button type="button" class="show-controls" aria-label={i18n.t('timer.show_controls')} onclick={() => session.poke()}></button>
+	{/if}
 	{#each session.warnings as w (w)}
 		<Banner
 			message={i18n.t(WARNING_KEYS[w].message)}
@@ -139,6 +144,7 @@
 
 <style>
 	.timer {
+		position: relative;
 		flex: 1;
 		min-height: 0;
 		display: flex;
@@ -243,6 +249,15 @@
 		transition: opacity var(--duration-slow) var(--easing-exit);
 	}
 	.hidden-controls {
+		cursor: none;
+	}
+	.show-controls {
+		position: absolute;
+		inset: 0;
+		z-index: 1;
+		border: 0;
+		background: transparent;
+		pointer-events: none;
 		cursor: none;
 	}
 	.hidden-controls .controls,

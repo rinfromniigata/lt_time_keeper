@@ -10,6 +10,7 @@
 		"prepare": "svelte-kit sync || echo ''",
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json && tsc -p src/service-worker/tsconfig.json",
 		"check:tokens": "bun scripts/check_tokens.ts",
+		"check:i18n": "bun scripts/check_i18n.ts",
 		"gen:icons": "bun scripts/gen_icons.ts",
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
 		"test:unit": "vitest",

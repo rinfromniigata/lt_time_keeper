@@ -62,6 +62,20 @@ test.describe('W4-1 操作ボタンを隠す', () => {
 		await expect(controls(page)).toHaveCSS('visibility', 'visible');
 	});
 
+	test('隠しているあいだだけ、スクリーンリーダー向けの「操作ボタンを表示」ボタンが現れ、押すと戻る', async ({ page }) => {
+		await open(page);
+		await start(page);
+		const delay = await hideDelayMs(page);
+		const show = page.getByRole('button', { name: 'タップで操作ボタンを表示' });
+		await expect(show).toHaveCount(0);
+		await advance(page, delay + 100);
+		await expect(controls(page)).toHaveCSS('visibility', 'hidden');
+		await expect(show).toHaveCount(1);
+		await show.dispatchEvent('click');
+		await expect(controls(page)).toHaveCSS('visibility', 'visible');
+		await expect(show).toHaveCount(0);
+	});
+
 	test('一時停止中と確認中は隠れない', async ({ page }) => {
 		await open(page);
 		await start(page);
