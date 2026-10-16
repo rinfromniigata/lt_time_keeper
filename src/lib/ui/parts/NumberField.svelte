@@ -81,7 +81,7 @@
 		font-size: calc(var(--font-size-xl) * 1.4);
 		font-weight: var(--font-weight-timer);
 		padding-block: var(--space-2);
-		border: var(--border-width-strong) solid var(--color-border);
+		border: var(--border-width-strong) solid var(--color-border-input);
 		border-radius: var(--radius-md);
 		background: var(--color-bg);
 		color: var(--color-text);

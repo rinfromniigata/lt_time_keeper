@@ -96,11 +96,11 @@
 		text-overflow: ellipsis;
 	}
 	.warn {
-		color: var(--color-state-warn);
+		color: var(--color-state-warn-text);
 		font-weight: var(--font-weight-bold);
 	}
 	.over {
-		color: var(--color-state-over);
+		color: var(--color-state-over-text);
 		font-weight: var(--font-weight-bold);
 	}
 	.strikes {

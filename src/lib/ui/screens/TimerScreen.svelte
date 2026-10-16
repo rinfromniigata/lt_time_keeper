@@ -192,7 +192,7 @@
 		font-variant-numeric: var(--font-digits-variant);
 	}
 	.over .digits {
-		color: var(--color-state-over);
+		color: var(--color-state-over-text);
 		animation: over-blink var(--blink-period-over) var(--easing-standard) infinite alternate;
 	}
 	.paused .digits {

@@ -146,7 +146,7 @@ test('リングは残りの割合で減り、通常は緑・超過は赤で満�
 	expect(await ringOffset(page)).toBeCloseTo(0, 0);
 	await expect.poll(() => ringStroke(page)).toBe(await tokenColor(page, '--color-state-over'));
 	expect(await digits(page).evaluate((el) => getComputedStyle(el).color)).toBe(
-		await tokenColor(page, '--color-state-over')
+		await tokenColor(page, '--color-state-over-text')
 	);
 });
 

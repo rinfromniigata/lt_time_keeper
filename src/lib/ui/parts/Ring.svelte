@@ -70,18 +70,22 @@
 	.ok {
 		--state-color: var(--color-state-ok);
 		--state-soft: var(--color-state-ok-soft);
+		--state-text: var(--color-state-ok-text);
 	}
 	.warn {
 		--state-color: var(--color-state-warn);
 		--state-soft: var(--color-state-warn-soft);
+		--state-text: var(--color-state-warn-text);
 	}
 	.over {
 		--state-color: var(--color-state-over);
 		--state-soft: var(--color-state-over-soft);
+		--state-text: var(--color-state-over-text);
 	}
 	.paused {
 		--state-color: var(--color-state-paused);
 		--state-soft: var(--color-state-paused-soft);
+		--state-text: var(--color-state-paused-text);
 	}
 
 	.over .progress {

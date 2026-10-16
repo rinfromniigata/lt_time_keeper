@@ -32,7 +32,7 @@
 		min-height: var(--tap-target-min);
 		padding-inline: var(--space-4);
 		border-radius: var(--radius-full);
-		border: var(--border-width) solid var(--color-border);
+		border: var(--border-width) solid var(--color-border-input);
 		background: var(--color-bg);
 		color: var(--color-text);
 		font-size: var(--font-size-sm);

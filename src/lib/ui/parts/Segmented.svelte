@@ -48,7 +48,7 @@
 		display: grid;
 		grid-auto-flow: column;
 		grid-auto-columns: 1fr;
-		border: var(--border-width) solid var(--color-border);
+		border: var(--border-width) solid var(--color-border-input);
 		border-radius: var(--radius-md);
 		overflow: hidden;
 	}
@@ -57,7 +57,7 @@
 		display: grid;
 		place-items: center;
 		font-size: var(--font-size-sm);
-		border-left: var(--border-width) solid var(--color-border);
+		border-left: var(--border-width) solid var(--color-border-input);
 		background: var(--color-bg);
 		transition: background var(--duration-fast) var(--easing-standard);
 	}

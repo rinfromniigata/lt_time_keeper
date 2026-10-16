@@ -37,7 +37,7 @@
 		font-size: var(--font-size-sm);
 	}
 	.banner > :global(.icon:first-child) {
-		color: var(--color-state-warn);
+		color: var(--color-state-warn-text);
 		margin-top: var(--space-1);
 	}
 	.info {

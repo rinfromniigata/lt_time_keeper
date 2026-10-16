@@ -143,8 +143,10 @@
 - [x] T7-2 【エージェント】`scripts/check_tokens.ts` に、`color:` に無印の `--color-state-*` を使っていないか（文字には `-text` を使うか）の検査を足す
   - 依存: T7-1
   - 実施メモ: `.svelte`・`.css`（tokens.css を除く）の行ごとに、`color:` の値に `var(--color-state-{ok|warn|over|paused})`（`-text`・`-soft` なし）があれば失敗にする。`background-color`・`border-color` などは対象外（`color` の前が英数字・`-` の場合は除く）。検査は動き、既存の4箇所を検出して `check:tokens` は失敗する状態：`Banner.svelte:40`、`BellRow.svelte:99, 103`、`TimerScreen.svelte:195`。これらは T7-3 で直す（それまで `check:tokens` は通らない）。`check` は 0 エラー
-- [ ] T7-3 【エージェント】既存の部品・画面に v3 のトークンを適用する。状態色の文字（状態ラベル・ベルの行の補足文・次のベル）は `--color-state-*-text`、入力欄・数値入力・スイッチ・セグメント・プリセットの境界は `--color-border-input`、パネルや行の区切りは `--color-border` のままにする
+- [x] T7-3 【エージェント】既存の部品・画面に v3 のトークンを適用する。状態色の文字（状態ラベル・ベルの行の補足文・次のベル）は `--color-state-*-text`、入力欄・数値入力・スイッチ・セグメント・プリセットの境界は `--color-border-input`、パネルや行の区切りは `--color-border` のままにする
   - 依存: T7-2
+  - 実施メモ: (1) 文字: `StatePill` は `--state-text`（`Ring`・`StatePill` の状態クラスに `--color-state-*-text` を足した）、`BellRow` の「黄に変わる／赤に変わる」補足文、`TimerScreen` の超過の数字を `-text` に。リング・点は無印のまま。(2) 境界: `NumberField`・`TextField`・`PresetChips`・`Segmented`（外枠と区切り線）・`Switch` の溝を `--color-border-input` に。パネル・行・ダイアログ・空の状態・Kbd・ゴースト／通常ボタンの枠は `--color-border` のまま（モックどおり。ボタンの枠はモックで装飾扱い）。(3) 判断: `Banner` の警告アイコンは、モックでは無印の `--color-state-warn` だが、T7-2 の検査（`color:` に無印を使わない）に合わせて `-warn-text` にした（アイコンは地の `-soft` に対して 3:1 以上を保つ）。(4) e2e `timer.e2e.ts` の超過の数字の期待色を v2 の `--color-state-over` から `--color-state-over-text` に直した（v3 の仕様どおりで、軽微な修正）。`check:tokens` OK、`check` 0 エラー、単体161件、e2e 56件通過。モックとの見た目の照合（ライト・ダーク）はユーザーが W7 で行う。ダークの `-text` は無印と同値なので見た目は変わらない
+  - 未適用: チェックボックス・タブはこれから作る部品（T9-4）。ヘッダーの月のボタンとメニュー（`ThemeMenu`）は T9-6 で取り除くため手を入れていない
   - 画面: S01, S01a, S01c, S01d, S03, S03a, S03b, S03c, S90
 - [ ] T7-4 【エージェント】`CONTRIBUTING.md` の骨格（受け付け方針、開発環境、セットアップ、確認・テスト、ビルド、アイコン生成、リリース、リポジトリ構成）を作り、`README.md` の開発・ビルド・リリースの節をそこへ移す。README には `CONTRIBUTING.md` へのリンクを1行置く（README の書き直しは T11-2）
 

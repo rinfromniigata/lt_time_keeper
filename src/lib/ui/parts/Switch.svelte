@@ -38,7 +38,7 @@
 		position: relative;
 		height: calc(var(--tap-target-min) * 0.65);
 		border-radius: var(--radius-full);
-		background: var(--color-border);
+		background: var(--color-border-input);
 		transition: background var(--duration-fast) var(--easing-standard);
 	}
 	.track::after {

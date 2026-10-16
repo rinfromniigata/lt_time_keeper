@@ -15,7 +15,7 @@
 		width: 100%;
 		min-height: var(--tap-target-min);
 		padding-inline: var(--space-3);
-		border: var(--border-width-strong) solid var(--color-border);
+		border: var(--border-width-strong) solid var(--color-border-input);
 		border-radius: var(--radius-md);
 		background: var(--color-bg);
 		color: var(--color-text);
