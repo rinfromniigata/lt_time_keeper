@@ -138,7 +138,8 @@
 以下、v0.2.0（プランアセット v3）。
 
 ## Phase 7: トークン v3 と既存画面の色
-- [ ] T7-1 【エージェント】specs の `lt_time_keeper_tokens_v3.css` を `src/lib/theme/tokens.css` へ無変更でコピーし、`brand_v3.md`・`icon_master_v3.svg` を `docs/brand/` へコピーする（`docs/brand/` の v2 の写しは削除する）
+- [x] T7-1 【エージェント】specs の `lt_time_keeper_tokens_v3.css` を `src/lib/theme/tokens.css` へ無変更でコピーし、`brand_v3.md`・`icon_master_v3.svg` を `docs/brand/` へコピーする（`docs/brand/` の v2 の写しは削除する）
+  - 実施メモ: tokens v3 を `cmp` で一致確認のうえコピー、brand_v3.md・icon_master_v3.svg を `docs/brand/` へコピーし、v2 の2ファイルは `git rm` で削除（追跡済みで復元可能）。`check:tokens` は OK。`gen:icons` を再実行するとマスターは v3 を読み、アイコン一式に差分なし（manifest は改行コードの警告のみで、元に戻した）。色の直書き検査は通ったが、既存画面への v3 の適用は T7-3
 - [ ] T7-2 【エージェント】`scripts/check_tokens.ts` に、`color:` に無印の `--color-state-*` を使っていないか（文字には `-text` を使うか）の検査を足す
   - 依存: T7-1
 - [ ] T7-3 【エージェント】既存の部品・画面に v3 のトークンを適用する。状態色の文字（状態ラベル・ベルの行の補足文・次のベル）は `--color-state-*-text`、入力欄・数値入力・スイッチ・セグメント・プリセットの境界は `--color-border-input`、パネルや行の区切りは `--color-border` のままにする
