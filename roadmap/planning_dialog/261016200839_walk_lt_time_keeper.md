@@ -168,8 +168,9 @@
 - [x] W7-1 【エージェント】`bun run check:tokens` が通る（`src/lib/theme/tokens.css` が `tokens_v3.css` と一致、色・寸法の直書きなし、状態色の文字に `-text` を使っている）。わざと違反（無印の状態色を `color:` に使う、tokens を1か所変える）を入れると失敗する
   - 依存: T7-2, T7-3
   - 実施メモ: 通過（終了コード0）。違反の確認：(1) 一時ファイルに `color: var(--color-state-ok)` を入れると、その行だけ1件検出して終了コード1（同じファイルの `background-color: var(--color-state-ok)` と `color: var(--color-state-ok-text)` は検出されない）。(2) `tokens.css` の `--color-border-input` を1桁変えると不一致で終了コード1。どちらも元に戻し（一時ファイル削除、tokens は v3 と一致）、再び通過
-- [ ] W7-2 【エージェント】`docs/brand/` の2ファイルが specs の v3 と一致し、v2 の写しが残っていない
+- [x] W7-2 【エージェント】`docs/brand/` の2ファイルが specs の v3 と一致し、v2 の写しが残っていない
   - 依存: T7-1
+  - 実施メモ: `docs/brand/` には `brand_v3.md` と `icon_master_v3.svg` の2ファイルだけがある。どちらも `cmp` で `roadmap/specs/` の v3 と完全に一致。v2 のファイルは残っていない（`v2` を含む名前が0件）
 - [ ] W7-3 【エージェント】ライト・ダークそれぞれで、状態ラベル（予鈴・超過・一時停止中）とベルの行の補足文の文字色が `-text` のトークンの値、入力欄・スイッチ・セグメントの枠の色が `--color-border-input` の値になっている（`getComputedStyle` で確かめる）。超過の明滅の暗い側の不透明度が 0.75
   - 依存: T7-3
   - 画面: S01, S01a, S03a, S03b, S03c, S90
