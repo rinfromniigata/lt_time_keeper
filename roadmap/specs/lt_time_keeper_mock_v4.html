@@ -1,6 +1,6 @@
 <title>lt_time_keeper モック</title>
 <style>
-/* ===== :root は lt_time_keeper_tokens_v3.css の写し ===== */
+/* ===== :root は lt_time_keeper_tokens_v4.css の写し ===== */
 
 /* ===== :root は lt_time_keeper_tokens.css の写し（ここから） ===== */
 :root {
@@ -45,12 +45,14 @@
   /* ---- タイポグラフィ ---- */
   /* 書体はロケールごとに持ち、<html lang> に合わせて --font-sans を切り替える。
      日本語と中国語は同じ漢字でも字形が違うため、和文フォントを中国語に流用しない。
-     外部フォントは読み込まない（OSの書体だけを使う） */
-  --font-sans-ja: "Hiragino Sans", "Noto Sans JP", "Yu Gothic UI", "Meiryo", system-ui, sans-serif;
-  --font-sans-en: system-ui, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
-  --font-sans-zh-hans: "PingFang SC", "Microsoft YaHei UI", "Microsoft YaHei", "Noto Sans SC", "Source Han Sans SC", system-ui, sans-serif;
+     全言語で Noto Sans 系、数字は JetBrains Mono。OS の書体は使わず、Google Fonts の Web フォントで読み込む
+     （読み込みは app.html の <link>。太さ 400〜700、font-display: swap）。
+     最後の総称（sans-serif・monospace）は、読み込み前・失敗時の保険 */
+  --font-sans-ja: "Noto Sans JP", sans-serif;
+  --font-sans-en: "Noto Sans", sans-serif;
+  --font-sans-zh-hans: "Noto Sans SC", sans-serif;
   --font-sans: var(--font-sans-ja);
-  --font-digits: "SF Mono", "Roboto Mono", "Cascadia Mono", ui-monospace, monospace;
+  --font-digits: "JetBrains Mono", monospace;
   --font-digits-variant: tabular-nums;
 
   --font-size-xs: 0.75rem;
@@ -719,7 +721,7 @@ a.timer { color: inherit; text-decoration: none; }
 
 </style>
 
-<!-- 共通アイコン（ic-a は lt_time_keeper_icon_master_v3.svg の写し） -->
+<!-- 共通アイコン（ic-a は lt_time_keeper_icon_master_v4.svg の写し） -->
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
   <symbol id="i-pause" viewBox="0 0 24 24"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></symbol>
   <symbol id="i-play" viewBox="0 0 24 24"><path d="M7 5l12 7-12 7z"/></symbol>
@@ -1311,7 +1313,7 @@ a.timer { color: inherit; text-decoration: none; }
           <div><dt><span data-i18n="prefs.about.license">ライセンス</span></dt><dd lang="en">Apache License 2.0</dd></div>
           <div><dt><span data-i18n="prefs.about.third_party">使用しているオープンソースソフトウェア</span></dt><dd lang="en">SvelteKit — MIT License<br>Svelte — MIT License</dd></div>
         </dl>
-        <a class="about-link" href="#S05c"><span class="grow"><span class="label" data-i18n="prefs.about.privacy_link">プライバシーポリシー</span><span class="hint" data-i18n="prefs.about.privacy_summary">情報を集めず、外部へ送りません。</span></span><svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg></a>
+        <a class="about-link" href="#S05c"><span class="grow"><span class="label" data-i18n="prefs.about.privacy_link">プライバシーポリシー</span><span class="hint" data-i18n="prefs.about.privacy_summary">情報を集めず、入力した内容を外部へ送りません。</span></span><svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg></a>
       </div></div>
     </div></div>
       </div></div><div class="frame-scroll"><div class="frame-label">デスクトップ 1280×720</div>
@@ -1352,7 +1354,7 @@ a.timer { color: inherit; text-decoration: none; }
           <div><dt><span data-i18n="prefs.about.license">ライセンス</span></dt><dd lang="en">Apache License 2.0</dd></div>
           <div><dt><span data-i18n="prefs.about.third_party">使用しているオープンソースソフトウェア</span></dt><dd lang="en">SvelteKit — MIT License<br>Svelte — MIT License</dd></div>
         </dl>
-        <a class="about-link" href="#S05c"><span class="grow"><span class="label" data-i18n="prefs.about.privacy_link">プライバシーポリシー</span><span class="hint" data-i18n="prefs.about.privacy_summary">情報を集めず、外部へ送りません。</span></span><svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg></a>
+        <a class="about-link" href="#S05c"><span class="grow"><span class="label" data-i18n="prefs.about.privacy_link">プライバシーポリシー</span><span class="hint" data-i18n="prefs.about.privacy_summary">情報を集めず、入力した内容を外部へ送りません。</span></span><svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg></a>
       </div></div>
     </div></div>
       </div></div>
@@ -1361,7 +1363,7 @@ a.timer { color: inherit; text-decoration: none; }
 <section class="screen" id="S05c">
   <div class="screen-head">
     <h2><span class="sid">S05c</span>環境設定：プライバシーポリシー</h2>
-    <p>S05b の「プライバシーポリシー」から開く下位ページ。タブは「アプリ情報」を選んだままで、左上の「アプリ情報」で S05b に戻る。書く内容は、集める情報（なし）・端末に保存する情報・外部への送信（なし）・使う端末の機能と使わない機能・変更のお知らせ、の5つ。</p>
+    <p>S05b の「プライバシーポリシー」から開く下位ページ。タブは「アプリ情報」を選んだままで、左上の「アプリ情報」で S05b に戻る。書く内容は、集める情報（なし）・端末に保存する情報・外部への送信（入力内容は送らない。書体の読み込みで Google に接続情報が届くことを書く）・使う端末の機能と使わない機能・変更のお知らせ、の5つ。</p>
   </div>
   <div class="frames">
     <div class="frame-scroll"><div class="frame-label">モバイル 390px</div>
@@ -1375,8 +1377,8 @@ a.timer { color: inherit; text-decoration: none; }
         <h4 data-i18n="privacy.title">プライバシーポリシー</h4>
         <p class="hint" data-i18n="privacy.lead">LTタイムキーパーが扱う情報と、使う端末の機能についての説明です。</p>
         <section><h5 data-i18n="privacy.collect.title">集める情報</h5><p data-i18n="privacy.collect.body">このアプリは、あなたの個人情報や利用状況を集めません。アカウント登録、解析ツール、広告、Cookie による追跡はありません。</p></section>
-        <section><h5 data-i18n="privacy.store.title">端末に保存する情報</h5><p data-i18n="privacy.store.body">環境設定の値（言語・表示テーマ・音量・振動・終了の確認）を、この端末のブラウザの中にだけ保存します。持ち時間・ベル・表示名は保存しません。保存した値は、ブラウザでこのサイトのデータを消すと消えます。</p><p data-i18n="privacy.store.cache">通信なしで動かすために、アプリ本体のファイルもブラウザに保存します。</p></section>
-        <section><h5 data-i18n="privacy.send.title">外部への送信</h5><p data-i18n="privacy.send.body">入力した内容や保存した値を、外部へ送ることはありません。通信するのは、アプリ本体と更新を lt.rinontech.com から読み込むときだけです。この配信は Cloudflare Pages が行います。</p></section>
+        <section><h5 data-i18n="privacy.store.title">端末に保存する情報</h5><p data-i18n="privacy.store.body">環境設定の値（言語・表示テーマ・音量・振動・終了の確認）を、この端末のブラウザの中にだけ保存します。持ち時間・ベル・表示名は保存しません。保存した値は、ブラウザでこのサイトのデータを消すと消えます。</p><p data-i18n="privacy.store.cache">通信なしで動かすために、アプリ本体と書体のファイルもブラウザに保存します。</p></section>
+        <section><h5 data-i18n="privacy.send.title">外部への送信</h5><p data-i18n="privacy.send.body">入力した内容や保存した値を、外部へ送ることはありません。通信するのは、アプリ本体と更新を lt.rinontech.com から読み込むときと、書体（Noto Sans・JetBrains Mono）を Google Fonts から読み込むときだけです。アプリ本体の配信は Cloudflare Pages が行います。書体を読み込むとき、お使いのブラウザの接続情報（IP アドレスなど）が Google に届きます。</p></section>
         <section><h5 data-i18n="privacy.perm.title">使う端末の機能</h5><p data-i18n="privacy.perm.lead">どれも許可を求めるダイアログは出ません。</p>
           <div class="perm-group"><h6 data-i18n="privacy.perm.used">使うもの</h6><ul class="perm-list"><li><span data-i18n="privacy.perm.wake_lock">画面のスリープ防止（計測中だけ）</span></li><li><span data-i18n="privacy.perm.audio">音の再生（ベル）</span></li><li><span data-i18n="privacy.perm.vibration">振動（対応した端末で、オンにしたときだけ）</span></li><li><span data-i18n="privacy.perm.fullscreen">全画面表示（ボタンか F キーを押したときだけ）</span></li></ul></div>
           <div class="perm-group"><h6 data-i18n="privacy.perm.unused">使わないもの</h6><p data-i18n="privacy.perm.unused_list">カメラ、マイク、位置情報、通知、連絡先・写真・ファイル</p></div>
@@ -1418,8 +1420,8 @@ a.timer { color: inherit; text-decoration: none; }
         <h4 data-i18n="privacy.title">プライバシーポリシー</h4>
         <p class="hint" data-i18n="privacy.lead">LTタイムキーパーが扱う情報と、使う端末の機能についての説明です。</p>
         <section><h5 data-i18n="privacy.collect.title">集める情報</h5><p data-i18n="privacy.collect.body">このアプリは、あなたの個人情報や利用状況を集めません。アカウント登録、解析ツール、広告、Cookie による追跡はありません。</p></section>
-        <section><h5 data-i18n="privacy.store.title">端末に保存する情報</h5><p data-i18n="privacy.store.body">環境設定の値（言語・表示テーマ・音量・振動・終了の確認）を、この端末のブラウザの中にだけ保存します。持ち時間・ベル・表示名は保存しません。保存した値は、ブラウザでこのサイトのデータを消すと消えます。</p><p data-i18n="privacy.store.cache">通信なしで動かすために、アプリ本体のファイルもブラウザに保存します。</p></section>
-        <section><h5 data-i18n="privacy.send.title">外部への送信</h5><p data-i18n="privacy.send.body">入力した内容や保存した値を、外部へ送ることはありません。通信するのは、アプリ本体と更新を lt.rinontech.com から読み込むときだけです。この配信は Cloudflare Pages が行います。</p></section>
+        <section><h5 data-i18n="privacy.store.title">端末に保存する情報</h5><p data-i18n="privacy.store.body">環境設定の値（言語・表示テーマ・音量・振動・終了の確認）を、この端末のブラウザの中にだけ保存します。持ち時間・ベル・表示名は保存しません。保存した値は、ブラウザでこのサイトのデータを消すと消えます。</p><p data-i18n="privacy.store.cache">通信なしで動かすために、アプリ本体と書体のファイルもブラウザに保存します。</p></section>
+        <section><h5 data-i18n="privacy.send.title">外部への送信</h5><p data-i18n="privacy.send.body">入力した内容や保存した値を、外部へ送ることはありません。通信するのは、アプリ本体と更新を lt.rinontech.com から読み込むときと、書体（Noto Sans・JetBrains Mono）を Google Fonts から読み込むときだけです。アプリ本体の配信は Cloudflare Pages が行います。書体を読み込むとき、お使いのブラウザの接続情報（IP アドレスなど）が Google に届きます。</p></section>
         <section><h5 data-i18n="privacy.perm.title">使う端末の機能</h5><p data-i18n="privacy.perm.lead">どれも許可を求めるダイアログは出ません。</p>
           <div class="perm-group"><h6 data-i18n="privacy.perm.used">使うもの</h6><ul class="perm-list"><li><span data-i18n="privacy.perm.wake_lock">画面のスリープ防止（計測中だけ）</span></li><li><span data-i18n="privacy.perm.audio">音の再生（ベル）</span></li><li><span data-i18n="privacy.perm.vibration">振動（対応した端末で、オンにしたときだけ）</span></li><li><span data-i18n="privacy.perm.fullscreen">全画面表示（ボタンか F キーを押したときだけ）</span></li></ul></div>
           <div class="perm-group"><h6 data-i18n="privacy.perm.unused">使わないもの</h6><p data-i18n="privacy.perm.unused_list">カメラ、マイク、位置情報、通知、連絡先・写真・ファイル</p></div>
@@ -1472,7 +1474,7 @@ a.timer { color: inherit; text-decoration: none; }
       <li>v0.2.0 から日本語・英語・中国語（簡体字 zh-Hans）に対応する。原文は日本語。文言はすべて辞書から引く</li>
       <li>アプリ名は、日本語「LTタイムキーパー」、英語「LT Timekeeper」、中国語「LT 计时器」</li>
       <li>言語の初期値はブラウザの言語に合わせる。ja・en・zh 以外は英語にする（S05）</li>
-      <li>書体は言語ごとに切り替える（--font-sans-ja / -en / -zh-hans）。外部フォントは使わない</li>
+      <li>書体は言語ごとに切り替える（--font-sans-ja / -en / -zh-hans）。全言語で Noto Sans 系（JP・Noto Sans・SC）、数字は JetBrains Mono。OS の書体は使わず Google Fonts の Web フォントで読み込む</li>
       <li>環境設定を新しく作り、タブで「一般・音・アプリ情報」の3つに分ける（S05〜S05c）。S01 のヘッダーの歯車から開き、計測中には開けない</li>
       <li>ヘッダーのボタンは歯車だけにする。テーマのメニュー（v2 の S01e）とヘッダーの GitHub リンクはなくし、ソースコードへのリンクは S05b に置く</li>
       <li>音の設定（音量・試し鳴らし・振動）は S01 から環境設定へ移す（S05a）</li>
@@ -1593,16 +1595,16 @@ a.timer { color: inherit; text-decoration: none; }
   "prefs.about.license": "ライセンス",
   "prefs.about.third_party": "使用しているオープンソースソフトウェア",
   "prefs.about.privacy_link": "プライバシーポリシー",
-  "prefs.about.privacy_summary": "情報を集めず、外部へ送りません。",
+  "prefs.about.privacy_summary": "情報を集めず、入力した内容を外部へ送りません。",
   "privacy.title": "プライバシーポリシー",
   "privacy.lead": "LTタイムキーパーが扱う情報と、使う端末の機能についての説明です。",
   "privacy.collect.title": "集める情報",
   "privacy.collect.body": "このアプリは、あなたの個人情報や利用状況を集めません。アカウント登録、解析ツール、広告、Cookie による追跡はありません。",
   "privacy.store.title": "端末に保存する情報",
   "privacy.store.body": "環境設定の値（言語・表示テーマ・音量・振動・終了の確認）を、この端末のブラウザの中にだけ保存します。持ち時間・ベル・表示名は保存しません。保存した値は、ブラウザでこのサイトのデータを消すと消えます。",
-  "privacy.store.cache": "通信なしで動かすために、アプリ本体のファイルもブラウザに保存します。",
+  "privacy.store.cache": "通信なしで動かすために、アプリ本体と書体のファイルもブラウザに保存します。",
   "privacy.send.title": "外部への送信",
-  "privacy.send.body": "入力した内容や保存した値を、外部へ送ることはありません。通信するのは、アプリ本体と更新を lt.rinontech.com から読み込むときだけです。この配信は Cloudflare Pages が行います。",
+  "privacy.send.body": "入力した内容や保存した値を、外部へ送ることはありません。通信するのは、アプリ本体と更新を lt.rinontech.com から読み込むときと、書体（Noto Sans・JetBrains Mono）を Google Fonts から読み込むときだけです。アプリ本体の配信は Cloudflare Pages が行います。書体を読み込むとき、お使いのブラウザの接続情報（IP アドレスなど）が Google に届きます。",
   "privacy.perm.title": "使う端末の機能",
   "privacy.perm.lead": "どれも許可を求めるダイアログは出ません。",
   "privacy.perm.used": "使うもの",
@@ -1728,16 +1730,16 @@ a.timer { color: inherit; text-decoration: none; }
   "prefs.about.license": "License",
   "prefs.about.third_party": "Open-source software",
   "prefs.about.privacy_link": "Privacy policy",
-  "prefs.about.privacy_summary": "Collects nothing and sends nothing off your device.",
+  "prefs.about.privacy_summary": "Collects nothing, and never sends what you enter off your device.",
   "privacy.title": "Privacy policy",
   "privacy.lead": "What information LT Timekeeper handles, and which device features it uses.",
   "privacy.collect.title": "Information we collect",
   "privacy.collect.body": "This app does not collect any personal information or usage data. There are no accounts, analytics, ads, or tracking cookies.",
   "privacy.store.title": "Information stored on your device",
   "privacy.store.body": "Your preferences (language, theme, volume, vibration, and end confirmation) are saved only in this browser on this device. Talk time, bells, and the display title are not saved. Clearing this site's data in your browser deletes them.",
-  "privacy.store.cache": "To work offline, the app's own files are also stored in your browser.",
+  "privacy.store.cache": "To work offline, the app's own files and fonts are also stored in your browser.",
   "privacy.send.title": "Data sent off your device",
-  "privacy.send.body": "Nothing you enter or save is ever sent anywhere. The app only goes online to load itself and its updates from lt.rinontech.com, which is served by Cloudflare Pages.",
+  "privacy.send.body": "Nothing you enter or save is ever sent anywhere. The app only goes online to load itself and its updates from lt.rinontech.com (served by Cloudflare Pages), and to load its fonts (Noto Sans and JetBrains Mono) from Google Fonts. When the fonts load, your browser's connection information, such as your IP address, reaches Google.",
   "privacy.perm.title": "Device features",
   "privacy.perm.lead": "None of these ask for permission.",
   "privacy.perm.used": "Used",
@@ -1854,16 +1856,16 @@ a.timer { color: inherit; text-decoration: none; }
   "prefs.about.license": "许可证",
   "prefs.about.third_party": "使用的开源软件",
   "prefs.about.privacy_link": "隐私政策",
-  "prefs.about.privacy_summary": "不收集信息，也不向外部发送。",
+  "prefs.about.privacy_summary": "不收集信息，也不会把你输入的内容发送到外部。",
   "privacy.title": "隐私政策",
   "privacy.lead": "说明 LT 计时器处理哪些信息，以及使用哪些设备功能。",
   "privacy.collect.title": "收集的信息",
   "privacy.collect.body": "本应用不收集你的个人信息或使用情况。没有账号注册、统计分析工具、广告，也不使用 Cookie 进行跟踪。",
   "privacy.store.title": "保存在设备上的信息",
   "privacy.store.body": "偏好设置（语言、外观主题、音量、振动和结束确认）仅保存在此设备的浏览器中。演讲时长、铃声和显示标题不会保存。在浏览器中清除本网站的数据后，这些值会被删除。",
-  "privacy.store.cache": "为了在离线时运行，应用本身的文件也会保存在浏览器中。",
+  "privacy.store.cache": "为了在离线时运行，应用本身的文件和字体也会保存在浏览器中。",
   "privacy.send.title": "向外部发送",
-  "privacy.send.body": "你输入或保存的内容绝不会发送到外部。应用仅在从 lt.rinontech.com 加载自身及其更新时联网，该分发由 Cloudflare Pages 提供。",
+  "privacy.send.body": "你输入或保存的内容绝不会发送到外部。应用仅在从 lt.rinontech.com 加载自身及其更新（由 Cloudflare Pages 分发）时，以及从 Google Fonts 加载字体（Noto Sans 和 JetBrains Mono）时联网。加载字体时，你的浏览器连接信息（如 IP 地址）会发送给 Google。",
   "privacy.perm.title": "使用的设备功能",
   "privacy.perm.lead": "以下功能均不会弹出权限请求。",
   "privacy.perm.used": "使用",

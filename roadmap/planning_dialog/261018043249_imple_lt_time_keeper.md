@@ -1,7 +1,7 @@
 # lt_time_keeper 実装設計（imple）
 
-- 対象スペック: `roadmap/specs/lt_time_keeper_SPEC_v3.md`（プランアセット v3、アプリ v0.2.0）
-- 対応する tasks・walk: `261016234906_tasks_lt_time_keeper.md`・`261016234906_walk_lt_time_keeper.md`
+- 対象スペック: `roadmap/specs/lt_time_keeper_SPEC_v4.md`（プランアセット v4、アプリ v0.2.0）。v3 からの変更は書体の Web フォント化だけ（仕様変更 `roadmap/development/261018042727_change_noto_sans_webfont.md`）。変わった節には【v4】を付けた
+- 対応する tasks・walk: `261018043249_tasks_lt_time_keeper.md`・`261018043249_walk_lt_time_keeper.md`
 - 仕様変更サマリー: `roadmap/development/261016195942_change_v0_2_0_update.md`
 - 前版: `roadmap/archived/261011225751_imple_lt_time_keeper.md`（v0.1.0）。この版は前版を引き継ぎ、v0.2.0 で変わる部分を書き換えた。変わった節には【v0.2.0】を付けた
 
@@ -68,7 +68,7 @@ src/
    ├─ pwa/
    │  └─ update.svelte.ts   新しい Service Worker の検知と切り替え（変更なし）
    ├─ theme/
-   │  ├─ tokens.css         specs の tokens_v3.css の写し（値の唯一の置き場）
+   │  ├─ tokens.css         specs の tokens_v4.css の写し（値の唯一の置き場）
    │  ├─ base.css
    │  ├─ splash.css
    │  └─ theme.ts           prefs.theme を <html data-theme> に反映する【v0.2.0】（theme.svelte.ts から置き換え）
@@ -259,6 +259,18 @@ export class Session {
 - 【v0.2.0】辞書は JS に入るので `immutable` に含まれる。`oss.json`・`third_party_licenses.txt` は書き出したページとして `prerendered` に含まれる。どちらも追加の設定なしで事前キャッシュされることを W10 で確かめる
 - 【v0.2.0】マニフェストは英語表記で固定（スペック §2）：`name` "LT Timekeeper"、`short_name` "LT Timer"、`description` は en の `prefs.about.tagline`、`lang` "en"。`id` は変えない。`gen_icons.ts` が en の辞書から作る
 
+### 3.9a 書体の Web フォント【v4】
+
+- 書体のトークン（tokens v4）：`--font-sans-ja`＝"Noto Sans JP"、`--font-sans-en`＝"Noto Sans"、`--font-sans-zh-hans`＝"Noto Sans SC"、`--font-digits`＝"JetBrains Mono"。末尾の総称（`sans-serif`・`monospace`）は読み込み前・失敗時の保険。OS の書体は並べない
+- 読み込みは `app.html` の `<head>` に置く：`fonts.googleapis.com`・`fonts.gstatic.com`（crossorigin）への `preconnect` と、4つの書体（太さ 400〜700 の可変、`display=swap`）をまとめて指定した Google Fonts のスタイルシートの `<link>`。URL の書き方は Google Fonts の公式ドキュメントで確認する（T10-11）。CJK は Google 側が `unicode-range` で分割して配信するので、使う文字の分だけが読み込まれる
+- 書体はすべて `font-family: var(--font-sans)`／`var(--font-digits)` 経由で使い、書体名を CSS や `.svelte` に直書きしない（`check_tokens` の既存の検査の範囲）
+- Service Worker（`src/service-worker/index.ts`）に、実行時キャッシュを足す（T10-12）
+  - 対象は `fonts.googleapis.com`（スタイルシート。stale-while-revalidate）と `fonts.gstatic.com`（書体ファイル。cache-first）だけ。ほかの外部ホストは扱わない
+  - 版つきの事前キャッシュ（`cache-<version>+…`）とは別の名前（例：`fonts-v1`）で持つ。`activate` の削除は `cache-` ではじまる名前だけが対象なので、アプリを更新しても書体のキャッシュは残る
+  - 取得に失敗しても例外を画面に出さない。初回がオフラインのときは書体が総称に置き換わるだけで、起動と計測は動く（スペック §3「オフライン」）
+- 通信の許可範囲は「自分のオリジン、`fonts.googleapis.com`、`fonts.gstatic.com`」だけ。e2e はこの3つ以外への通信が0件であることを確かめ、2つの外部ホストの応答はテスト側で差し替える（実際の通信は検証 W10-10 で確かめる）
+- プライバシーポリシー（S05c）の `privacy.send.body`・`privacy.store.cache`、S05b の入口の `prefs.about.privacy_summary` は、モック v4 の文言（書体の読み込みと Google への接続情報、書体のファイルの保存を含む）にする（T10-4）
+
 ### 3.10 環境設定の画面（S05〜S05c）【v0.2.0】
 
 - `PrefsScreen.svelte` を、720px 以上では S01 に重ねたモーダルのダイアログ、未満では全画面で出す（モックの S05・S05b のデスクトップ／モバイル）
@@ -286,7 +298,7 @@ export class Session {
 
 ### 3.12 theme・ui
 
-- `tokens.css` は specs の `lt_time_keeper_tokens_v3.css` を変更なしでコピーする。`--mock-` の値と、モックで vw を cqi に読み替えた部分は持ち込まない
+- `tokens.css` は specs の `lt_time_keeper_tokens_v4.css` を変更なしでコピーする。`--mock-` の値と、モックで vw を cqi に読み替えた部分は持ち込まない
 - 【v0.2.0】状態色で文字を書くときは `--color-state-*-text` を使う（状態ラベル・ベルの行の補足文・次のベル）。リング・点・アイコンは無印の `--color-state-*`
 - 【v0.2.0】入力欄・チェックボックス・スイッチ・セグメントの境界は `--color-border-input`。パネルや行の区切りは `--color-border`
 - 部品は値をトークンからだけ参照する。広い画面（720px以上）の配置はコンテナクエリで切り替え、720px は `base.css` の1か所だけに書く

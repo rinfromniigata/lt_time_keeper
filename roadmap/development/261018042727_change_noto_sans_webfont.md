@@ -1,10 +1,15 @@
 # 仕様変更サマリー：全言語の標準書体を Noto Sans 系にし、Google Fonts の Web フォントに統一する
 
-- 状態: **承認待ち**（実施していない）
+- 状態: **承認済み・計画の更新まで実施済み**（2026-10-18）。承認の内容：(1) 英語は Noto Sans、(2) 初回オンラインで可、(3) 等幅は **JetBrains Mono**（案 A・B ではなく、ユーザーの指定）。現行の imple・tasks・walk とプランアセット v3 を `archived/` へ移し、`261018043249_{imple,tasks,walk}_lt_time_keeper.md` とプランアセット v4（SPEC・brand・icon_master・mock・tokens）を作成した。実装（`src/`）にはまだ着手していない
+  - モックの変更：`:root` の書体トークンと注記、プライバシーポリシー（`privacy.send.body`・`privacy.store.cache`・`prefs.about.privacy_summary`）の3言語の文言、S05c の説明、決定事項の書体の項。画面構成は変えていない
+  - 追加した項目：tasks の T10-10〜T10-14（Phase 10 の末尾）、walk の W10-9〜W10-15。T10-4・T11-2・T11-3・W5-3・W9-10 に注記を足した
+  - 次の着手：T10-10 ではなく、Phase 9 の残り（W9-10・W9-11 の【ユーザー】確認）と Phase 10 の T10-1 から順に進む。書体の項目だけを先に行う場合は、指示をもらう
 - きっかけ: ユーザーから「トークンのタイポで、全言語の標準フォントを Noto Sans 系（Noto Sans JP・Noto Sans SC）にし、OS のフォントを使わず Google Fonts API の Web フォントに統一する」との打診
 - 現行: `261016234906_{imple,tasks,walk}_lt_time_keeper.md`、プランアセット v3
 
 ---
+
+（以下の本文は承認前の案。等幅数字は上の決定のとおり JetBrains Mono に変わっている）
 
 ## 1. 変更内容と理由
 
@@ -26,9 +31,8 @@
 
 1. **英語の書体**：Noto Sans にする（推奨）。
 2. **初回オフライン**：初回だけはオンラインが必要、でよいか。よければ上記のランタイムキャッシュで進める（推奨）。ビルド時に自前配信する案は、「Google Fonts API を使う」の指定から外れるため採らない。
-3. **等幅数字 `--font-digits`**（タイマー・数値入力・Kbd）：現状は OS の等幅書体。OS 書体を使わない方針に合わせ、次のどちらかにする。
-   - A（推奨）: `"Noto Sans"` ＋ `tabular-nums`（`--font-digits-variant` が既にある）。数字は Noto Sans のまま統一され、桁幅も揺れない
-   - B: `"Noto Sans Mono"`。完全な等幅だが、字形が本文とやや異なる
+3. **等幅数字 `--font-digits`**（タイマー・数値入力・Kbd）：現状は OS の等幅書体。OS 書体を使わない方針に合わせる。
+   - 決定：ユーザーの指定で **JetBrains Mono**（案 A の Noto Sans ＋ `tabular-nums`、案 B の Noto Sans Mono のどちらでもない）。`tabular-nums`（`--font-digits-variant`）も併用する
 
 ## 3. 影響するドキュメントと項目
 
