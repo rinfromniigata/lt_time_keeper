@@ -7,6 +7,31 @@
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-11-18
+
+### Added
+
+- 日本語・English・简体中文の3言語に対応。初回はブラウザの言語から決め、選び直した言語は保存する。言語を切り替えても、入力中の持ち時間・ベル・表示名は消えない
+- 環境設定の画面（S05〜S05c）。設定画面の歯車から開き、「一般」（言語・表示テーマ・計測を終了するときの確認）・「音」（音量・ベルの試し鳴らし・振動）・「アプリ情報」の3つのタブがある
+- アプリ情報に、バージョン・ソースコードへのリンク・ライセンス・使用しているオープンソースソフトウェアの一覧を表示。一覧とライセンス全文（`third_party_licenses.txt`）はビルド時に自動で作る
+- プライバシーポリシーの画面（S05c）
+- 終了の確認に「今後この確認を表示しない」を追加
+- 環境設定の5項目（言語・表示テーマ・音量・振動・終了の確認）を、端末のブラウザ（`localStorage`）に保存する。持ち時間・ベル・表示名は保存しない
+- README を3言語で用意（`README.md`・`README.en.md`・`README.zh-Hans.md`）。開発者向けの情報は `CONTRIBUTING.md` に分けた
+
+### Changed
+
+- 色を見直し、ライト・ダークとも WCAG 2.2 AA を満たすようにした（文字 4.5:1 以上、図形・部品の境界 3:1 以上）。状態色で書く文字には専用の色を使う
+- 書体を、全言語で Google Fonts の Web フォント（Noto Sans JP・Noto Sans・Noto Sans SC、数字は JetBrains Mono）に統一した。OS の書体は使わない。外部への通信は、この書体の読み込みだけ。**初回の起動だけはオンラインが必要**（初回がオフラインのときは、標準の書体で表示し、起動と計測は動く）
+- 音の設定を、設定画面から環境設定の「音」へ移した
+- 設定画面のヘッダーを、歯車のボタンだけにした
+- PWA の表示名を「LT Timekeeper」（英語）に固定し、`short_name` を「LT Timer」にした。ページの題名は、表示中の言語に合わせる
+- 長い文は、言語が変わっても崩れないように折り返す
+
+### Removed
+
+- ヘッダーのテーマのメニューと GitHub へのリンク（テーマは環境設定の「一般」で選ぶ。ソースコードへのリンクはアプリ情報にある）
+
 ## [0.1.0] - 2026-10-11
 
 ### Added
@@ -19,5 +44,6 @@
 - PWA 対応（Service Worker による事前キャッシュとオフライン起動、manifest、アイコン一式、OGP 画像）
 - 新しい版を検知して再読み込みを促す、更新のお知らせ（S01f）
 
-[Unreleased]: https://github.com/rinfromniigata/lt_time_keeper/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/rinfromniigata/lt_time_keeper/compare/v0.2.0...HEAD
+[0.2.0]: https://github.com/rinfromniigata/lt_time_keeper/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/rinfromniigata/lt_time_keeper/releases/tag/v0.1.0

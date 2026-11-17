@@ -311,21 +311,34 @@ Phaseの推奨: Sonnet・high以上
 
 ## Phase 11: リリース準備（v0.2.0）
 Phaseの推奨: Sonnet・high以上
-- [ ] T11-1 【エージェント】README 用のスクリーンショットを3言語で撮り、`docs/images/screenshot_{ja,en,zh-Hans}.png` に置く。`docs/lt_time_keeper_pr_v0.1.0.png` は参照をなくしてから削除する
+引き継ぎ: T11-1〜T11-6 は完了（`timeline.md` にリリース準備の行を追記済み）。次はユーザーの T11-7（コミット・push・`v0.2.0` タグ）。walk の W11-1〜W11-2 はエージェントの機械的な確認で、W11-3（README の英語・中国語を含む確認）はユーザー。CHANGELOG の日付 2026-11-18 は、タグを打つ日が変わったら直す。
+- [x] T11-1 【エージェント】README 用のスクリーンショットを3言語で撮り、`docs/images/screenshot_{ja,en,zh-Hans}.png` に置く。`docs/lt_time_keeper_pr_v0.1.0.png` は参照をなくしてから削除する
   - 依存: T10-9
-- [ ] T11-2 【エージェント】`README.md`（日本語）を利用者向けに書き直し、`README.en.md`・`README.zh-Hans.md` を作る。冒頭に言語のリンク、中身は目的・スクリーンショット・特徴・使い方・対応環境・プライバシー・ライセンス
+  - 実施: Sonnet・?
+  - 実施メモ: ビルド済みの `build/` を `bun run preview` で開き、Playwright（実際の Google Fonts に接続。e2e のスタブなし）で計測画面（S03）を 1280×800・ライトテーマで撮った。持ち時間 5:00 のうち 1:28 経過（残り 3:32）、表示名は言語ごとの例（日本語 `LT「型安全なCSS設計」`）。言語は `localStorage` の環境設定で指定。スリープ防止の警告（ヘッドレスでは取れない）は閉じ、操作ボタンは出した状態。3言語とも Noto Sans 系・JetBrains Mono が読み込まれたことを `document.fonts` で確かめた。README の参照を `docs/images/screenshot_ja.png` に差し替えてから、旧画像のファイルを削除した（README の書き直しは T11-2）。撮影の手順は一度きりの確認用で、スクリプトはリポジトリに入れていない
+- [x] T11-2 【エージェント】`README.md`（日本語）を利用者向けに書き直し、`README.en.md`・`README.zh-Hans.md` を作る。冒頭に言語のリンク、中身は目的・スクリーンショット・特徴・使い方・対応環境・プライバシー・ライセンス
   - 依存: T11-1
+  - 実施: Sonnet・?
+  - 実施メモ: 3つとも同じ節の構成（特徴・使い方・対応環境・プライバシー・更新履歴とライセンス）で、1行目に言語のリンク、画像は `docs/images/screenshot_{言語}.png`。画面内の用語（環境設定→アプリ情報→プライバシーポリシー、予鈴・Warning・预警、ボタンの名前）は各言語の辞書と照らして合わせた。プライバシーと対応環境は SPEC v5 第3節の「個人情報と保存」「オフライン」「通信」と同じ内容で、Google Fonts への接続（IP アドレスなどが Google に届く）と、初回だけオンラインが必要なことを書いた。「通信しない」と読める書き方はしていない。`CHANGELOG.md`・`CONTRIBUTING.md` は日本語のみのため、他言語の README では「（日本語）」と添えた。旧 README の「ドキュメント」の節（`docs/brand/`・`roadmap/` の案内）は、利用者向けでないため外した。判断: 入手方法の節は、Web アプリなので「使う」の1行（公開 URL）にまとめた。訳（英語・中国語）はユーザーの確認が要る（T11-6 で確認の状況を見る）
   - 【v4】プライバシーの節と対応環境には、書体を Google Fonts から読み込むこと（その際に Google へ IP アドレスなどの接続情報が届く）と、初回の起動だけはオンラインが必要なことを、SPEC v4 の第3節「個人情報と保存」「オフライン」「通信」と同じ内容で書く。「通信しない」「外部へ一切送らない」と読める書き方をしない
-- [ ] T11-3 【エージェント】`CONTRIBUTING.md` を仕上げる（疑似ロケール、checkコマンド（中身の各段と個別のコマンド。T10-16 で書いた分の確認）、OSS 一覧の生成、保存のキー名、リポジトリ構成の更新）
+- [x] T11-3 【エージェント】`CONTRIBUTING.md` を仕上げる（疑似ロケール、checkコマンド（中身の各段と個別のコマンド。T10-16 で書いた分の確認）、OSS 一覧の生成、保存のキー名、リポジトリ構成の更新）
   - 依存: T10-9
   - 【v4】書体の節（T10-14 で書いた分）が最新の実装と合っているか確かめる
-- [ ] T11-4 【エージェント】GitHub の About 欄の文案（英語の説明文・Webサイト・トピック）を提示する
+  - 実施: Sonnet・?
+  - 実施メモ: 足した節は、「画面の文字列（辞書）と疑似ロケール」（キー規則を確認・テストの節から移し、`?pseudo` の開き方を追加）、「設定の保存」（キー `lt_time_keeper.prefs`、形 `{"v":1,…}`、`prefs_codec.ts`）、ビルドの下の「使用しているオープンソースソフトウェアの一覧」（`oss_collect.ts` → `oss.json`・`third_party_licenses.txt`）、「README とスクリーンショット」（3言語の追従、撮り方）。リポジトリ構成は `i18n/`・`prefs/`・`storage/`・`oss/`・`hooks.server.ts`・`.github/workflows/`・`docs/images/`・README を足した。確認: checkコマンドの7段の順序と `LT_E2E_SKIP_BUILD` は `scripts/check.ts`・`playwright.config.ts` と一致。書体の節は `app.html`（preconnect・`media="print"`＋`onload`）・`service-worker/index.ts`（`fonts-v1`、スタイルシートは stale-while-revalidate、書体ファイルは cache-first）・`tokens.css` と一致しており、直す箇所なし。疑似ロケールの開き方・OSS 一覧の仕組み・キー名の共有は実装のコードで確かめた
+- [x] T11-4 【エージェント】GitHub の About 欄の文案（英語の説明文・Webサイト・トピック）を提示する
   - 依存: T11-2
-- [ ] T11-5 【エージェント】`CHANGELOG.md` に 0.2.0 を書き、`package.json` の version を 0.2.0 にする
+  - 実施: Sonnet・?
+  - 実施メモ: チャットで提示した。説明文: `A browser-based timekeeper for lightning talks and presentations. A big countdown ring, bells, and overtime counting; installable PWA that works offline. Japanese, English and Simplified Chinese.`／Webサイト: `https://lt.rinontech.com/`／トピック: `timer` `timekeeper` `lightning-talk` `presentation` `pwa` `svelte` `sveltekit` `typescript` `i18n`。設定は T11-7 でユーザーが行う
+- [x] T11-5 【エージェント】`CHANGELOG.md` に 0.2.0 を書き、`package.json` の version を 0.2.0 にする
   - 推奨: Sonnet・medium以上
   - 依存: T11-2, T11-3
-- [ ] T11-6 【エージェント】リリース前の確認をする（ワークフローと同じ手順のローカル実行、アイコン一式が specs の最新のマスターSVGから生成されたものか、README の特徴・使い方・スクリーンショット・対応環境が実物と一致するか、各言語の README が `README.md` に追従しているか、訳がユーザーに確認済みか）。コミットメッセージとタグのコマンドを提示して停止する
+  - 実施: Sonnet・?
+  - 実施メモ: `CHANGELOG.md` に `[0.2.0] - 2026-11-18`（Added・Changed・Removed。v0.1.0 からの利用者に見える変更だけ）を書き、比較リンク（`[Unreleased]`＝`v0.2.0...HEAD`、`[0.2.0]`＝`v0.1.0...v0.2.0`）を直した。`package.json` の version を 0.2.0 にした（バージョンの表記はここだけ。S05b・S05c は build 時に埋め込まれる。確認は T11-6）。日付は書いた日で、タグを打つ日が変わったら直す
+- [x] T11-6 【エージェント】リリース前の確認をする（ワークフローと同じ手順のローカル実行、アイコン一式が specs の最新のマスターSVGから生成されたものか、README の特徴・使い方・スクリーンショット・対応環境が実物と一致するか、各言語の README が `README.md` に追従しているか、訳がユーザーに確認済みか）。コミットメッセージとタグのコマンドを提示して停止する
   - 依存: T11-4, T11-5
   - 【v5】「ワークフローと同じ手順のローカル実行」は `bun run check` の実行になる。リリース前の確認のあと、コミットメッセージを提示する前に、`timeline.md` に `リリース準備 0.2.0（プランアセット v{n}）← CHANGELOG.md` の行を追記する（v{n} はその時点の specs の版）
+  - 実施: Sonnet・?
+  - 実施メモ: ①`bun run check` 全7段通過（型検査・lint・tokens・i18n・単体テスト・build・e2e）。②`bun run gen:icons` を再実行して `static/` に差分なし（アイコン一式は specs の最新のマスターSVG（v5）から生成されたもの）。`docs/brand/` の2ファイルも specs と同一。③README の特徴・使い方・対応環境・スクリーンショットを、実物（設定画面・計測画面・辞書の用語・プリセットの値・キー操作）と照合して一致。画像・リンクのパスは3つとも存在し、`roadmap/` への参照はない。④3つの README は節の構成・順序が同じで、言語のリンクが互いに開ける（W11-2 の機械的な部分）。⑤build の出力に S05b・S05c のバージョン `0.2.0` が入っている。⑥辞書の訳は T10-8 でユーザー確認済み（以降、辞書は変えていない）。**未確認：README の英語・中国語の文は、ユーザーの確認が要る（W11-3）。** ⑦`timeline.md` にリリース準備 0.2.0（v5）の行を追記した。⑧実際の Google Fonts との通信は、T11-1 の撮影で3言語とも書体が読み込まれることを確かめた
 - [ ] T11-7 【ユーザー】コミットして main に push し、`v0.2.0` タグを push する。Actions の完了後、ドラフトリリースを公開し、About 欄を設定する
   - 依存: T11-6
