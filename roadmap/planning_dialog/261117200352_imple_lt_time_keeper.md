@@ -1,7 +1,7 @@
 # lt_time_keeper 実装設計（imple）
 
 - 対象スペック: `roadmap/specs/lt_time_keeper_SPEC_v5.md`（プランアセット v5、アプリ v0.2.0）。v3 からの変更は、書体の Web フォント化（v4。仕様変更 `roadmap/development/261018042727_change_noto_sans_webfont.md`）と、checkコマンドの統合・ESLint の導入（v5。仕様変更 `roadmap/development/261117163547_change_check_command_and_lint.md`）。変わった節には【v4】【v5】を付けた
-- 対応する tasks・walk: `261117170958_tasks_lt_time_keeper.md`・`261117170958_walk_lt_time_keeper.md`
+- 対応する tasks・walk: `261117200352_tasks_lt_time_keeper.md`・`261117200352_walk_lt_time_keeper.md`
 - 仕様変更サマリー: `roadmap/development/261016195942_change_v0_2_0_update.md`
 - 前版: `roadmap/archived/261011225751_imple_lt_time_keeper.md`（v0.1.0）。この版は前版を引き継ぎ、v0.2.0 で変わる部分を書き換えた。変わった節には【v0.2.0】を付けた
 
@@ -16,7 +16,8 @@
 - テスト: Vitest 4.1.11（純粋なTSの単体テスト）、Playwright 1.64.0（画面の結合テスト。`page.clock` で時刻を進める）
 - アイコン生成: `@resvg/resvg-js` 2.6.x（開発時の依存だけ）
 - 【v0.2.0】配信物に入る依存は増やさない。i18n・OSS一覧・保存は自作する（スペック §4）
-- 【v5】lint: ESLint（TypeScript・`.svelte` 用のプラグイン。開発時だけの依存で、配信物と OSS 一覧には入らない）。版と設定ファイル（flat config）の書き方は、T10-15 でインストールした版の公式ドキュメントで確かめてから、ここに書き足す
+- 【v5】lint: ESLint 10.15.0（`@eslint/js` 10.0.1、`typescript-eslint` 8.73.0、`eslint-plugin-svelte` 3.24.1、`globals` 17.14.0）。開発時だけの依存で、配信物と OSS 一覧には入らない。`sv add eslint`（Svelte CLI 1.4.0）で入れた flat config（`eslint.config.js`）を基本にし、`.gitignore` に書いたものを対象から外す。対象は TypeScript・`.svelte` のすべて（`src`・`scripts`・`e2e`・設定ファイル）。`@types/node` 24.19.2 も、このとき入った（`scripts` の型）
+  - 弱めた規則は `no-undef` の無効化だけ（`sv add eslint` の既定。TypeScript では型検査がこの役目を果たす）。そのほか、推奨設定の規則に反する箇所を3か所だけ、行を指定して例外にした（理由は各行のコメント）：`session.svelte.ts` の `#dismissed`（描画に使わない内部の記録なので `Set` のまま）、`e2e/fixtures.ts` の空の分割（Playwright の fixture の決まり）、`scripts/check.ts` の ANSI 除去の正規表現（制御文字を含むのが目的）
 
 SvelteKit 3 で、一般的な書き方から変わっている点（v0.1.0 で確認済み）:
 
@@ -265,11 +266,12 @@ export class Session {
 ### 3.9a 書体の Web フォント【v4】
 
 - 書体のトークン（tokens v4）：`--font-sans-ja`＝"Noto Sans JP"、`--font-sans-en`＝"Noto Sans"、`--font-sans-zh-hans`＝"Noto Sans SC"、`--font-digits`＝"JetBrains Mono"。末尾の総称（`sans-serif`・`monospace`）は読み込み前・失敗時の保険。OS の書体は並べない
-- 読み込みは `app.html` の `<head>` に置く：`fonts.googleapis.com`・`fonts.gstatic.com`（crossorigin）への `preconnect` と、4つの書体（太さ 400〜700 の可変、`display=swap`）をまとめて指定した Google Fonts のスタイルシートの `<link>`。URL の書き方は Google Fonts の公式ドキュメントで確認する（T10-11）。CJK は Google 側が `unicode-range` で分割して配信するので、使う文字の分だけが読み込まれる
+- 読み込みは `app.html` の `<head>` に置く（T10-11 の実装：スタイルシートの `<link>` は `media="print"` で出し、`onload` で `all` に切り替える。取得中・失敗時は描画を止めない）：`fonts.googleapis.com`・`fonts.gstatic.com`（crossorigin）への `preconnect` と、4つの書体（太さ 400〜700 の可変、`display=swap`）をまとめて指定した Google Fonts のスタイルシートの `<link>`。URL の書き方は Google Fonts の公式ドキュメントで確認する（T10-11）。CJK は Google 側が `unicode-range` で分割して配信するので、使う文字の分だけが読み込まれる
 - 書体はすべて `font-family: var(--font-sans)`／`var(--font-digits)` 経由で使い、書体名を CSS や `.svelte` に直書きしない（`check_tokens` の既存の検査の範囲）
 - Service Worker（`src/service-worker/index.ts`）に、実行時キャッシュを足す（T10-12）
   - 対象は `fonts.googleapis.com`（スタイルシート。stale-while-revalidate）と `fonts.gstatic.com`（書体ファイル。cache-first）だけ。ほかの外部ホストは扱わない
   - 版つきの事前キャッシュ（`cache-<version>+…`）とは別の名前（例：`fonts-v1`）で持つ。`activate` の削除は `cache-` ではじまる名前だけが対象なので、アプリを更新しても書体のキャッシュは残る
+  - スタイルシートは `<link>`（no-cors）の読み込みなので opaque な応答で返る。それも `cache.put` できることを、インストールした版の Chromium（Playwright 1.64）で確かめた。書体ファイルは CORS の読み込みで、通常の応答
   - 取得に失敗しても例外を画面に出さない。初回がオフラインのときは書体が総称に置き換わるだけで、起動と計測は動く（スペック §3「オフライン」）
 - 通信の許可範囲は「自分のオリジン、`fonts.googleapis.com`、`fonts.gstatic.com`」だけ。e2e はこの3つ以外への通信が0件であることを確かめ、2つの外部ホストの応答はテスト側で差し替える（実際の通信は検証 W10-10 で確かめる）
 - プライバシーポリシー（S05c）の `privacy.send.body`・`privacy.store.cache`、S05b の入口の `prefs.about.privacy_summary` は、モック v4 の文言（書体の読み込みと Google への接続情報、書体のファイルの保存を含む）にする（T10-4）
@@ -398,8 +400,10 @@ export class Session {
   7. e2e（Playwright）
 - 表示：各段の出力は控えておき、通った段は1行（段の名前と「通過」）だけを出す。失敗した段は、その出力のうち失敗の部分（エラー・失敗したテストの行と、末尾）だけを出し、終了コードを0以外にする
 - 個別のコマンド（`check:types`・`lint`・`check:tokens`・`check:i18n`・`test`・`test:unit`・`test:e2e`・`check:watch`）は残し、単独でも実行できる
-- build と e2e：いまの `playwright.config.ts` の `webServer` は、build してからプレビューを開く。checkコマンドの中では、6. の build を e2e が使い、二重に build しない。`test:e2e` を単独で実行したときは、今までどおり build してから開く。切り替えの方法（環境変数など）は T10-16 で決めて、ここに書き足す
+- build と e2e：いまの `playwright.config.ts` の `webServer` は、build してからプレビューを開く。checkコマンドの中では、6. の build を e2e が使い、二重に build しない。`test:e2e` を単独で実行したときは、今までどおり build してから開く。切り替えは環境変数 `LT_E2E_SKIP_BUILD`（T10-16 で決定）：`scripts/check.ts` が e2e の段だけに付け、`playwright.config.ts` の `webServer.command` が、付いていれば `bun run preview` だけ、なければ `bun run build && bun run preview` にする
 - CI（§7）も、ローカルも、このコマンドを使う
+- 失敗の部分の取り出し（T10-16 で決定）：段ごとに「失敗のはじまりの行」の目印（型検査は `ERROR`・`error TS`、単体テストは `FAIL`、build は `error during build` など、e2e は `1) `）を決め、見つかればそこから後ろ（長いときははじめと終わりだけ）、なければ末尾 40 行を出す。bun が足す `$ …` と `error: script …` の行、ANSI の色、300 文字を超える行の後ろは出さない
+- e2e が使う書体のスタブ（T10-13）：`e2e/fixtures.ts` が `test` を拡張し、`fonts.googleapis.com`・`fonts.gstatic.com` へのリクエストをすべてのテストで差し替える（`context` の fixture）。`fonts` の fixture で、失敗に切り替え（`mode`）と、ネットワークまで届いた回数（`hits`）を見られる
 
 ## 6. アイコン
 

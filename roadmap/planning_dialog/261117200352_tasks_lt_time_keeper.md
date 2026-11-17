@@ -1,7 +1,7 @@
 # lt_time_keeper 実装項目（tasks）
 
-- 設計: `261117170958_imple_lt_time_keeper.md`
-- 検証: `261117170958_walk_lt_time_keeper.md`（同じ Phase 番号の W 項目）
+- 設計: `261117200352_imple_lt_time_keeper.md`
+- 検証: `261117200352_walk_lt_time_keeper.md`（同じ Phase 番号の W 項目）
 - 進め方: Tn をすべて終えたら Wn を行い、Wn がすべて通過してから Phase n+1 に進む
 - 版の経緯: Phase 1〜6 は v0.1.0（前版 `archived/261011225751_tasks_lt_time_keeper.md`）の項目で、ID・チェック・実施メモをそのまま引き継いだ。Phase 7〜11 は v0.2.0（仕様変更 `development/261016195942_change_v0_2_0_update.md`）の項目
   - Phase 1〜6 の実施メモにある `_v2` のファイル名は、当時の版を指す
@@ -10,6 +10,7 @@
 - 計画の版：`261018043249` 版から、checkコマンドの統合と ESLint の導入を反映した（`development/261117163547_change_check_command_and_lint.md`、プランアセット v5）。追加は T10-15・T10-16（Phase 10 の先頭）。T10-10・T11-3・T11-6 を直した。ほかの項目は変えていない
   - T10-15・T10-16 は、当初 Phase 10 の先頭に置いたが、`development/261117170640_change_reorder_phase10_check.md` で末尾へ移した
 - 計画の版：`261117165719` 版から、T10-15・T10-16 を Phase 10 の末尾（T10-14 の後）へ移した（`development/261117170640_change_reorder_phase10_check.md`）。番号順と記載順を一致させ、checkコマンドを作る時点で `check:tokens` が通る（T10-10 が済んでいる）ようにするため。項目の中身・依存は変えていない（T10-15 は T1-2、T10-16 は T10-15）。プランアセットは v5 のまま
+- 計画の版：`261117170958` 版から、walk の W10-16〜W10-18 を Phase 10 の末尾へ移した（`development/261117192133_change_reorder_phase10_walk.md`）。tasks の項目と並びは変えていない
 - 推奨：共通規則の改訂に合わせ、未着手の Phase 10・11 に `Phaseの推奨` と項目ごとの `推奨:` を付けた（ID と順序は変えていない。`development/261117163201_fix_recommendations_and_timeline.md`）。Phase 1〜9 には付けない
   - Phase 10 の項目を書体の追加で広げたのは、Phase 10 以降が未着手で、Phase 11（リリース）より前に入れる必要があるため。T10-10〜T10-14 の依存は、すべて前方（T10-10 は T7-1、ほかは前の新項目か T5-1・T10-4）
 
@@ -219,63 +220,94 @@
 
 ## Phase 10: アプリ情報・プライバシーポリシー・PWA の名前・書体の Web フォント・checkコマンド
 Phaseの推奨: Sonnet・high以上
-引き継ぎ: Phase 9 は完了。T10-1 から。ESLint の導入と checkコマンドのまとめは、Phase の末尾（T10-15・T10-16）で行う
-- [ ] T10-1 【エージェント】`vite.config.ts` の `define` で `package.json` の `version` を `__APP_VERSION__` として埋め込み、型を宣言する
+引き継ぎ: Phase 10 の実装（T10-1〜T10-16）は完了。次は検証（W10-1 から。checkコマンドの W10-16〜W10-18 は Phase の末尾）。W10-10（実際の Google Fonts との通信）は、e2e がスタブで確かめていないため、実ブラウザ（Chrome の woff2 と `unicode-range` の分割）で確かめる。T10-16 の checkコマンドは全7段が通る。W10-18 の「わざと入れる」確認は、T10-16 で型・lint・色の直書き・単体テスト・build・e2e を試した（辞書のキーの欠けは型検査の段で止まる）。
+- [x] T10-1 【エージェント】`vite.config.ts` の `define` で `package.json` の `version` を `__APP_VERSION__` として埋め込み、型を宣言する
   - 推奨: Sonnet・medium以上
-- [ ] T10-2 【エージェント】`scripts/oss_collect.ts`（Vite プラグイン）と、`routes/oss.json/+server.ts`・`routes/third_party_licenses.txt/+server.ts` を作る。インストールした版で、クライアントのビルドが書き出しより先に終わることを確かめ、成り立たなければ imple §3.11 の代わりの方法に切り替えて imple を直す
+  - 実施: Sonnet・high
+  - 実施メモ: `vite.config.ts` の `define` に `__APP_VERSION__`（`package.json` の version そのまま）、型は `src/app.d.ts` の `declare global` に `const __APP_VERSION__: string`
+- [x] T10-2 【エージェント】`scripts/oss_collect.ts`（Vite プラグイン）と、`routes/oss.json/+server.ts`・`routes/third_party_licenses.txt/+server.ts` を作る。インストールした版で、クライアントのビルドが書き出しより先に終わることを確かめ、成り立たなければ imple §3.11 の代わりの方法に切り替えて imple を直す
   - 推奨: Opus・high以上
-- [ ] T10-3 【エージェント】環境設定に「アプリ情報」タブ（S05b）を足す。アイコン・アプリ名・ひとこと説明・バージョン・ソースコードへのリンク（新しいタブ）・ライセンス・OSS 一覧（`oss.json`）・プライバシーポリシーへの入口。使うキーを辞書に足す
+  - 実施: Sonnet・high
+  - 実施メモ: 推奨は Opus・high 以上だが、ユーザーの指示で Sonnet・high で実施。確かめ：`.svelte-kit/oss/` を消してから `bun run build` → クライアントのビルドが先に終わり、書き出し（prerender）が `packages.json` を読めた（imple §3.11 の前提は成り立つ。代わりの方法への切り替えは不要）。`oss.json`・`third_party_licenses.txt` は `prerendered` に含まれ SW の事前キャッシュに入る。配信物の依存は @sveltejs/kit・clsx・devalue・svelte の4件。読み取りと型は `src/lib/oss/packages.ts`（サーバー側だけ）、プラグインは `scripts/oss_collect.ts`。開発サーバー（`dev`）では空の一覧
+- [x] T10-3 【エージェント】環境設定に「アプリ情報」タブ（S05b）を足す。アイコン・アプリ名・ひとこと説明・バージョン・ソースコードへのリンク（新しいタブ）・ライセンス・OSS 一覧（`oss.json`）・プライバシーポリシーへの入口。使うキーを辞書に足す
   - 依存: T10-1, T10-2, T9-5
   - 画面: S05b
-- [ ] T10-4 【エージェント】プライバシーポリシー（S05c）を作る。S05b から開き、「アプリ情報」で戻る。`{version}` に `__APP_VERSION__` を入れる。使うキーを辞書に足す
+  - 実施: Sonnet・high
+  - 実施メモ: 環境設定にタブ「アプリ情報」を足し、`AboutPanel.svelte` を作った。ポリシーへの入口は `<button>`（モックは `<a>`）。`PrefsScreen` の Tab を回す対象に `a[href]`（ソースコードのリンク）を足した。アイコンに `chevron` を足した（`app.html` のスプライトにも）。OSS 一覧は、読めなかったとき（開発サーバー・初回オフライン）その行を出さない
+- [x] T10-4 【エージェント】プライバシーポリシー（S05c）を作る。S05b から開き、「アプリ情報」で戻る。`{version}` に `__APP_VERSION__` を入れる。使うキーを辞書に足す
   - 依存: T10-3
   - 画面: S05c
   - 【v4】文言はモック v4 の辞書のとおりにする。`privacy.send.body` は書体を Google Fonts から読み込むこと（接続情報が Google に届く）を含み、`privacy.store.cache` は書体のファイルの保存を含み、`prefs.about.privacy_summary` は「入力した内容を外部へ送りません」に変わっている。T10-1〜T10-3 で先に足した同名キーがあれば、v4 の値に直す
-- [ ] T10-5 【エージェント】`scripts/gen_icons.ts` の manifest を英語表記にする（`name` "LT Timekeeper"、`short_name` "LT Timer"、`description` は en の辞書から、`lang` "en"、`id` は変えない）。`bun run gen:icons` を実行し、アイコンに差分がないことを確かめる
+  - 実施: Sonnet・high
+  - 実施メモ: `PrivacyPanel.svelte` を作り、S05b の中で切り替える（`aboutView`）。ほかのタブへ移ると S05b に戻る。切り替えでフォーカスを移す（開く→「アプリ情報」、戻る→入口）。文言はモック v5 の辞書（v4 の値）。モックの `max-width: 40rem` は `check:tokens` の寸法の直書きに当たるため付けていない（ダイアログの幅で足りる）
+- [x] T10-5 【エージェント】`scripts/gen_icons.ts` の manifest を英語表記にする（`name` "LT Timekeeper"、`short_name` "LT Timer"、`description` は en の辞書から、`lang` "en"、`id` は変えない）。`bun run gen:icons` を実行し、アイコンに差分がないことを確かめる
   - 推奨: Sonnet・medium以上
   - 依存: T8-1
-- [ ] T10-6 【エージェント】S05b・S05c・manifest・オフラインの e2e を足す
+  - 実施: Sonnet・high
+  - 実施メモ: `gen_icons.ts` が `en.json` の `prefs.about.tagline` から description を作る。`bun run gen:icons` の前後で `static/icons/` を `diff -r` し、差分なし。変わったのは `manifest.webmanifest` の name・short_name・description・lang
+- [x] T10-6 【エージェント】S05b・S05c・manifest・オフラインの e2e を足す
   - 依存: T10-4, T10-5
-- [ ] T10-7 【エージェント】英語・中国語の訳を見直し（意味を変えない範囲）、確認用の一覧（キー・ja・en・zh-Hans・画面ID）を `development/` に作る
+  - 実施: Sonnet・high
+  - 実施メモ: `e2e/about.e2e.ts`（11件）：S05b の表示（バージョン・リンクの `target`・`rel`・OSS 一覧が `oss.json` と一致）、英語での表示と矢印キー、390px・1280px で横にはみ出さない、S05c の開閉とフォーカス・5つの節・Google Fonts の記述、タブ移動で S05b に戻る・Tab が外へ出ない・Esc、英語・簡体字、manifest、`oss.json`・`third_party_licenses.txt`、オフラインの再読み込み、事前キャッシュ。`W5-3`（外部通信 0 件）は書体の追加（T10-13）で書き換えるため、ここでは触れていない
+- [x] T10-7 【エージェント】英語・中国語の訳を見直し（意味を変えない範囲）、確認用の一覧（キー・ja・en・zh-Hans・画面ID）を `development/` に作る
   - 依存: T10-4
-- [ ] T10-8 【ユーザー】T10-7 の一覧で訳を確認し、直したい箇所を伝える
+  - 実施: Sonnet・high
+  - 実施メモ: en の2か所を直した（`timer.elapsed`・`warning.wake_title`）。確認用の一覧は `development/261117171929_translation_list_phase10.md`（全 122 キーを画面IDごと）。確認：`check` 0エラー、`check:i18n` 通過、単体テスト 214件、e2e 98件がすべて通過。`check:tokens` は T10-10 まで上記の1件で失敗
+- [x] T10-8 【ユーザー】T10-7 の一覧で訳を確認し、直したい箇所を伝える
   - 依存: T10-7
-- [ ] T10-9 【エージェント】T10-8 の指摘を辞書に反映する（言い回しの修正は fix として記録する）
+  - 確認: ユーザーの完了報告あり（直したい箇所の指摘なし）
+- [x] T10-9 【エージェント】T10-8 の指摘を辞書に反映する（言い回しの修正は fix として記録する）
   - 推奨: Sonnet・medium以上
   - 依存: T10-8
-- [ ] T10-10 【エージェント】specs の `lt_time_keeper_tokens_v5.css` を `src/lib/theme/tokens.css` へ無変更でコピーし、`brand_v5.md`・`icon_master_v5.svg` を `docs/brand/` へコピーする（`docs/brand/` の v3 の写しは削除する）
+  - 実施: Sonnet・high
+  - 実施メモ: 指摘がなかった（T10-8）ので、辞書は変えていない
+- [x] T10-10 【エージェント】specs の `lt_time_keeper_tokens_v5.css` を `src/lib/theme/tokens.css` へ無変更でコピーし、`brand_v5.md`・`icon_master_v5.svg` を `docs/brand/` へコピーする（`docs/brand/` の v3 の写しは削除する）
   - 推奨: Sonnet・medium以上
   - 依存: T7-1
   - 【v5】v5 の tokens・brand・icon_master は v4 と同じ中身（書体のトークンが変わったのは v4）
   - 変わるのは書体のトークンだけ（`--font-sans-ja`＝"Noto Sans JP"、`-en`＝"Noto Sans"、`-zh-hans`＝"Noto Sans SC"、`--font-digits`＝"JetBrains Mono"。末尾の総称は保険）。マスターSVGは v2 から変更なし
-- [ ] T10-11 【エージェント】`src/app.html` に Google Fonts の読み込みを足す（`fonts.googleapis.com` と `fonts.gstatic.com`（crossorigin）への `preconnect`、Noto Sans JP・Noto Sans・Noto Sans SC・JetBrains Mono を太さ 400〜700・`display=swap` で指定したスタイルシートの `<link>`）
+  - 実施: Sonnet・high
+  - 実施メモ: `tokens.css` を v5 に無変更でコピー（`check:tokens` の一致の検査が通る）。`docs/brand/` に `brand_v5.md`・`icon_master_v5.svg` を置き、v3 の写しは削除
+- [x] T10-11 【エージェント】`src/app.html` に Google Fonts の読み込みを足す（`fonts.googleapis.com` と `fonts.gstatic.com`（crossorigin）への `preconnect`、Noto Sans JP・Noto Sans・Noto Sans SC・JetBrains Mono を太さ 400〜700・`display=swap` で指定したスタイルシートの `<link>`）
   - 依存: T10-10
   - 画面: S00, S01, S03
   - URL の書き方と、可変フォントの太さ指定（`wght@400..700`）は、Google Fonts の公式ドキュメントで確認してから書く。CJK の分割配信（`unicode-range`）はそのまま使う。S00（起動画面）も同じ書体になるため、`splash.css` の `font-family` がトークンを参照していることを確かめる
   - 初回がオフラインのときは書体が総称に置き換わるだけで、起動を遅らせたり止めたりしない書き方にする（スタイルシートの取得失敗で画面の描画を止めない）
-- [ ] T10-12 【エージェント】Service Worker に、Google Fonts の実行時キャッシュを足す（スタイルシート＝`fonts.googleapis.com`、書体ファイル＝`fonts.gstatic.com`）
+  - 実施: Sonnet・high
+  - 実施メモ: Google Fonts の公式ドキュメント（css2 の URL の書き方）と、実際の URL への取得（4書体・太さ 400〜700・`display=swap` が通る）で確かめた。スタイルシートは `media="print"` で読み込み、`onload` で `all` に切り替える形（描画を止めない）。S00 は `splash.css` に書体の指定がなく、`<body>` から継承するトークンの書体になる（e2e で JS を止めて確認）。CJK の `unicode-range` の分割は、curl の応答（非ブラウザの UA で ttf・分割なし）では確かめられない。実ブラウザでの確認は W10-10
+- [x] T10-12 【エージェント】Service Worker に、Google Fonts の実行時キャッシュを足す（スタイルシート＝`fonts.googleapis.com`、書体ファイル＝`fonts.gstatic.com`）
   - 推奨: Opus・high以上
   - 依存: T10-11, T5-1
   - 事前キャッシュのキャッシュ（`cache-` ではじまる版つきの名前）とは別の名前（例：`fonts-v1`）で持つ。`activate` の古いキャッシュの削除（`cache-` ではじまるものだけ）で消されず、アプリが更新されても書体を取り直さないようにする
   - スタイルシートは stale-while-revalidate、書体ファイルは cache-first にする。この2つのホスト以外の外部のリクエストはキャッシュも取得もしない。クロスオリジンの応答（opaque を含む）の扱いは、インストールした版のブラウザの挙動で確かめる
   - オフラインで取得に失敗しても例外を画面に出さない（`respond` のオフライン時の遷移の扱いは変えない）
-- [ ] T10-13 【エージェント】書体の Web フォントに合わせて e2e を直し、足す
+  - 実施: Sonnet・high
+  - 実施メモ: `src/service-worker/index.ts` に `fonts-v1` を足した。スタイルシート（`fonts.googleapis.com`）は stale-while-revalidate、書体ファイル（`fonts.gstatic.com`）は cache-first。スタイルシートは no-cors の読み込みで opaque な応答になるが、`cache.put` できる（Playwright 1.64 の Chromium で確認）。取得に失敗したときは `Response.error()` を返し、例外を出さない。`respond` のオフライン時の遷移の扱いは変えていない
+- [x] T10-13 【エージェント】書体の Web フォントに合わせて e2e を直し、足す
   - 推奨: Opus・high以上
   - 依存: T10-12, T10-4
   - 外部通信が0件であることを前提にした e2e（`e2e/pwa.e2e.ts` の W5-3）を、「自分のオリジンのほかは `fonts.googleapis.com`・`fonts.gstatic.com` だけ」に書き換える（実施メモは W5-3 に残してある）
   - e2e が実際の Google Fonts に依存して不安定にならないよう、2つのホストへのリクエストはテスト側で応答を差し替える（スタイルシートと小さなダミーの書体）。実際の Google Fonts との通信は W10-10 で確かめる
   - 足すテスト：Service Worker が2つのホストの応答を別名のキャッシュに入れること・アプリの更新で消えないこと・オフラインの再読み込みで同じ応答が返ること、初回がオフライン（応答が失敗）でも起動と計測が動くこと
-- [ ] T10-14 【エージェント】ドキュメントを書体の変更に合わせる（`CONTRIBUTING.md` に、書体のトークン・Google Fonts の読み込み・Service Worker の書体キャッシュ・「初回だけオンラインが必要」を追記する。`docs/brand/` はコピー済み）
+  - 実施: Sonnet・high
+  - 実施メモ: `e2e/fixtures.ts` を作り、すべての e2e で2つのホストの応答を差し替えた（`context.route` は、Service Worker 経由の取得にも効いた）。既存の `pwa.e2e.ts` は、版つきのキャッシュ名の数え方を `cache-` のものだけにし、W5-3 を「自分のオリジンと2つのホストだけ」に書き換えた。新しい `e2e/fonts.e2e.ts`（8件）と、`pwa.e2e.ts` の T10-12（更新で `fonts-v1` が残り、書体ファイルを取り直さない）。e2e は 107 件
+- [x] T10-14 【エージェント】ドキュメントを書体の変更に合わせる（`CONTRIBUTING.md` に、書体のトークン・Google Fonts の読み込み・Service Worker の書体キャッシュ・「初回だけオンラインが必要」を追記する。`docs/brand/` はコピー済み）
   - 推奨: Sonnet・medium以上
   - 依存: T10-12
   - README は T11-2 で書く（プライバシーの節に Google Fonts への接続を含める）
-- [ ] T10-15 【エージェント】ESLint を導入する（TypeScript と `.svelte` を対象に、各パッケージの推奨設定を基本にした flat config。`package.json` に `lint` を足す）。既存のコードで出る違反を、動作を変えない範囲で直す
+  - 実施: Sonnet・high
+  - 実施メモ: `CONTRIBUTING.md` に「書体（Web フォント）」の節を足した（トークン・読み込み・Service Worker のキャッシュ・初回だけオンラインが必要・通信先・テスト）
+- [x] T10-15 【エージェント】ESLint を導入する（TypeScript と `.svelte` を対象に、各パッケージの推奨設定を基本にした flat config。`package.json` に `lint` を足す）。既存のコードで出る違反を、動作を変えない範囲で直す
   - 依存: T1-2
   - 版と設定の書き方は、インストールした版の公式ドキュメントで確かめる。`sv add eslint` が使えるなら、それを優先する。規則を外す・弱める場合は、理由を imple §1 に書く。インストールした版を imple §1 に書き足す
   - 違反を直した箇所は `{タイムスタンプ}_fix_phase10.md` に記録する
-- [ ] T10-16 【エージェント】`scripts/check.ts` を作り、`bun run check` を、型検査（`check:types` に改名）→ lint → `check:tokens` → `check:i18n` → 単体テスト → build → e2e の順に実行する1つのコマンドにする（imple §5.1）。最初に失敗した段で止め、失敗の部分だけを表示する。`release.yml` を `bun run check` を呼ぶ形に、`CONTRIBUTING.md` の確認・テスト・リリース手順・リポジトリ構成を checkコマンドに合わせて直す
+  - 実施: Sonnet・high
+  - 実施メモ: `sv add eslint`（Svelte CLI 1.4.0）で導入。版は imple §1 に書いた。違反は5件（`development/261117184612_fix_phase10.md`）。弱めた規則は `no-undef` の無効化（`sv add` の既定）だけ。ほかに行単位の例外が3か所（理由は imple §1）。`@types/node` も `sv add` が足した
+- [x] T10-16 【エージェント】`scripts/check.ts` を作り、`bun run check` を、型検査（`check:types` に改名）→ lint → `check:tokens` → `check:i18n` → 単体テスト → build → e2e の順に実行する1つのコマンドにする（imple §5.1）。最初に失敗した段で止め、失敗の部分だけを表示する。`release.yml` を `bun run check` を呼ぶ形に、`CONTRIBUTING.md` の確認・テスト・リリース手順・リポジトリ構成を checkコマンドに合わせて直す
   - 依存: T10-15
   - e2e がビルドを二重に作らないようにする。`test:e2e` を単独で実行したときは、今までどおり build してから開く。切り替えの方法を imple §5.1 に書き足す
+  - 実施: Sonnet・high
+  - 実施メモ: `scripts/check.ts` を作り、`check`＝全7段、`check:types`（旧 `check`）。e2e の二重 build は環境変数 `LT_E2E_SKIP_BUILD` で避ける（`playwright.config.ts`）。`release.yml` は `bun run check` の1回に（zip は check の中の build が作った `build/` から）。`CONTRIBUTING.md` の確認・テスト・リリース手順・リポジトリ構成を直した。失敗の検出を、型の誤り・lint 違反・色の直書き・単体テストの失敗・build の失敗（prerender で例外）・e2e の失敗（`timer.pause` の文言を変更）を1つずつ入れて確かめ、戻すと全段通過。辞書のキーの欠けは型検査の段で止まる（`check:i18n` の単独の検出は T9 までに確認済み）。表示は、失敗の部分と、300 文字を超える行の短縮だけ。imple §5.1 に切り替えの方法と取り出しの方針を書いた
 
 ## Phase 11: リリース準備（v0.2.0）
 Phaseの推奨: Sonnet・high以上
