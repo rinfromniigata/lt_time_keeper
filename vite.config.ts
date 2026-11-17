@@ -2,13 +2,17 @@ import { readFileSync } from 'node:fs';
 import { defineConfig } from 'vitest/config';
 import adapter from '@sveltejs/adapter-static';
 import { sveltekit } from '@sveltejs/kit/vite';
+import { ossCollect } from './scripts/oss_collect.ts';
 
 const pkg = JSON.parse(readFileSync('./package.json', 'utf-8')) as { version: string };
 // Service Worker のキャッシュ名に使う。SemVer を含めつつ、同じ版の再デプロイでも更新を検知できるようビルド時刻を足す
 const appVersion = `${pkg.version}+${Date.now().toString(36)}`;
 
 export default defineConfig({
+	// 画面のバージョン表示（環境設定のアプリ情報・プライバシーポリシー）に使う。Service Worker 用の +ビルド時刻 は付けない
+	define: { __APP_VERSION__: JSON.stringify(pkg.version) },
 	plugins: [
+		ossCollect(),
 		sveltekit({
 			compilerOptions: {
 				// Force runes mode for the project, except for libraries. Can be removed in svelte 6.

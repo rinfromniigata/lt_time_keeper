@@ -1,6 +1,7 @@
 import { readFileSync, writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
-import { expect, test, type Page } from '@playwright/test';
+import { type Page } from '@playwright/test';
+import { expect, FONT_FILE_HOST, FONT_STYLESHEET_HOST, test } from './fixtures.ts';
 
 const ORIGIN = 'http://localhost:4173';
 
@@ -11,7 +12,9 @@ async function open(page: Page) {
 	await page.evaluate(() => navigator.serviceWorker.ready.then(() => undefined));
 }
 
-const cacheNames = (page: Page) => page.evaluate(() => caches.keys());
+const allCacheNames = (page: Page) => page.evaluate(() => caches.keys());
+// 版つきの事前キャッシュ（cache-…）だけ。書体の実行時キャッシュ（fonts-v1）は別に数える
+const cacheNames = async (page: Page) => (await allCacheNames(page)).filter((name) => name.startsWith('cache-'));
 
 test('Service Worker が登録され、版を含む名前のキャッシュに全資源が入る', async ({ page }) => {
 	await open(page);
@@ -52,7 +55,7 @@ test('再登録すると、古い版のキャッシュは消え、関係ない�
 	await page.reload();
 	await page.evaluate(() => navigator.serviceWorker.ready.then(() => undefined));
 
-	const names = await cacheNames(page);
+	const names = await allCacheNames(page);
 	expect(names).toContain(current);
 	expect(names).toContain('unrelated');
 	expect(names).not.toContain('cache-0.0.0+old');
@@ -165,6 +168,32 @@ test('W5-2: 版の違うビルドでは、再読み込みのあとに古いキ�
 	await expect(banner(page)).toHaveCount(0);
 });
 
+test('T10-12: アプリの更新で古い版のキャッシュが消えても、書体のキャッシュ（fonts-v1）は残り、取り直さない', async ({ page, fonts }) => {
+	await open(page);
+	// 書体は Service Worker 経由で読み込ませて、fonts-v1 に入れておく
+	await page.reload();
+	await expect(page.locator('#splash')).toHaveCount(0);
+	const fontsCache = () =>
+		page.evaluate(async () => ((await caches.has('fonts-v1')) ? (await (await caches.open('fonts-v1')).keys()).map((r) => r.url) : []));
+	await expect.poll(async () => (await fontsCache()).length).toBeGreaterThan(1);
+	const before = await fontsCache();
+	const [oldName] = await cacheNames(page);
+
+	serveNewWorker({ newVersion: true });
+	await page.evaluate(async () => (await navigator.serviceWorker.ready).update());
+	await expect(banner(page)).toBeVisible();
+	const fileHits = fonts.hits.file;
+	await Promise.all([page.waitForEvent('load'), page.getByRole('button', { name: '再読み込み' }).click()]);
+	await expect(page.locator('#splash')).toHaveCount(0);
+	await expect.poll(() => cacheNames(page)).toHaveLength(1);
+	expect(await cacheNames(page)).not.toContain(oldName);
+
+	expect(await allCacheNames(page)).toContain('fonts-v1');
+	expect((await fontsCache()).sort()).toEqual(before.sort());
+	// 書体ファイルは、更新のあとも取り直さない
+	expect(fonts.hits.file).toBe(fileHits);
+});
+
 test('W5-2: ×で閉じた場合は、そのページを閉じて次に開いたときに新しい版になる', async ({ page, context }) => {
 	await open(page);
 	const [oldName] = await cacheNames(page);
@@ -185,7 +214,8 @@ test('W5-2: ×で閉じた場合は、そのページを閉じて次に開いた
 	await expect(banner(next)).toHaveCount(0);
 });
 
-test('W5-3: ページの読み込みから計測終了まで、自分のオリジン以外への通信がない', async ({ page, context }) => {
+// 書体（v0.2.0・T10-13）：通信先は、自分のオリジンと、Google Fonts の2つのホストだけ
+test('W5-3: ページの読み込みから計測終了まで、通信先は自分のオリジンと書体の2つのホストだけ', async ({ page, context }) => {
 	const urls: string[] = [];
 	context.on('request', (request) => urls.push(request.url()));
 
@@ -202,7 +232,10 @@ test('W5-3: ページの読み込みから計測終了まで、自分のオリ�
 	const resources = await page.evaluate(() => performance.getEntriesByType('resource').map((entry) => entry.name));
 	const external = [...urls, ...resources].filter((url) => /^https?:/.test(url) && new URL(url).origin !== ORIGIN);
 	expect(urls.length).toBeGreaterThan(5);
-	expect(external).toEqual([]);
+	// 書体は実際に読み込まれる（スタイルシートと書体ファイル）
+	expect(external.length).toBeGreaterThan(0);
+	const hosts = new Set(external.map((url) => new URL(url).hostname));
+	expect([...hosts].sort()).toEqual([FONT_FILE_HOST, FONT_STYLESHEET_HOST].sort());
 });
 
 test('W5-5: インストール可能と判定される（DevTools の Application と同じ検査）', async ({ page, context }) => {

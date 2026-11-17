@@ -4,12 +4,21 @@ import en from './locales/en.json';
 import { pseudoDictionary, pseudolocalize } from './pseudo.ts';
 import { format, msg, type Dictionary } from './messages.ts';
 
+// ゼロ幅スペース（埋め草の間の改行の機会）
+const ZWSP = String.fromCharCode(0x200b);
+
 describe('pseudolocalize', () => {
 	it('前後を ［］ で囲み、長さを約1.4倍にする', () => {
 		const out = pseudolocalize('ベルを追加');
 		expect(out.startsWith('［ベルを追加')).toBe(true);
 		expect(out.endsWith('］')).toBe(true);
-		expect(out.length).toBe(1 + 5 + 2 + 1); // 5文字 × 0.4 = 2 の埋め草
+		expect(out.match(/〜/g)).toHaveLength(2); // 5文字 × 0.4 = 2 の埋め草
+	});
+
+	it('埋め草の間に改行の機会（ゼロ幅スペース）を挟み、長い文でも折り返せる', () => {
+		const out = pseudolocalize('あ'.repeat(20));
+		expect(out).toBe(`［${'あ'.repeat(20)}${Array(8).fill('〜').join(ZWSP)}］`);
+		expect(out).not.toMatch(/〜〜/);
 	});
 
 	it('プレースホルダは残し、長さの計算に入れない', () => {
@@ -33,7 +42,7 @@ describe('pseudoDictionary', () => {
 	it('format で引け、プレースホルダが置き換わる', () => {
 		const dicts: Record<string, Dictionary> = { ja, pseudo };
 		const out = format(dicts, 'pseudo', msg('settings.duration.preset', { n: 5 }));
-		expect(out).toMatch(/^［5分〜*］$/);
+		expect(out).toMatch(new RegExp(`^［5分[〜${ZWSP}]*］$`));
 	});
 
 	it('複数形の辞書は、各形を変える（en の複数形で確かめる）', () => {

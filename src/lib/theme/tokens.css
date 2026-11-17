@@ -1,4 +1,7 @@
-/* lt_time_keeper デザイントークン（値の正本・v3）
+/* lt_time_keeper デザイントークン（値の正本・v4）
+   v4 での変更
+   - 書体を全言語で Noto Sans 系（Noto Sans JP / Noto Sans / Noto Sans SC）、数字を JetBrains Mono にした。
+     OS の書体は使わず、Google Fonts の Web フォントに統一した
    v0.2.0 での変更
    - ライト・ダークとも WCAG 2.2 AA を満たすように色を見直した
      （文字 4.5:1、大きな文字・図形・部品の境界 3:1）
@@ -49,12 +52,14 @@
   /* ---- タイポグラフィ ---- */
   /* 書体はロケールごとに持ち、<html lang> に合わせて --font-sans を切り替える。
      日本語と中国語は同じ漢字でも字形が違うため、和文フォントを中国語に流用しない。
-     外部フォントは読み込まない（OSの書体だけを使う） */
-  --font-sans-ja: "Hiragino Sans", "Noto Sans JP", "Yu Gothic UI", "Meiryo", system-ui, sans-serif;
-  --font-sans-en: system-ui, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
-  --font-sans-zh-hans: "PingFang SC", "Microsoft YaHei UI", "Microsoft YaHei", "Noto Sans SC", "Source Han Sans SC", system-ui, sans-serif;
+     全言語で Noto Sans 系、数字は JetBrains Mono。OS の書体は使わず、Google Fonts の Web フォントで読み込む
+     （読み込みは app.html の <link>。太さ 400〜700、font-display: swap）。
+     最後の総称（sans-serif・monospace）は、読み込み前・失敗時の保険 */
+  --font-sans-ja: "Noto Sans JP", sans-serif;
+  --font-sans-en: "Noto Sans", sans-serif;
+  --font-sans-zh-hans: "Noto Sans SC", sans-serif;
   --font-sans: var(--font-sans-ja);
-  --font-digits: "SF Mono", "Roboto Mono", "Cascadia Mono", ui-monospace, monospace;
+  --font-digits: "JetBrains Mono", monospace;
   --font-digits-variant: tabular-nums;
 
   --font-size-xs: 0.75rem;

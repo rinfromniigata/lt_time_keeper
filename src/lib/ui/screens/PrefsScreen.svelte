@@ -1,14 +1,16 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
+	import { onMount, tick } from 'svelte';
 	import { i18n, LOCALE_NAMES } from '#lib/i18n/i18n.svelte.ts';
 	import { LOCALES, type Locale } from '#lib/i18n/messages.ts';
 	import type { Ringer } from '../../output/ringer.ts';
 	import { VibrationRinger } from '../../output/vibration_ringer.ts';
 	import type { PrefsStore } from '../../prefs/store.svelte.ts';
+	import AboutPanel from './AboutPanel.svelte';
 	import Button from '../parts/Button.svelte';
 	import Icon from '../parts/Icon.svelte';
 	import Segmented from '../parts/Segmented.svelte';
 	import Switch from '../parts/Switch.svelte';
+	import PrivacyPanel from './PrivacyPanel.svelte';
 	import Tabs, { panelId, tabId } from '../parts/Tabs.svelte';
 	import VolumeSlider from '../parts/VolumeSlider.svelte';
 
@@ -18,8 +20,23 @@
 	// previewRinger: 「鳴らしてみる」で使う（計測のセッションとは別）
 	let { prefs, previewRinger, onclose }: { prefs: PrefsStore; previewRinger: Ringer; onclose: () => void } = $props();
 
-	type TabValue = 'general' | 'sound';
+	type TabValue = 'general' | 'sound' | 'about';
 	let tab = $state<TabValue>('general');
+
+	// 「アプリ情報」の中の表示。プライバシーポリシー（S05c）はタブを変えずに切り替える下位の表示で、タブを離れたら S05b に戻る
+	let aboutView = $state<'about' | 'privacy'>('about');
+	$effect(() => {
+		if (tab !== 'about') aboutView = 'about';
+	});
+	let body: HTMLDivElement;
+
+	async function showAboutView(view: 'about' | 'privacy') {
+		aboutView = view;
+		await tick();
+		body.scrollTop = 0;
+		// ポリシーを開いたら「アプリ情報」へ、戻ったら入口へ、フォーカスを移す
+		body.querySelector<HTMLElement>(view === 'privacy' ? '[data-initial-focus]' : '[data-privacy-entry]')?.focus();
+	}
 
 	const idBase = $props.id();
 	const titleId = `${idBase}-title`;
@@ -55,7 +72,7 @@
 	function tabbables(): HTMLElement[] {
 		return [
 			...dialog.querySelectorAll<HTMLElement>(
-				'button:not(:disabled):not([tabindex="-1"]), input:not(:disabled), [role="radio"][tabindex="0"]'
+				'button:not(:disabled):not([tabindex="-1"]), a[href], input:not(:disabled),[role="radio"][tabindex="0"]'
 			)
 		];
 	}
@@ -94,13 +111,14 @@
 		<Tabs
 			tabs={[
 				{ value: 'general', label: i18n.t('prefs.tab.general') },
-				{ value: 'sound', label: i18n.t('prefs.tab.sound') }
+				{ value: 'sound', label: i18n.t('prefs.tab.sound') },
+				{ value: 'about', label: i18n.t('prefs.tab.about') }
 			]}
 			bind:selected={tab}
 			label={i18n.t('prefs.title')}
 			{idBase}
 		/>
-		<div class="body" role="tabpanel" id={panelId(idBase, tab)} aria-labelledby={tabId(idBase, tab)}>
+		<div bind:this={body} class="body" role="tabpanel" id={panelId(idBase, tab)} aria-labelledby={tabId(idBase, tab)}>
 			{#if tab === 'general'}
 				<section class="section">
 					<h4>{i18n.t('prefs.language.title')}</h4>
@@ -136,7 +154,7 @@
 						/>
 					</div>
 				</section>
-			{:else}
+			{:else if tab === 'sound'}
 				<section class="section">
 					<h4>{i18n.t('prefs.sound.volume')}</h4>
 					<div class="volume">
@@ -161,6 +179,10 @@
 						</div>
 					</section>
 				{/if}
+			{:else if aboutView === 'privacy'}
+				<PrivacyPanel onback={() => showAboutView('about')} />
+			{:else}
+				<AboutPanel onprivacy={() => showAboutView('privacy')} />
 			{/if}
 		</div>
 	</div>

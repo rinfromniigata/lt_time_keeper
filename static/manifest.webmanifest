@@ -1,9 +1,9 @@
 {
 	"id": "com.rinontech.lt-time-keeper",
-	"name": "LTタイムキーパー",
-	"short_name": "LTタイマー",
-	"description": "LTやプレゼンテーションの持ち時間を計り、ベルで知らせるタイムキーパー",
-	"lang": "ja",
+	"name": "LT Timekeeper",
+	"short_name": "LT Timer",
+	"description": "A timekeeper for lightning talks and presentations",
+	"lang": "en",
 	"start_url": "/",
 	"scope": "/",
 	"display": "standalone",

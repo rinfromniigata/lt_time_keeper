@@ -35,7 +35,7 @@
 			</span>
 		</span>
 		<span class="strikes" role="img" aria-label={i18n.t('settings.bells.strikes', { n: strikes })}>
-			{#each { length: strikes } as _, i (i)}<i></i>{/each}
+			{#each { length: strikes }, i (i)}<i></i>{/each}
 		</span>
 	</button>
 	<Button variant="ghost" iconOnly aria-label={i18n.t('settings.bells.delete')} onclick={ondelete}>

@@ -114,7 +114,9 @@ export class Session {
 	#readHideDelay: () => number;
 	#hideDelayMs = Number.POSITIVE_INFINITY;
 	#hideHandle: unknown = null;
-	#dismissed = new Set<Warning>(); // 閉じた警告は、同じ計測のあいだ出し直さない
+	// 閉じた警告は、同じ計測のあいだ出し直さない。画面の描画には使わない内部の記録なので、リアクティブにしない
+	// eslint-disable-next-line svelte/prefer-svelte-reactivity
+	#dismissed = new Set<Warning>();
 	#visibility: VisibilityDriver;
 	#unsubscribe: (() => void) | null = null;
 	#timer: Timer;

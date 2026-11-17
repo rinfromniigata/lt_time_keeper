@@ -1,4 +1,5 @@
-import { expect, test, type Page } from '@playwright/test';
+import { type Page } from '@playwright/test';
+import { expect, test } from './fixtures.ts';
 
 async function open(page: Page) {
 	await page.goto('http://localhost:4173/');

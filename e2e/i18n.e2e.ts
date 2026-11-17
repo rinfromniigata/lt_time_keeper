@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test';
+import { expect, test } from './fixtures.ts';
 import { readFileSync } from 'node:fs';
 
 // Playwright の読み込みは JSON の import を受け付けないため、ファイルから読む

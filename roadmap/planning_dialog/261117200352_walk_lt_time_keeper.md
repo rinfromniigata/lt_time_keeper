@@ -263,57 +263,86 @@
   - 実施メモ: ユーザーが実機（Android の Chrome）で確認を完了し、問題なしと報告（完了報告を受けて記録）
 
 ## Phase 10: アプリ情報・プライバシーポリシー・PWA の名前・書体の Web フォント・checkコマンド
-- [ ] W10-1 【エージェント】ビルドした `oss.json` の一覧が、`build/_app/` の JS に入ったパッケージと一致し、開発時だけの依存（vitest・playwright・resvg・eslint など）を含まない。`third_party_licenses.txt` に、一覧の各パッケージのライセンス全文が入っている
+- [x] W10-1 【エージェント】ビルドした `oss.json` の一覧が、`build/_app/` の JS に入ったパッケージと一致し、開発時だけの依存（vitest・playwright・resvg・eslint など）を含まない。`third_party_licenses.txt` に、一覧の各パッケージのライセンス全文が入っている
   - 依存: T10-2
-- [ ] W10-2 【エージェント】S05b のバージョンと S05c の `{version}` が、`package.json` の version と一致する。ソースコードのリンクが新しいタブで `https://github.com/rinfromniigata/lt_time_keeper` を開く。S05c の「アプリ情報」で S05b に戻る
+  - 実施: Opus・low
+  - 実施メモ: プラグインとは別の方法として、`build.sourcemap` を有効にした一時のビルドで `build/_app/` の JS のソースマップの `sources` から node_modules のパッケージを集め、`oss.json`（@sveltejs/kit・clsx・devalue・svelte の4件）と一致。開発時だけの依存は0件。`third_party_licenses.txt` に4件の見出し（名前と版）と、node_modules のライセンスファイルの全文が入っている。確認後に通常のビルドへ戻した
+- [x] W10-2 【エージェント】S05b のバージョンと S05c の `{version}` が、`package.json` の version と一致する。ソースコードのリンクが新しいタブで `https://github.com/rinfromniigata/lt_time_keeper` を開く。S05c の「アプリ情報」で S05b に戻る
   - 推奨: Sonnet・medium以上
   - 依存: T10-6
   - 画面: S05b, S05c
-- [ ] W10-3 【エージェント】一度開いたあと通信を切って再読み込みしても、S05b の OSS 一覧と S05c が表示され、`third_party_licenses.txt` もキャッシュから返る
+  - 実施: Opus・low
+  - 実施メモ: 使い捨ての e2e（削除済み）で、ja・en・zh-Hans の S05b・S05c に 0.1.0 が出ること、「アプリ情報」で S05b に戻ること、リンクが新しいタブ（popup）で上記 URL を開き元の画面とダイアログが残ることを確認（github.com への通信はテスト側で応答を差し替え）
+- [x] W10-3 【エージェント】一度開いたあと通信を切って再読み込みしても、S05b の OSS 一覧と S05c が表示され、`third_party_licenses.txt` もキャッシュから返る
   - 推奨: Sonnet・medium以上
   - 依存: T10-6
   - 画面: S05b, S05c
-- [ ] W10-4 【エージェント】manifest の `name` が "LT Timekeeper"、`short_name` が "LT Timer"、`lang` が "en"、`id` が v0.1.0 と同じ。`bun run gen:icons` を実行しても `static/icons/` に差分が出ない。Lighthouse（または DevTools の Application）でインストール可能と判定される
+  - 実施: Opus・low
+  - 実施メモ: オフラインで再読み込み後、S05b の OSS 一覧（`oss.json` と同じ4件）と S05c が出た。`third_party_licenses.txt` は fetch とページの移動の両方で、`build/` の中身と同一の本文が Service Worker から返った（`fromServiceWorker()` が true）
+- [x] W10-4 【エージェント】manifest の `name` が "LT Timekeeper"、`short_name` が "LT Timer"、`lang` が "en"、`id` が v0.1.0 と同じ。`bun run gen:icons` を実行しても `static/icons/` に差分が出ない。Lighthouse（または DevTools の Application）でインストール可能と判定される
   - 推奨: Sonnet・medium以上
   - 依存: T10-5
-- [ ] W10-5 【エージェント】疑似ロケールと3言語で、390px と 1280px の S05b・S05c に横スクロールやはみ出しがない
+  - 実施: Opus・low
+  - 実施メモ: `id` はタグ v0.1.0 と同じ `com.rinontech.lt-time-keeper`。`gen:icons` の前後で `static/icons/` と manifest に差分なし（`static/icons/` は v0.1.0 からも差分なし）。Chromium の CDP の `Page.getInstallabilityErrors` が空（インストール可能）、`Page.getAppManifest` のエラーも0件で、name・short_name・lang が上記どおり
+- [x] W10-5 【エージェント】疑似ロケールと3言語で、390px と 1280px の S05b・S05c に横スクロールやはみ出しがない
   - 推奨: Sonnet・medium以上
   - 依存: T10-6
   - 画面: S05b, S05c
+  - 実施: Opus・low
+  - 実施メモ: `VITE_PSEUDO_LOCALE=1` のビルドで、使い捨ての e2e（削除済み）により W9-8 と同じ観点（文書の横スクロール・画面やダイアログの外へ出た要素・文字が切れている要素）を検査。1回目、疑似ロケールの S05c だけ本文があふれた（埋め草の `〜` が改行できない列になる、検査の道具の側の問題）。`pseudo.ts` を直し（`development/261117184612_fix_phase10.md` の W10-5 の節）、再検査で全8通り0件。わざとはみ出させた要素を検出できることも確認
 - 空き番号 W10-6（欠番）→ W10-16 に統合した（checkコマンドを1つにまとめたため）
-- [ ] W10-7 【ユーザー】3言語・ライト・ダークで、モックと実物を並べて、アプリ情報とプライバシーポリシーを確認する
+- [x] W10-7 【ユーザー】3言語・ライト・ダークで、モックと実物を並べて、アプリ情報とプライバシーポリシーを確認する
   - 依存: T10-9
   - 画面: S05b, S05c
-- [ ] W10-8 【ユーザー】Windows と macOS の Chrome で PWA としてインストールし直し、アプリの名前が「LT Timekeeper」で、アイコンの見え方が v0.1.0 から変わっていないことを確認する
+  - 確認: ユーザーの完了報告あり（バージョンの表示が 0.1.0 なのは、T11-5 で package.json を 0.2.0 にするまでの仕様）
+- [x] W10-8 【ユーザー】Windows と macOS の Chrome で PWA としてインストールし直し、アプリの名前が「LT Timekeeper」で、アイコンの見え方が v0.1.0 から変わっていないことを確認する
   - 依存: T10-5
-- [ ] W10-9 【エージェント】`src/lib/theme/tokens.css` が specs の `tokens_v5.css` と一致し（`check:tokens` が通る）、`docs/brand/` の2ファイルが v5 の写しで、v3 の写しが残っていない。書体のトークンに OS の書体名（`system-ui`・Hiragino・Yu Gothic UI・Segoe UI・PingFang SC・SF Mono など）が含まれない
+  - 確認: ユーザーの完了報告あり
+- [x] W10-9 【エージェント】`src/lib/theme/tokens.css` が specs の `tokens_v5.css` と一致し（`check:tokens` が通る）、`docs/brand/` の2ファイルが v5 の写しで、v3 の写しが残っていない。書体のトークンに OS の書体名（`system-ui`・Hiragino・Yu Gothic UI・Segoe UI・PingFang SC・SF Mono など）が含まれない
   - 推奨: Sonnet・low以上
   - 依存: T10-10
-- [ ] W10-10 【エージェント】実際の Google Fonts に接続して、`ja`・`en`・`zh-Hans` の各言語で開くと、本文の書体が Noto Sans JP・Noto Sans・Noto Sans SC、タイマーの数字・時間の入力欄が JetBrains Mono で描かれる（`document.fonts` で読み込まれた書体と、`getComputedStyle` の `font-family` で確かめる）。S00 も同じ書体になる。ja と zh-Hans で、同じ漢字（例：直、骨）の字形が書体の違いとして描かれる
+  - 実施: Opus・low
+  - 実施メモ: `diff` で tokens が一致、`check:tokens` 通過。`docs/brand/` は `brand_v5.md`・`icon_master_v5.svg` の2つだけで、specs と同一（`cmp`）。roadmap の外に v3 の写しへの参照なし。書体のトークンは Noto Sans JP・Noto Sans・Noto Sans SC・JetBrains Mono と総称だけ
+- [x] W10-10 【エージェント】実際の Google Fonts に接続して、`ja`・`en`・`zh-Hans` の各言語で開くと、本文の書体が Noto Sans JP・Noto Sans・Noto Sans SC、タイマーの数字・時間の入力欄が JetBrains Mono で描かれる（`document.fonts` で読み込まれた書体と、`getComputedStyle` の `font-family` で確かめる）。S00 も同じ書体になる。ja と zh-Hans で、同じ漢字（例：直、骨）の字形が書体の違いとして描かれる
   - 依存: T10-11
   - 画面: S00, S01, S03
-- [ ] W10-11 【エージェント】一度オンラインで開いたあと通信を切って再読み込みしても、書体が同じ（Service Worker の書体キャッシュから返る）で起動し、計測できる。アプリを更新（版の違うビルドに差し替え）しても書体のキャッシュは消えない。初回がオフライン（書体の取得が失敗）でも、総称の書体で崩れずに起動して計測できる
+  - 実施: Opus・low
+  - 実施メモ: 使い捨ての e2e（削除済み）を、Playwright の Chromium 本体（`channel: 'chromium'`。この端末に Chrome はない）で実行し、実際の Google Fonts に接続。3言語とも、`document.fonts`・`font-family` に加え、CDP の `CSS.getPlatformFontsForNode` で実際に描画に使われた書体を確かめた：本文（S01・S00）は各言語の Noto、入力欄と S03 の数字は JetBrains Mono（いずれも Web フォント）。書体ファイルはすべて `font/woff2` で、CJK は `unicode-range` で分割（`@font-face` が JP 124・SC 101）。「直骨」は ja と zh-Hans で画像が異なり、字形の違いを目でも確認。可変フォントは CDP では既定のインスタンス名（例：Noto Sans JP Thin）で返るため、太さの語を除いて照合した
+- [x] W10-11 【エージェント】一度オンラインで開いたあと通信を切って再読み込みしても、書体が同じ（Service Worker の書体キャッシュから返る）で起動し、計測できる。アプリを更新（版の違うビルドに差し替え）しても書体のキャッシュは消えない。初回がオフライン（書体の取得が失敗）でも、総称の書体で崩れずに起動して計測できる
   - 依存: T10-12
-- [ ] W10-12 【エージェント】ページの読み込みから計測終了まで、自分のオリジン以外への通信が `fonts.googleapis.com`・`fonts.gstatic.com` だけで、ほかは0件である。リクエストのクエリに、入力した内容（表示名・持ち時間）や保存した値が含まれない
+  - 実施: Opus・low
+  - 実施メモ: W10-10 と同じ方法。オフラインの再読み込みで、本文 Noto Sans JP・数字と入力欄 JetBrains Mono（Web フォント）のまま起動し、計測が進む。ビルドし直して preview を差し替え、更新のお知らせの「再読み込み」で切り替えると、`cache-` は新しい1つになり、`fonts-v1`（20件）は残った。更新後の再読み込みで書体ファイルを取り直さず、オフラインでも同じ書体で起動。初回オフライン（2ホストへの接続を失敗させた）でも起動・計測でき、エラー0件。なお、この端末には Noto Sans JP・JetBrains Mono がインストールされていて、初回オフラインではそれが使われた（Web フォントではない）。インストールしていない端末では総称の書体になる
+- [x] W10-12 【エージェント】ページの読み込みから計測終了まで、自分のオリジン以外への通信が `fonts.googleapis.com`・`fonts.gstatic.com` だけで、ほかは0件である。リクエストのクエリに、入力した内容（表示名・持ち時間）や保存した値が含まれない
   - 依存: T10-12
-- [ ] W10-13 【エージェント】疑似ロケールと3言語で、390px と 1280px の S01・S01c・S03・S03a・S03f・S05・S05a・S05b・S05c に横スクロールやはみ出しがない（書体が変わって文字の幅が変わったため、W8-5・W8-6・W9-8 と同じ検査をやり直す）
+  - 実施: Opus・low
+  - 実施メモ: 表示名・持ち時間（7:13）を入れ、言語を English に変えて保存させ、開始から終了まで（Service Worker 経由の通信も含め）記録。外部は上記2ホストの64件だけ。`fonts.googleapis.com` のクエリは `app.html` の固定の値と一致し、`fonts.gstatic.com` はクエリなし。入力した値・保存した値は、どの URL にも含まれない
+- [x] W10-13 【エージェント】疑似ロケールと3言語で、390px と 1280px の S01・S01c・S03・S03a・S03f・S05・S05a・S05b・S05c に横スクロールやはみ出しがない（書体が変わって文字の幅が変わったため、W8-5・W8-6・W9-8 と同じ検査をやり直す）
   - 推奨: Sonnet・medium以上
   - 依存: T10-11, T10-4
   - 画面: S01, S01c, S03, S03a, S03f, S05, S05a, S05b, S05c
+  - 実施: Opus・low
+  - 実施メモ: `VITE_PSEUDO_LOCALE=1` のビルドを、実際の Google Fonts の書体で、使い捨ての e2e（削除済み）により W9-8 と同じ観点で検査。S01c はベル8件・長い表示名、S03a は予鈴後（残り 0:30）で操作ボタンを出した状態、S05a は振動のスイッチを出した状態。全8通り×9画面で、横スクロール・画面の外へ出た要素・文字が切れている要素が0件。表示名は1行で省略され、次のベルは隠れない（390px の疑似ロケールでは表示名の幅が 94px と狭いが、仕様どおりの省略）。表示名の入力欄の中で文字が横に送られるのはブラウザ標準の動きのため、入力欄は「文字が切れている」の判定から外した（画面の外へ出ていないかは判定した）。わざとはみ出させた要素を検出できることも確認。終了後に `bun run check`（全7段）通過
 - 空き番号 W10-14（欠番）→ W10-16 に統合した（checkコマンドを1つにまとめたため）
-- [ ] W10-15 【ユーザー】3言語・ライト・ダークで、モック v5（v4 と同じ中身）と実物を並べて、書体（日本語・中国語の字形、英語、タイマーと入力欄の JetBrains Mono の数字）を確認する。一度開いたあとオフラインで開き直しても、同じ書体で出ることも確かめる
+- [x] W10-15 【ユーザー】3言語・ライト・ダークで、モック v5（v4 と同じ中身）と実物を並べて、書体（日本語・中国語の字形、英語、タイマーと入力欄の JetBrains Mono の数字）を確認する。一度開いたあとオフラインで開き直しても、同じ書体で出ることも確かめる
   - 依存: T10-12, T10-4
   - 画面: S00, S01, S03, S05, S05b, S05c
-- [ ] W10-16 【エージェント】checkコマンド（`bun run check`）が通る
+  - 確認: ユーザーの完了報告あり
+- [x] W10-16 【エージェント】checkコマンド（`bun run check`）が通る
   - 推奨: Sonnet・low以上
   - 依存: T10-9, T10-13, T10-14, T10-16
-- [ ] W10-17 【エージェント】Phase 10 で作った画面が、モックと構造で一致する（要素の有無と配置の順序、遷移先、描かれた状態、文言の辞書キー）
+  - 実施: Opus・low
+  - 実施メモ: 全7段（型検査・lint・check:tokens・check:i18n・単体テスト・build・e2e）が通過、終了コード 0
+- [x] W10-17 【エージェント】Phase 10 で作った画面が、モックと構造で一致する（要素の有無と配置の順序、遷移先、描かれた状態、文言の辞書キー）
   - 依存: W10-16
   - 画面: S05b, S05c
   - モックは1枚の旧形式（`lt_time_keeper_mock_v5.html`）。画面IDで位置を検索し、S05b・S05c の範囲だけを読む
-- [ ] W10-18 【エージェント】checkコマンドが各段の失敗を検出し、失敗した段の失敗の部分だけを表示して止まる。型の誤り・lint の違反・色の直書き・辞書のキーの欠け・単体テストの失敗を1つずつわざと入れて確かめ、戻すと通る。`release.yml` が自動検査を `bun run check` の1回だけで行っている
+  - 実施: Opus・low
+  - 実施メモ: モックの S05b・S05c のモバイルのフレームから `data-i18n` のキーの並びと要素の並びを取り出し、使い捨ての e2e（削除済み）で実物の 390px の DOM（文言を ja の辞書から逆引き）と比べた。文言の並びは両画面とも一致（同じ文言を持つ `privacy.title`・`prefs.about.privacy_link` は文言で照合）。要素は、見出し・`dl` の4行・入口のシェブロン、S05c の戻る（back アイコン）・5つの節・`h6` と一覧が同じ順。差分は、OSS 一覧が `ul`/`li`（モックは `<br>` 区切りの例示2件。ビルド時の一覧）、ブランドのスプライトの ID（`#ic-brand`、モックは `#ic-a`。同じ図形）、入口と戻るが `<button>`（モックは `<a>`。T10-3・T10-4 の実施メモのとおり）で、いずれも実装方式の範囲。遷移は S05b → S05c → 「アプリ情報」で S05b、閉じるボタンあり、モバイルは全画面。ソースコードのリンクは新しいタブ
+- [x] W10-18 【エージェント】checkコマンドが各段の失敗を検出し、失敗した段の失敗の部分だけを表示して止まる。型の誤り・lint の違反・色の直書き・辞書のキーの欠け・単体テストの失敗を1つずつわざと入れて確かめ、戻すと通る。`release.yml` が自動検査を `bun run check` の1回だけで行っている
   - 推奨: Sonnet・medium以上
   - 依存: W10-16
+  - 実施: Opus・low
+  - 実施メモ: 対象のファイルを控えてから1つずつ入れ、毎回 `cmp` で元に戻したことを確かめた。型の誤り（`number` に文字列）→ 1段目、lint の違反（`debugger`）→ 2段目、色の直書き（`Kbd.svelte` に `#ff0000`）→ 3段目、辞書のキーの欠け（zh-Hans から `privacy.perm.audio` を削除）→ 1段目（欠けたキー名が出る）、単体テストの失敗 → 5段目で、それぞれ止まり、終了コード 1。加えて、プレースホルダの食い違い（en の `{version}` を `{ver}`）で 4段目（check:i18n）が止まることも確かめた。表示は、通った段の1行と、失敗した段の失敗の部分（エラーの行と件数）だけで、以降の段は実行しない。戻すと全7段が通過。`release.yml` は自動検査を `bun run check` の1回だけで行い、zip はその中の build が作った `build/` から作る
 
 ## Phase 11: リリース準備（v0.2.0）
 - [ ] W11-1 【エージェント】`package.json`・S05b・S05c・`CHANGELOG.md` の版が 0.2.0 にそろい、CHANGELOG の比較リンクが正しい

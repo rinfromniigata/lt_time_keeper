@@ -10,6 +10,7 @@
 		| 'bell'
 		| 'alert'
 		| 'back'
+		| 'chevron'
 		| 'check'
 		| 'gear'
 		| 'moon'

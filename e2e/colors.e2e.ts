@@ -1,4 +1,5 @@
-import { expect, test, type Page } from '@playwright/test';
+import { type Page } from '@playwright/test';
+import { expect, test } from './fixtures.ts';
 
 // v3 のトークン（文字は -text、入力部品の境界は --color-border-input）が、ライト・ダークとも実際に適用されている
 

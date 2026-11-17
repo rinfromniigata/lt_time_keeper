@@ -57,12 +57,15 @@ const og = `<svg xmlns="http://www.w3.org/2000/svg" width="${OG_WIDTH}" height="
 </svg>`;
 write('og.png', png(og, OG_WIDTH));
 
+const enDictionary = JSON.parse(readFileSync(join(root, 'src', 'lib', 'i18n', 'locales', 'en.json'), 'utf8')) as Record<string, string>;
+
 const manifest = {
 	id: 'com.rinontech.lt-time-keeper', // スペックシート §10 の識別子
-	name: 'LTタイムキーパー',
-	short_name: 'LTタイマー',
-	description: 'LTやプレゼンテーションの持ち時間を計り、ベルで知らせるタイムキーパー',
-	lang: 'ja',
+	// マニフェストは英語表記で固定する（スペック §2。OS 側のアプリ名は言語で切り替えない）
+	name: 'LT Timekeeper',
+	short_name: 'LT Timer',
+	description: enDictionary['prefs.about.tagline'],
+	lang: 'en',
 	start_url: '/',
 	scope: '/',
 	display: 'standalone',

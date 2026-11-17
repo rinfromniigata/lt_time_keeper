@@ -55,7 +55,6 @@ for (const l of LOCALES) {
 
 // 2. プレースホルダ --------------------------------------------------------------------------
 const placeholders = (s: string) => new Set(s.match(/\{\w+\}/g) ?? []);
-const sameSet = (a: Set<string>, b: Set<string>) => a.size === b.size && [...a].every((x) => b.has(x));
 const forms = (v: Value): [string, string][] => (typeof v === 'string' ? [['', v]] : Object.entries(v));
 
 for (const l of LOCALES) {

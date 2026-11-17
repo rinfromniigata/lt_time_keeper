@@ -220,7 +220,7 @@
 
 ## Phase 10: アプリ情報・プライバシーポリシー・PWA の名前・書体の Web フォント・checkコマンド
 Phaseの推奨: Sonnet・high以上
-引き継ぎ: Phase 10 の実装（T10-1〜T10-16）は完了。次は検証（W10-1 から。checkコマンドの W10-16〜W10-18 は Phase の末尾）。W10-10（実際の Google Fonts との通信）は、e2e がスタブで確かめていないため、実ブラウザ（Chrome の woff2 と `unicode-range` の分割）で確かめる。T10-16 の checkコマンドは全7段が通る。W10-18 の「わざと入れる」確認は、T10-16 で型・lint・色の直書き・単体テスト・build・e2e を試した（辞書のキーの欠けは型検査の段で止まる）。
+引き継ぎ: Phase 10 は実装・検証（W10-1〜W10-18）とも完了。次は Phase 11 の T11-1。S05b・S05c のバージョンは T11-5 で package.json を 0.2.0 にすると 0.2.0 になる（T11-6 で表示を確かめる）。疑似ロケールの埋め草は W10-5 で改行できる形に直した（fix_phase10 の W10-5 の節）。
 - [x] T10-1 【エージェント】`vite.config.ts` の `define` で `package.json` の `version` を `__APP_VERSION__` として埋め込み、型を宣言する
   - 推奨: Sonnet・medium以上
   - 実施: Sonnet・high

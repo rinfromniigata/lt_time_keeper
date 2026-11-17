@@ -16,7 +16,7 @@
 
 	function onkeydown(e: KeyboardEvent) {
 		const index = tabs.findIndex((t) => t.value === selected);
-		let next = index;
+		let next: number;
 		if (e.key === 'ArrowRight') next = (index + 1) % tabs.length;
 		else if (e.key === 'ArrowLeft') next = (index - 1 + tabs.length) % tabs.length;
 		else if (e.key === 'Home') next = 0;

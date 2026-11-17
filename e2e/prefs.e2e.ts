@@ -1,4 +1,5 @@
-import { expect, test, type Page } from '@playwright/test';
+import { type Page } from '@playwright/test';
+import { expect, test } from './fixtures.ts';
 import { readFileSync } from 'node:fs';
 
 // 環境設定の保存と、環境設定の画面（S05・S05a）、終了の確認（S03f）の e2e。
