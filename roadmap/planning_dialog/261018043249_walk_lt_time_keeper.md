@@ -7,6 +7,7 @@
 - 版の経緯: Phase 1〜6 は v0.1.0（前版 `archived/261011225751_walk_lt_time_keeper.md`）の項目で、ID・チェック・実施メモをそのまま引き継いだ。Phase 7〜11 は v0.2.0 の項目
   - v0.2.0 では、【ユーザー】のモックとの照合を、3言語（日本語・English・简体中文）とライト・ダークで行う。モックは `roadmap/specs/lt_time_keeper_mock_v4.html` の言語・テーマの切り替えを使う
 - 計画の版：`261016234906` 版から、書体の Web フォント化（`development/261018042727_change_noto_sans_webfont.md`、プランアセット v4）を反映した。追加は W10-9〜W10-15。W5-3・W9-10 に注記を足した。ほかの項目は変えていない
+- 推奨：共通規則の改訂に合わせ、Phase 10・11 の未着手の【エージェント】の項目のうち、tasks の `Phaseの推奨`（Sonnet・high以上）と異なるものに `推奨:` を付けた（`development/261117163201_fix_recommendations_and_timeline.md`）
 
 ---
 
@@ -260,17 +261,22 @@
 - [ ] W10-1 【エージェント】ビルドした `oss.json` の一覧が、`build/_app/` の JS に入ったパッケージと一致し、開発時だけの依存（vitest・playwright・resvg など）を含まない。`third_party_licenses.txt` に、一覧の各パッケージのライセンス全文が入っている
   - 依存: T10-2
 - [ ] W10-2 【エージェント】S05b のバージョンと S05c の `{version}` が、`package.json` の version と一致する。ソースコードのリンクが新しいタブで `https://github.com/rinfromniigata/lt_time_keeper` を開く。S05c の「アプリ情報」で S05b に戻る
+  - 推奨: Sonnet・medium以上
   - 依存: T10-6
   - 画面: S05b, S05c
 - [ ] W10-3 【エージェント】一度開いたあと通信を切って再読み込みしても、S05b の OSS 一覧と S05c が表示され、`third_party_licenses.txt` もキャッシュから返る
+  - 推奨: Sonnet・medium以上
   - 依存: T10-6
   - 画面: S05b, S05c
 - [ ] W10-4 【エージェント】manifest の `name` が "LT Timekeeper"、`short_name` が "LT Timer"、`lang` が "en"、`id` が v0.1.0 と同じ。`bun run gen:icons` を実行しても `static/icons/` に差分が出ない。Lighthouse（または DevTools の Application）でインストール可能と判定される
+  - 推奨: Sonnet・medium以上
   - 依存: T10-5
 - [ ] W10-5 【エージェント】疑似ロケールと3言語で、390px と 1280px の S05b・S05c に横スクロールやはみ出しがない
+  - 推奨: Sonnet・medium以上
   - 依存: T10-6
   - 画面: S05b, S05c
 - [ ] W10-6 【エージェント】`bun run check:tokens`・`check:i18n`・`check`・`test`・`build` が通る
+  - 推奨: Sonnet・low以上
   - 依存: T10-9
 - [ ] W10-7 【ユーザー】3言語・ライト・ダークで、モックと実物を並べて、アプリ情報とプライバシーポリシーを確認する
   - 依存: T10-9
@@ -278,6 +284,7 @@
 - [ ] W10-8 【ユーザー】Windows と macOS の Chrome で PWA としてインストールし直し、アプリの名前が「LT Timekeeper」で、アイコンの見え方が v0.1.0 から変わっていないことを確認する
   - 依存: T10-5
 - [ ] W10-9 【エージェント】`src/lib/theme/tokens.css` が specs の `tokens_v4.css` と一致し（`check:tokens` が通る）、`docs/brand/` の2ファイルが v4 の写しで、v3 の写しが残っていない。書体のトークンに OS の書体名（`system-ui`・Hiragino・Yu Gothic UI・Segoe UI・PingFang SC・SF Mono など）が含まれない
+  - 推奨: Sonnet・low以上
   - 依存: T10-10
 - [ ] W10-10 【エージェント】実際の Google Fonts に接続して、`ja`・`en`・`zh-Hans` の各言語で開くと、本文の書体が Noto Sans JP・Noto Sans・Noto Sans SC、タイマーの数字・時間の入力欄が JetBrains Mono で描かれる（`document.fonts` で読み込まれた書体と、`getComputedStyle` の `font-family` で確かめる）。S00 も同じ書体になる。ja と zh-Hans で、同じ漢字（例：直、骨）の字形が書体の違いとして描かれる
   - 依存: T10-11
@@ -287,9 +294,11 @@
 - [ ] W10-12 【エージェント】ページの読み込みから計測終了まで、自分のオリジン以外への通信が `fonts.googleapis.com`・`fonts.gstatic.com` だけで、ほかは0件である。リクエストのクエリに、入力した内容（表示名・持ち時間）や保存した値が含まれない
   - 依存: T10-12
 - [ ] W10-13 【エージェント】疑似ロケールと3言語で、390px と 1280px の S01・S01c・S03・S03a・S03f・S05・S05a・S05b・S05c に横スクロールやはみ出しがない（書体が変わって文字の幅が変わったため、W8-5・W8-6・W9-8 と同じ検査をやり直す）
+  - 推奨: Sonnet・medium以上
   - 依存: T10-11, T10-4
   - 画面: S01, S01c, S03, S03a, S03f, S05, S05a, S05b, S05c
 - [ ] W10-14 【エージェント】`bun run check:tokens`・`check:i18n`・`check`・`test`・`build` が通る
+  - 推奨: Sonnet・low以上
   - 依存: T10-13, T10-14
 - [ ] W10-15 【ユーザー】3言語・ライト・ダークで、モック v4 と実物を並べて、書体（日本語・中国語の字形、英語、タイマーと入力欄の JetBrains Mono の数字）を確認する。一度開いたあとオフラインで開き直しても、同じ書体で出ることも確かめる
   - 依存: T10-12, T10-4
@@ -297,8 +306,10 @@
 
 ## Phase 11: リリース準備（v0.2.0）
 - [ ] W11-1 【エージェント】`package.json`・S05b・S05c・`CHANGELOG.md` の版が 0.2.0 にそろい、CHANGELOG の比較リンクが正しい
+  - 推奨: Sonnet・low以上
   - 依存: T11-5
 - [ ] W11-2 【エージェント】3つの README の節の構成と順序が一致し、冒頭の言語のリンクが互いに開ける。画像のパスがすべて存在し、`roadmap/` を参照していない。開発・ビルドの情報が含まれていない
+  - 推奨: Sonnet・medium以上
   - 依存: T11-2
 - [ ] W11-3 【ユーザー】README を3言語とも利用者の立場で読み、開発者向けの情報が混ざっていないこと、特徴・使い方・対応環境・プライバシーが実物と一致することを確認する
   - 依存: T11-2
