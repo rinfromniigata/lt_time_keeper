@@ -1,7 +1,7 @@
 # lt_time_keeper 実装設計（imple）
 
 - 対象スペック: `roadmap/specs/lt_time_keeper_SPEC_v5.md`（プランアセット v5、アプリ v0.2.0）。v3 からの変更は、書体の Web フォント化（v4。仕様変更 `roadmap/development/261018042727_change_noto_sans_webfont.md`）と、checkコマンドの統合・ESLint の導入（v5。仕様変更 `roadmap/development/261117163547_change_check_command_and_lint.md`）。変わった節には【v4】【v5】を付けた
-- 対応する tasks・walk: `261117165719_tasks_lt_time_keeper.md`・`261117165719_walk_lt_time_keeper.md`
+- 対応する tasks・walk: `261117170958_tasks_lt_time_keeper.md`・`261117170958_walk_lt_time_keeper.md`
 - 仕様変更サマリー: `roadmap/development/261016195942_change_v0_2_0_update.md`
 - 前版: `roadmap/archived/261011225751_imple_lt_time_keeper.md`（v0.1.0）。この版は前版を引き継ぎ、v0.2.0 で変わる部分を書き換えた。変わった節には【v0.2.0】を付けた
 

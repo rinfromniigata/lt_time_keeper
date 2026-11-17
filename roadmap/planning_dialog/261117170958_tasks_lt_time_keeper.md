@@ -1,14 +1,15 @@
 # lt_time_keeper 実装項目（tasks）
 
-- 設計: `261117165719_imple_lt_time_keeper.md`
-- 検証: `261117165719_walk_lt_time_keeper.md`（同じ Phase 番号の W 項目）
+- 設計: `261117170958_imple_lt_time_keeper.md`
+- 検証: `261117170958_walk_lt_time_keeper.md`（同じ Phase 番号の W 項目）
 - 進め方: Tn をすべて終えたら Wn を行い、Wn がすべて通過してから Phase n+1 に進む
 - 版の経緯: Phase 1〜6 は v0.1.0（前版 `archived/261011225751_tasks_lt_time_keeper.md`）の項目で、ID・チェック・実施メモをそのまま引き継いだ。Phase 7〜11 は v0.2.0（仕様変更 `development/261016195942_change_v0_2_0_update.md`）の項目
   - Phase 1〜6 の実施メモにある `_v2` のファイル名は、当時の版を指す
 - 計画の版：`261016200839` 版から、W8-8 を W9-10 に統合した（仕様変更 `development/261016234757_change_merge_w8_8_into_w9_10.md`）。tasks と imple は内容を変えていない
 - 計画の版：`261016234906` 版から、書体を Noto Sans 系・JetBrains Mono の Google Fonts Web フォントに統一する仕様変更を反映した（`development/261018042727_change_noto_sans_webfont.md`、プランアセット v4）。追加は T10-10〜T10-14（Phase 10 の末尾）。T10-4・T11-2・T11-3 に注記を足した。ほかの項目は変えていない
 - 計画の版：`261018043249` 版から、checkコマンドの統合と ESLint の導入を反映した（`development/261117163547_change_check_command_and_lint.md`、プランアセット v5）。追加は T10-15・T10-16（Phase 10 の先頭）。T10-10・T11-3・T11-6 を直した。ほかの項目は変えていない
-  - T10-15・T10-16 を Phase 10 の先頭に置いたのは、Phase 10 の検証（W10-16）がまとめた checkコマンドを使うため。依存はすべて前方（T10-15 は T1-2、T10-16 は T10-15）
+  - T10-15・T10-16 は、当初 Phase 10 の先頭に置いたが、`development/261117170640_change_reorder_phase10_check.md` で末尾へ移した
+- 計画の版：`261117165719` 版から、T10-15・T10-16 を Phase 10 の末尾（T10-14 の後）へ移した（`development/261117170640_change_reorder_phase10_check.md`）。番号順と記載順を一致させ、checkコマンドを作る時点で `check:tokens` が通る（T10-10 が済んでいる）ようにするため。項目の中身・依存は変えていない（T10-15 は T1-2、T10-16 は T10-15）。プランアセットは v5 のまま
 - 推奨：共通規則の改訂に合わせ、未着手の Phase 10・11 に `Phaseの推奨` と項目ごとの `推奨:` を付けた（ID と順序は変えていない。`development/261117163201_fix_recommendations_and_timeline.md`）。Phase 1〜9 には付けない
   - Phase 10 の項目を書体の追加で広げたのは、Phase 10 以降が未着手で、Phase 11（リリース）より前に入れる必要があるため。T10-10〜T10-14 の依存は、すべて前方（T10-10 は T7-1、ほかは前の新項目か T5-1・T10-4）
 
@@ -218,14 +219,7 @@
 
 ## Phase 10: アプリ情報・プライバシーポリシー・PWA の名前・書体の Web フォント・checkコマンド
 Phaseの推奨: Sonnet・high以上
-引き継ぎ: Phase 9 は完了。T10-15 から（Phase の先頭で ESLint を導入し、T10-16 で checkコマンドをまとめてから既存の T10-1 以降に進む）。`check:tokens` は T10-10 まで失敗する（src の tokens が v3 の写しのため。想定どおり）
-- [ ] T10-15 【エージェント】ESLint を導入する（TypeScript と `.svelte` を対象に、各パッケージの推奨設定を基本にした flat config。`package.json` に `lint` を足す）。既存のコードで出る違反を、動作を変えない範囲で直す
-  - 依存: T1-2
-  - 版と設定の書き方は、インストールした版の公式ドキュメントで確かめる。`sv add eslint` が使えるなら、それを優先する。規則を外す・弱める場合は、理由を imple §1 に書く。インストールした版を imple §1 に書き足す
-  - 違反を直した箇所は `{タイムスタンプ}_fix_phase10.md` に記録する
-- [ ] T10-16 【エージェント】`scripts/check.ts` を作り、`bun run check` を、型検査（`check:types` に改名）→ lint → `check:tokens` → `check:i18n` → 単体テスト → build → e2e の順に実行する1つのコマンドにする（imple §5.1）。最初に失敗した段で止め、失敗の部分だけを表示する。`release.yml` を `bun run check` を呼ぶ形に、`CONTRIBUTING.md` の確認・テスト・リリース手順・リポジトリ構成を checkコマンドに合わせて直す
-  - 依存: T10-15
-  - e2e がビルドを二重に作らないようにする。`test:e2e` を単独で実行したときは、今までどおり build してから開く。切り替えの方法を imple §5.1 に書き足す
+引き継ぎ: Phase 9 は完了。T10-1 から。ESLint の導入と checkコマンドのまとめは、Phase の末尾（T10-15・T10-16）で行う
 - [ ] T10-1 【エージェント】`vite.config.ts` の `define` で `package.json` の `version` を `__APP_VERSION__` として埋め込み、型を宣言する
   - 推奨: Sonnet・medium以上
 - [ ] T10-2 【エージェント】`scripts/oss_collect.ts`（Vite プラグイン）と、`routes/oss.json/+server.ts`・`routes/third_party_licenses.txt/+server.ts` を作る。インストールした版で、クライアントのビルドが書き出しより先に終わることを確かめ、成り立たなければ imple §3.11 の代わりの方法に切り替えて imple を直す
@@ -275,6 +269,13 @@ Phaseの推奨: Sonnet・high以上
   - 推奨: Sonnet・medium以上
   - 依存: T10-12
   - README は T11-2 で書く（プライバシーの節に Google Fonts への接続を含める）
+- [ ] T10-15 【エージェント】ESLint を導入する（TypeScript と `.svelte` を対象に、各パッケージの推奨設定を基本にした flat config。`package.json` に `lint` を足す）。既存のコードで出る違反を、動作を変えない範囲で直す
+  - 依存: T1-2
+  - 版と設定の書き方は、インストールした版の公式ドキュメントで確かめる。`sv add eslint` が使えるなら、それを優先する。規則を外す・弱める場合は、理由を imple §1 に書く。インストールした版を imple §1 に書き足す
+  - 違反を直した箇所は `{タイムスタンプ}_fix_phase10.md` に記録する
+- [ ] T10-16 【エージェント】`scripts/check.ts` を作り、`bun run check` を、型検査（`check:types` に改名）→ lint → `check:tokens` → `check:i18n` → 単体テスト → build → e2e の順に実行する1つのコマンドにする（imple §5.1）。最初に失敗した段で止め、失敗の部分だけを表示する。`release.yml` を `bun run check` を呼ぶ形に、`CONTRIBUTING.md` の確認・テスト・リリース手順・リポジトリ構成を checkコマンドに合わせて直す
+  - 依存: T10-15
+  - e2e がビルドを二重に作らないようにする。`test:e2e` を単独で実行したときは、今までどおり build してから開く。切り替えの方法を imple §5.1 に書き足す
 
 ## Phase 11: リリース準備（v0.2.0）
 Phaseの推奨: Sonnet・high以上
