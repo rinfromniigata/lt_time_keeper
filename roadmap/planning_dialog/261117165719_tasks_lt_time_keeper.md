@@ -218,6 +218,7 @@
 
 ## Phase 10: アプリ情報・プライバシーポリシー・PWA の名前・書体の Web フォント・checkコマンド
 Phaseの推奨: Sonnet・high以上
+引き継ぎ: Phase 9 は完了。T10-15 から（Phase の先頭で ESLint を導入し、T10-16 で checkコマンドをまとめてから既存の T10-1 以降に進む）。`check:tokens` は T10-10 まで失敗する（src の tokens が v3 の写しのため。想定どおり）
 - [ ] T10-15 【エージェント】ESLint を導入する（TypeScript と `.svelte` を対象に、各パッケージの推奨設定を基本にした flat config。`package.json` に `lint` を足す）。既存のコードで出る違反を、動作を変えない範囲で直す
   - 依存: T1-2
   - 版と設定の書き方は、インストールした版の公式ドキュメントで確かめる。`sv add eslint` が使えるなら、それを優先する。規則を外す・弱める場合は、理由を imple §1 に書く。インストールした版を imple §1 に書き足す
