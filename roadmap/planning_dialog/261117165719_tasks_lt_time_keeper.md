@@ -1,12 +1,14 @@
 # lt_time_keeper 実装項目（tasks）
 
-- 設計: `261018043249_imple_lt_time_keeper.md`
-- 検証: `261018043249_walk_lt_time_keeper.md`（同じ Phase 番号の W 項目）
+- 設計: `261117165719_imple_lt_time_keeper.md`
+- 検証: `261117165719_walk_lt_time_keeper.md`（同じ Phase 番号の W 項目）
 - 進め方: Tn をすべて終えたら Wn を行い、Wn がすべて通過してから Phase n+1 に進む
 - 版の経緯: Phase 1〜6 は v0.1.0（前版 `archived/261011225751_tasks_lt_time_keeper.md`）の項目で、ID・チェック・実施メモをそのまま引き継いだ。Phase 7〜11 は v0.2.0（仕様変更 `development/261016195942_change_v0_2_0_update.md`）の項目
   - Phase 1〜6 の実施メモにある `_v2` のファイル名は、当時の版を指す
 - 計画の版：`261016200839` 版から、W8-8 を W9-10 に統合した（仕様変更 `development/261016234757_change_merge_w8_8_into_w9_10.md`）。tasks と imple は内容を変えていない
 - 計画の版：`261016234906` 版から、書体を Noto Sans 系・JetBrains Mono の Google Fonts Web フォントに統一する仕様変更を反映した（`development/261018042727_change_noto_sans_webfont.md`、プランアセット v4）。追加は T10-10〜T10-14（Phase 10 の末尾）。T10-4・T11-2・T11-3 に注記を足した。ほかの項目は変えていない
+- 計画の版：`261018043249` 版から、checkコマンドの統合と ESLint の導入を反映した（`development/261117163547_change_check_command_and_lint.md`、プランアセット v5）。追加は T10-15・T10-16（Phase 10 の先頭）。T10-10・T11-3・T11-6 を直した。ほかの項目は変えていない
+  - T10-15・T10-16 を Phase 10 の先頭に置いたのは、Phase 10 の検証（W10-16）がまとめた checkコマンドを使うため。依存はすべて前方（T10-15 は T1-2、T10-16 は T10-15）
 - 推奨：共通規則の改訂に合わせ、未着手の Phase 10・11 に `Phaseの推奨` と項目ごとの `推奨:` を付けた（ID と順序は変えていない。`development/261117163201_fix_recommendations_and_timeline.md`）。Phase 1〜9 には付けない
   - Phase 10 の項目を書体の追加で広げたのは、Phase 10 以降が未着手で、Phase 11（リリース）より前に入れる必要があるため。T10-10〜T10-14 の依存は、すべて前方（T10-10 は T7-1、ほかは前の新項目か T5-1・T10-4）
 
@@ -214,8 +216,15 @@
   - 依存: T9-3, T9-6, T9-7
   - 実施メモ: **既存の e2e の修正**（T9-6 で失敗していた9件）：`colors.e2e.ts` は S01 の枠の色のテストからスイッチの検査を外し、環境設定のセグメント・スイッチ（オフの溝）と終了の確認のチェックボックス（枠＝`--color-border-input`、チェックでアクセント色）を見る新しい1件に移した。`bells.e2e.ts` は、「鳴らしてみる」・振動のスイッチ・計測中の振動のテストを、歯車で環境設定を開いて「音」タブから操作する形に直し（振動に非対応の端末では音量は出てスイッチだけ出ない確認を足した）、パネルの並びは音を除いた3枚（狭い画面で 持ち時間・ベル・表示名、広い画面で左 持ち時間・表示名／右 ベル）にして、S01 に音の見出しがないことを足した。`phase4.e2e.ts` の W4-4 は、テーマのメニューの2件を、環境設定の「表示テーマ」（選ぶと `data-theme` が付け外しされ再読み込みしても残る、矢印キーで選択が移り Esc で歯車へ戻る）の2件に置き換え、W4-5 のフォーカスの見えるかは、テーマのメニューから環境設定（歯車・一般タブ・音タブ）に直した（マウス操作のあとの `focus()` は `:focus-visible` にならないため、音タブへはキーボードで移る）。T9-7 で直した `timer.e2e.ts` と合わせて、T9-6 の9件はすべて通過。**新しい e2e** `e2e/prefs.e2e.ts`（11件）：(1) W9-3＝imple §4.4 の手順1〜14を、ブラウザの言語 `zh-TW` でたどる（初回は何も保存しない、持ち時間・表示名の変更は保存しない、言語・テーマ・音量の保存と各画面の反映、言語を変えても10分と「LT」が残る、「鳴らしてみる」は 0.5 の音量で1回鳴り保存しない、「続ける」は保存しない、Enter で終了するとチェックを反映して保存、確認を出さない設定でのすぐ戻る、開き直しで保存値が反映され settings が初期値に戻る、スイッチを戻すと保存、データを消すと初期状態）。(2) W9-4＝壊れた保存値（手順15）で項目ごとに初期値になり次の変更で正しい形に書き直す、版違い・JSON でない値・配列でも開く、`localStorage` が例外を投げる環境（手順16）で動作しエラーが出ない。(3) W9-5＝日本語以外・ダークを保存して開くと、`body` が作られる時点（最初の描画前）で `lang`・`data-theme` が保存値（`MutationObserver` で控えた値で確認。JS の実行後では `DOMContentLoaded` より前に書き換わる可能性があるため、この方法にした）。(4) 環境設定の画面：広い画面はダイアログ・狭い画面は全画面、タブの左右キー、Tab がダイアログの外へ出ない、×・Esc・背景クリックで閉じて歯車へフォーカスが戻り開き直すと「一般」、横スクロールなし、言語の選択肢が自身の言語で並ぶ・公開版で `?pseudo` が効かない、計測中は歯車がない。(5) 終了の確認のチェックボックス：Tab の循環、Space がチェックだけを切り替える、確認を出さない設定で「終了」ボタンでもすぐ戻る。保存のテストは `addInitScript` で `localStorage` を用意して開く（開き直しでは上書きしないよう、既に値があるときは入れない形にしたものもある）。`check` 0エラー、`check:tokens`・`check:i18n` 通過、単体テスト214件、**e2e 87件がすべて通過**。Phase 9 の実装（T9-1〜T9-8）は終わり、次は検証（W9）
 
-## Phase 10: アプリ情報・プライバシーポリシー・PWA の名前・書体の Web フォント
+## Phase 10: アプリ情報・プライバシーポリシー・PWA の名前・書体の Web フォント・checkコマンド
 Phaseの推奨: Sonnet・high以上
+- [ ] T10-15 【エージェント】ESLint を導入する（TypeScript と `.svelte` を対象に、各パッケージの推奨設定を基本にした flat config。`package.json` に `lint` を足す）。既存のコードで出る違反を、動作を変えない範囲で直す
+  - 依存: T1-2
+  - 版と設定の書き方は、インストールした版の公式ドキュメントで確かめる。`sv add eslint` が使えるなら、それを優先する。規則を外す・弱める場合は、理由を imple §1 に書く。インストールした版を imple §1 に書き足す
+  - 違反を直した箇所は `{タイムスタンプ}_fix_phase10.md` に記録する
+- [ ] T10-16 【エージェント】`scripts/check.ts` を作り、`bun run check` を、型検査（`check:types` に改名）→ lint → `check:tokens` → `check:i18n` → 単体テスト → build → e2e の順に実行する1つのコマンドにする（imple §5.1）。最初に失敗した段で止め、失敗の部分だけを表示する。`release.yml` を `bun run check` を呼ぶ形に、`CONTRIBUTING.md` の確認・テスト・リリース手順・リポジトリ構成を checkコマンドに合わせて直す
+  - 依存: T10-15
+  - e2e がビルドを二重に作らないようにする。`test:e2e` を単独で実行したときは、今までどおり build してから開く。切り替えの方法を imple §5.1 に書き足す
 - [ ] T10-1 【エージェント】`vite.config.ts` の `define` で `package.json` の `version` を `__APP_VERSION__` として埋め込み、型を宣言する
   - 推奨: Sonnet・medium以上
 - [ ] T10-2 【エージェント】`scripts/oss_collect.ts`（Vite プラグイン）と、`routes/oss.json/+server.ts`・`routes/third_party_licenses.txt/+server.ts` を作る。インストールした版で、クライアントのビルドが書き出しより先に終わることを確かめ、成り立たなければ imple §3.11 の代わりの方法に切り替えて imple を直す
@@ -239,9 +248,10 @@ Phaseの推奨: Sonnet・high以上
 - [ ] T10-9 【エージェント】T10-8 の指摘を辞書に反映する（言い回しの修正は fix として記録する）
   - 推奨: Sonnet・medium以上
   - 依存: T10-8
-- [ ] T10-10 【エージェント】specs の `lt_time_keeper_tokens_v4.css` を `src/lib/theme/tokens.css` へ無変更でコピーし、`brand_v4.md`・`icon_master_v4.svg` を `docs/brand/` へコピーする（`docs/brand/` の v3 の写しは削除する）
+- [ ] T10-10 【エージェント】specs の `lt_time_keeper_tokens_v5.css` を `src/lib/theme/tokens.css` へ無変更でコピーし、`brand_v5.md`・`icon_master_v5.svg` を `docs/brand/` へコピーする（`docs/brand/` の v3 の写しは削除する）
   - 推奨: Sonnet・medium以上
   - 依存: T7-1
+  - 【v5】v5 の tokens・brand・icon_master は v4 と同じ中身（書体のトークンが変わったのは v4）
   - 変わるのは書体のトークンだけ（`--font-sans-ja`＝"Noto Sans JP"、`-en`＝"Noto Sans"、`-zh-hans`＝"Noto Sans SC"、`--font-digits`＝"JetBrains Mono"。末尾の総称は保険）。マスターSVGは v2 から変更なし
 - [ ] T10-11 【エージェント】`src/app.html` に Google Fonts の読み込みを足す（`fonts.googleapis.com` と `fonts.gstatic.com`（crossorigin）への `preconnect`、Noto Sans JP・Noto Sans・Noto Sans SC・JetBrains Mono を太さ 400〜700・`display=swap` で指定したスタイルシートの `<link>`）
   - 依存: T10-10
@@ -272,7 +282,7 @@ Phaseの推奨: Sonnet・high以上
 - [ ] T11-2 【エージェント】`README.md`（日本語）を利用者向けに書き直し、`README.en.md`・`README.zh-Hans.md` を作る。冒頭に言語のリンク、中身は目的・スクリーンショット・特徴・使い方・対応環境・プライバシー・ライセンス
   - 依存: T11-1
   - 【v4】プライバシーの節と対応環境には、書体を Google Fonts から読み込むこと（その際に Google へ IP アドレスなどの接続情報が届く）と、初回の起動だけはオンラインが必要なことを、SPEC v4 の第3節「個人情報と保存」「オフライン」「通信」と同じ内容で書く。「通信しない」「外部へ一切送らない」と読める書き方をしない
-- [ ] T11-3 【エージェント】`CONTRIBUTING.md` を仕上げる（疑似ロケール、`check:i18n`、OSS 一覧の生成、保存のキー名、リポジトリ構成の更新）
+- [ ] T11-3 【エージェント】`CONTRIBUTING.md` を仕上げる（疑似ロケール、checkコマンド（中身の各段と個別のコマンド。T10-16 で書いた分の確認）、OSS 一覧の生成、保存のキー名、リポジトリ構成の更新）
   - 依存: T10-9
   - 【v4】書体の節（T10-14 で書いた分）が最新の実装と合っているか確かめる
 - [ ] T11-4 【エージェント】GitHub の About 欄の文案（英語の説明文・Webサイト・トピック）を提示する
@@ -282,5 +292,6 @@ Phaseの推奨: Sonnet・high以上
   - 依存: T11-2, T11-3
 - [ ] T11-6 【エージェント】リリース前の確認をする（ワークフローと同じ手順のローカル実行、アイコン一式が specs の最新のマスターSVGから生成されたものか、README の特徴・使い方・スクリーンショット・対応環境が実物と一致するか、各言語の README が `README.md` に追従しているか、訳がユーザーに確認済みか）。コミットメッセージとタグのコマンドを提示して停止する
   - 依存: T11-4, T11-5
+  - 【v5】「ワークフローと同じ手順のローカル実行」は `bun run check` の実行になる。リリース前の確認のあと、コミットメッセージを提示する前に、`timeline.md` に `リリース準備 0.2.0（プランアセット v{n}）← CHANGELOG.md` の行を追記する（v{n} はその時点の specs の版）
 - [ ] T11-7 【ユーザー】コミットして main に push し、`v0.2.0` タグを push する。Actions の完了後、ドラフトリリースを公開し、About 欄を設定する
   - 依存: T11-6

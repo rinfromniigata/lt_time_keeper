@@ -20,7 +20,7 @@
 - 境界は2種類を使い分ける
   - `--color-border-input`：入力欄・チェックボックス・スイッチ・選択肢など、形が見えないと操作できない部品
   - `--color-border`：パネルや行の区切りなどの装飾
-- 値はすべて `lt_time_keeper_tokens_v4.css` を正とする
+- 値はすべて `lt_time_keeper_tokens_v5.css` を正とする
 
 ## 書体
 - 全言語で Noto Sans 系を標準にする：日本語＝Noto Sans JP、英語＝Noto Sans、中国語（簡体字）＝Noto Sans SC
@@ -29,7 +29,7 @@
 - 数字は JetBrains Mono の等幅数字（`--font-digits`）
 
 ## アイコン
-- 正本：`lt_time_keeper_icon_master_v4.svg`（1024×1024、v2 から変更なし）
+- 正本：`lt_time_keeper_icon_master_v5.svg`（1024×1024、v2 から変更なし）
 - 構成：墨色の正方形に、地のリングと、7割まで進んだ緑のリング（端は丸）を重ねる
 - アイコンには文字を入れないので、言語ごとの作り分けはしない
 - 余白ルール

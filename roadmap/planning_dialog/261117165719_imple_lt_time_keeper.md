@@ -1,7 +1,7 @@
 # lt_time_keeper 実装設計（imple）
 
-- 対象スペック: `roadmap/specs/lt_time_keeper_SPEC_v4.md`（プランアセット v4、アプリ v0.2.0）。v3 からの変更は書体の Web フォント化だけ（仕様変更 `roadmap/development/261018042727_change_noto_sans_webfont.md`）。変わった節には【v4】を付けた
-- 対応する tasks・walk: `261018043249_tasks_lt_time_keeper.md`・`261018043249_walk_lt_time_keeper.md`
+- 対象スペック: `roadmap/specs/lt_time_keeper_SPEC_v5.md`（プランアセット v5、アプリ v0.2.0）。v3 からの変更は、書体の Web フォント化（v4。仕様変更 `roadmap/development/261018042727_change_noto_sans_webfont.md`）と、checkコマンドの統合・ESLint の導入（v5。仕様変更 `roadmap/development/261117163547_change_check_command_and_lint.md`）。変わった節には【v4】【v5】を付けた
+- 対応する tasks・walk: `261117165719_tasks_lt_time_keeper.md`・`261117165719_walk_lt_time_keeper.md`
 - 仕様変更サマリー: `roadmap/development/261016195942_change_v0_2_0_update.md`
 - 前版: `roadmap/archived/261011225751_imple_lt_time_keeper.md`（v0.1.0）。この版は前版を引き継ぎ、v0.2.0 で変わる部分を書き換えた。変わった節には【v0.2.0】を付けた
 
@@ -15,7 +15,8 @@
 - Bun 1.4.3（ローカル・Pages の `BUN_VERSION`・CI とも）
 - テスト: Vitest 4.1.11（純粋なTSの単体テスト）、Playwright 1.64.0（画面の結合テスト。`page.clock` で時刻を進める）
 - アイコン生成: `@resvg/resvg-js` 2.6.x（開発時の依存だけ）
-- 【v0.2.0】依存は増やさない。i18n・OSS一覧・保存は自作する（スペック §4）
+- 【v0.2.0】配信物に入る依存は増やさない。i18n・OSS一覧・保存は自作する（スペック §4）
+- 【v5】lint: ESLint（TypeScript・`.svelte` 用のプラグイン。開発時だけの依存で、配信物と OSS 一覧には入らない）。版と設定ファイル（flat config）の書き方は、T10-15 でインストールした版の公式ドキュメントで確かめてから、ここに書き足す
 
 SvelteKit 3 で、一般的な書き方から変わっている点（v0.1.0 で確認済み）:
 
@@ -68,19 +69,21 @@ src/
    ├─ pwa/
    │  └─ update.svelte.ts   新しい Service Worker の検知と切り替え（変更なし）
    ├─ theme/
-   │  ├─ tokens.css         specs の tokens_v4.css の写し（値の唯一の置き場）
+   │  ├─ tokens.css         specs の最新版の tokens の写し（値の唯一の置き場）
    │  ├─ base.css
    │  ├─ splash.css
    │  └─ theme.ts           prefs.theme を <html data-theme> に反映する【v0.2.0】（theme.svelte.ts から置き換え）
    └─ ui/
       ├─ parts/             部品。ThemeMenu.svelte は廃止【v0.2.0】。Tabs・Checkbox を追加
       └─ screens/           SettingsScreen・TimerScreen・PrefsScreen【v0.2.0】
+eslint.config.js            【v5】ESLint の設定（ファイル名と形は、インストールした版の推奨に従う）
 scripts/
+├─ check.ts                 【v5】checkコマンド。型検査・lint・トークン・辞書・単体テスト・build・e2e を順に実行し、最初の失敗で止めて失敗の部分だけを表示する
 ├─ check_tokens.ts          tokens の一致と、色・寸法の直書き、状態色の文字に -text を使っているかを検査する【v0.2.0】
 ├─ check_i18n.ts            【v0.2.0】辞書のキー・プレースホルダ・未使用キー・直書きを検査する
 ├─ oss_collect.ts           【v0.2.0】Vite プラグイン。クライアントのバンドルに入ったパッケージを集める
 └─ gen_icons.ts             マスターSVGから各形式のアイコンと manifest を生成する
-docs/brand/                 brand.md とマスターSVGの写し（v3）
+docs/brand/                 brand.md とマスターSVGの写し（specs の最新版）
 docs/images/                【v0.2.0】README のスクリーンショット（版番号なしの固定名）
 ```
 
@@ -298,7 +301,7 @@ export class Session {
 
 ### 3.12 theme・ui
 
-- `tokens.css` は specs の `lt_time_keeper_tokens_v4.css` を変更なしでコピーする。`--mock-` の値と、モックで vw を cqi に読み替えた部分は持ち込まない
+- `tokens.css` は specs の最新版の tokens（v5。中身は v4 と同じ）を変更なしでコピーする。`--mock-` の値と、モックで vw を cqi に読み替えた部分は持ち込まない
 - 【v0.2.0】状態色で文字を書くときは `--color-state-*-text` を使う（状態ラベル・ベルの行の補足文・次のベル）。リング・点・アイコンは無印の `--color-state-*`
 - 【v0.2.0】入力欄・チェックボックス・スイッチ・セグメントの境界は `--color-border-input`。パネルや行の区切りは `--color-border`
 - 部品は値をトークンからだけ参照する。広い画面（720px以上）の配置はコンテナクエリで切り替え、720px は `base.css` の1か所だけに書く
@@ -381,7 +384,22 @@ export class Session {
   - 各キーのプレースホルダの集合が、ja と一致すること（複数形の各形もそれぞれ）
   - `src/` の中で参照されないキーがないこと（キーは `t('…')`・`msg('…')`・`key: '…'` の形で書き、静的に拾えるようにする）
   - `.svelte` のテンプレートの文字と、`aria-label`・`title`・`placeholder`・`alt` の値に、文字（`\p{L}`）の直書きがないこと（`LOCALE_NAMES` など、登録した例外を除く）
-  - CI（`release.yml`）で `check:tokens` の後に実行する
+  - checkコマンド（§5.1）の4段目として実行する【v5】
+
+### 5.1 checkコマンド【v5】
+
+- `bun run check` は `scripts/check.ts` を実行する。次の段をこの順に実行し、最初に失敗した段で止める
+  1. 型検査（`check:types`。旧 `check` の中身：`svelte-kit sync`・`svelte-check`・Service Worker の `tsc`）
+  2. lint（`lint`。ESLint）
+  3. `check:tokens`
+  4. `check:i18n`
+  5. 単体テスト（Vitest を1回だけ実行）
+  6. build
+  7. e2e（Playwright）
+- 表示：各段の出力は控えておき、通った段は1行（段の名前と「通過」）だけを出す。失敗した段は、その出力のうち失敗の部分（エラー・失敗したテストの行と、末尾）だけを出し、終了コードを0以外にする
+- 個別のコマンド（`check:types`・`lint`・`check:tokens`・`check:i18n`・`test`・`test:unit`・`test:e2e`・`check:watch`）は残し、単独でも実行できる
+- build と e2e：いまの `playwright.config.ts` の `webServer` は、build してからプレビューを開く。checkコマンドの中では、6. の build を e2e が使い、二重に build しない。`test:e2e` を単独で実行したときは、今までどおり build してから開く。切り替えの方法（環境変数など）は T10-16 で決めて、ここに書き足す
+- CI（§7）も、ローカルも、このコマンドを使う
 
 ## 6. アイコン
 
@@ -391,8 +409,8 @@ export class Session {
 ## 7. 公開・CI・ドキュメント
 
 - Cloudflare Pages の GitHub 連携（ビルド `bun run build`、出力 `build`、`BUN_VERSION=1.4.3`、`lt.rinontech.com`）。変更なし
-- `.github/workflows/release.yml`: `v*` タグで起動 → `bun install --frozen-lockfile` → `check:tokens` → `check:i18n`【v0.2.0】 → `check` → `test` → `build` → ドラフトリリース
+- `.github/workflows/release.yml`: `v*` タグで起動 → `bun install --frozen-lockfile` → Playwright の依存の導入 → `bun run check`（§5.1）【v5】 → ドラフトリリース
 - バージョンは `package.json` だけにある。`CHANGELOG.md` は Keep a Changelog 形式
 - 【v0.2.0】`README.md`（日本語・原文）・`README.en.md`・`README.zh-Hans.md`：利用者向け。冒頭に言語のリンク。目的・スクリーンショット・特徴・使い方・対応環境・プライバシー・ライセンス
-- 【v0.2.0】`CONTRIBUTING.md`（日本語）：受け付け方針、開発環境、セットアップ、確認・テスト（`check:i18n`・疑似ロケールを含む）、ビルド、アイコン生成、リリース手順、リポジトリ構成。いまの README の開発情報はここへ移す
+- 【v0.2.0】`CONTRIBUTING.md`（日本語）：受け付け方針、開発環境、セットアップ、確認・テスト（checkコマンドとその各段・lint【v5】、`check:i18n`・疑似ロケールを含む）、ビルド、アイコン生成、リリース手順、リポジトリ構成。いまの README の開発情報はここへ移す
 - 【v0.2.0】スクリーンショットは `docs/images/` に、`screenshot_ja.png`・`screenshot_en.png`・`screenshot_zh-Hans.png` の固定名で置く。いまの `docs/lt_time_keeper_pr_v0.1.0.png` はここへ移すか差し替える

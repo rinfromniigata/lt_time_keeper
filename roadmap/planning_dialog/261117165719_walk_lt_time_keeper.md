@@ -1,12 +1,13 @@
 # lt_time_keeper 検証手順（walk）
 
-- 設計: `261018043249_imple_lt_time_keeper.md`
-- 実装: `261018043249_tasks_lt_time_keeper.md`
+- 設計: `261117165719_imple_lt_time_keeper.md`
+- 実装: `261117165719_tasks_lt_time_keeper.md`
 - 各 Phase の実装（Tn）がすべて終わった直後に行う。不合格なら修正して同じ項目をやり直し、通過してからチェックを入れる。不合格の内容と、fix・change のファイル名を実施メモに残す
 - 【エージェント】の画面の検証は、Playwright でビルド済みの静的サイトに対して行う。時刻は `page.clock` で進め、ベルは記録用の Ringer で確かめる
 - 版の経緯: Phase 1〜6 は v0.1.0（前版 `archived/261011225751_walk_lt_time_keeper.md`）の項目で、ID・チェック・実施メモをそのまま引き継いだ。Phase 7〜11 は v0.2.0 の項目
-  - v0.2.0 では、【ユーザー】のモックとの照合を、3言語（日本語・English・简体中文）とライト・ダークで行う。モックは `roadmap/specs/lt_time_keeper_mock_v4.html` の言語・テーマの切り替えを使う
+  - v0.2.0 では、【ユーザー】のモックとの照合を、3言語（日本語・English・简体中文）とライト・ダークで行う。モックは `roadmap/specs/lt_time_keeper_mock_v5.html`（v4 と同じ中身）の言語・テーマの切り替えを使う
 - 計画の版：`261016234906` 版から、書体の Web フォント化（`development/261018042727_change_noto_sans_webfont.md`、プランアセット v4）を反映した。追加は W10-9〜W10-15。W5-3・W9-10 に注記を足した。ほかの項目は変えていない
+- 計画の版：`261018043249` 版から、checkコマンドの統合と ESLint の導入を反映した（`development/261117163547_change_check_command_and_lint.md`、プランアセット v5）。追加は W10-16〜W10-18（Phase 10 の先頭）。W10-6・W10-14 は W10-16 に統合した。W10-1・W10-9・W10-15・W11-4 を直した。ほかの項目は変えていない
 - 推奨：共通規則の改訂に合わせ、Phase 10・11 の未着手の【エージェント】の項目のうち、tasks の `Phaseの推奨`（Sonnet・high以上）と異なるものに `推奨:` を付けた（`development/261117163201_fix_recommendations_and_timeline.md`）
 
 ---
@@ -257,8 +258,18 @@
 - [ ] W9-11 【ユーザー】実機（Android の Chrome）で、音量と「鳴らしてみる」、振動のスイッチを確かめ、アプリを閉じて開き直しても環境設定が残っていることを確認する
   - 依存: T9-6
 
-## Phase 10: アプリ情報・プライバシーポリシー・PWA の名前
-- [ ] W10-1 【エージェント】ビルドした `oss.json` の一覧が、`build/_app/` の JS に入ったパッケージと一致し、開発時だけの依存（vitest・playwright・resvg など）を含まない。`third_party_licenses.txt` に、一覧の各パッケージのライセンス全文が入っている
+## Phase 10: アプリ情報・プライバシーポリシー・PWA の名前・書体の Web フォント・checkコマンド
+- [ ] W10-16 【エージェント】checkコマンド（`bun run check`）が通る
+  - 推奨: Sonnet・low以上
+  - 依存: T10-9, T10-13, T10-14, T10-16
+- [ ] W10-17 【エージェント】Phase 10 で作った画面が、モックと構造で一致する（要素の有無と配置の順序、遷移先、描かれた状態、文言の辞書キー）
+  - 依存: W10-16
+  - 画面: S05b, S05c
+  - モックは1枚の旧形式（`lt_time_keeper_mock_v5.html`）。画面IDで位置を検索し、S05b・S05c の範囲だけを読む
+- [ ] W10-18 【エージェント】checkコマンドが各段の失敗を検出し、失敗した段の失敗の部分だけを表示して止まる。型の誤り・lint の違反・色の直書き・辞書のキーの欠け・単体テストの失敗を1つずつわざと入れて確かめ、戻すと通る。`release.yml` が自動検査を `bun run check` の1回だけで行っている
+  - 推奨: Sonnet・medium以上
+  - 依存: W10-16
+- [ ] W10-1 【エージェント】ビルドした `oss.json` の一覧が、`build/_app/` の JS に入ったパッケージと一致し、開発時だけの依存（vitest・playwright・resvg・eslint など）を含まない。`third_party_licenses.txt` に、一覧の各パッケージのライセンス全文が入っている
   - 依存: T10-2
 - [ ] W10-2 【エージェント】S05b のバージョンと S05c の `{version}` が、`package.json` の version と一致する。ソースコードのリンクが新しいタブで `https://github.com/rinfromniigata/lt_time_keeper` を開く。S05c の「アプリ情報」で S05b に戻る
   - 推奨: Sonnet・medium以上
@@ -275,15 +286,13 @@
   - 推奨: Sonnet・medium以上
   - 依存: T10-6
   - 画面: S05b, S05c
-- [ ] W10-6 【エージェント】`bun run check:tokens`・`check:i18n`・`check`・`test`・`build` が通る
-  - 推奨: Sonnet・low以上
-  - 依存: T10-9
+- [ ] W10-6 【エージェント】→ W10-16 に統合した（checkコマンドを1つにまとめたため）
 - [ ] W10-7 【ユーザー】3言語・ライト・ダークで、モックと実物を並べて、アプリ情報とプライバシーポリシーを確認する
   - 依存: T10-9
   - 画面: S05b, S05c
 - [ ] W10-8 【ユーザー】Windows と macOS の Chrome で PWA としてインストールし直し、アプリの名前が「LT Timekeeper」で、アイコンの見え方が v0.1.0 から変わっていないことを確認する
   - 依存: T10-5
-- [ ] W10-9 【エージェント】`src/lib/theme/tokens.css` が specs の `tokens_v4.css` と一致し（`check:tokens` が通る）、`docs/brand/` の2ファイルが v4 の写しで、v3 の写しが残っていない。書体のトークンに OS の書体名（`system-ui`・Hiragino・Yu Gothic UI・Segoe UI・PingFang SC・SF Mono など）が含まれない
+- [ ] W10-9 【エージェント】`src/lib/theme/tokens.css` が specs の `tokens_v5.css` と一致し（`check:tokens` が通る）、`docs/brand/` の2ファイルが v5 の写しで、v3 の写しが残っていない。書体のトークンに OS の書体名（`system-ui`・Hiragino・Yu Gothic UI・Segoe UI・PingFang SC・SF Mono など）が含まれない
   - 推奨: Sonnet・low以上
   - 依存: T10-10
 - [ ] W10-10 【エージェント】実際の Google Fonts に接続して、`ja`・`en`・`zh-Hans` の各言語で開くと、本文の書体が Noto Sans JP・Noto Sans・Noto Sans SC、タイマーの数字・時間の入力欄が JetBrains Mono で描かれる（`document.fonts` で読み込まれた書体と、`getComputedStyle` の `font-family` で確かめる）。S00 も同じ書体になる。ja と zh-Hans で、同じ漢字（例：直、骨）の字形が書体の違いとして描かれる
@@ -297,10 +306,8 @@
   - 推奨: Sonnet・medium以上
   - 依存: T10-11, T10-4
   - 画面: S01, S01c, S03, S03a, S03f, S05, S05a, S05b, S05c
-- [ ] W10-14 【エージェント】`bun run check:tokens`・`check:i18n`・`check`・`test`・`build` が通る
-  - 推奨: Sonnet・low以上
-  - 依存: T10-13, T10-14
-- [ ] W10-15 【ユーザー】3言語・ライト・ダークで、モック v4 と実物を並べて、書体（日本語・中国語の字形、英語、タイマーと入力欄の JetBrains Mono の数字）を確認する。一度開いたあとオフラインで開き直しても、同じ書体で出ることも確かめる
+- [ ] W10-14 【エージェント】→ W10-16 に統合した（checkコマンドを1つにまとめたため）
+- [ ] W10-15 【ユーザー】3言語・ライト・ダークで、モック v5（v4 と同じ中身）と実物を並べて、書体（日本語・中国語の字形、英語、タイマーと入力欄の JetBrains Mono の数字）を確認する。一度開いたあとオフラインで開き直しても、同じ書体で出ることも確かめる
   - 依存: T10-12, T10-4
   - 画面: S00, S01, S03, S05, S05b, S05c
 
@@ -313,7 +320,7 @@
   - 依存: T11-2
 - [ ] W11-3 【ユーザー】README を3言語とも利用者の立場で読み、開発者向けの情報が混ざっていないこと、特徴・使い方・対応環境・プライバシーが実物と一致することを確認する
   - 依存: T11-2
-- [ ] W11-4 【ユーザー】`v0.2.0` タグで Actions が成功し（`check:i18n` を含む）、ドラフトリリースに zip が添付されている
+- [ ] W11-4 【ユーザー】`v0.2.0` タグで Actions が成功し（checkコマンドを含む）、ドラフトリリースに zip が添付されている
   - 依存: T11-7
 - [ ] W11-5 【ユーザー】v0.1.0 を開いたことのある端末で `https://lt.rinontech.com/` を開き、更新のお知らせ（S01f）から再読み込みすると v0.2.0 になる（S05b のバージョンで確かめる）
   - 依存: T11-7
